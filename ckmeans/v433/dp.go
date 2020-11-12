@@ -65,10 +65,12 @@ func backtrackWeighted(x, y []float64, J [][]int, counts []int, weights []float6
 	}
 }
 
-func backtrackWeightedX(x, y []float64, J [][]int, cluster []int, centers, withinss, weights []float64) {
+func backtrackWeightedX(x, y []float64, J [][]int, cluster []int, withinss, weights []float64) {
 	K := len(J)
 	N := len(J[0])
 	cluster_right := N - 1
+
+	centers := make([]float64, K) // TODO remove once withinss etc have been extracted
 
 	// Backtrack the clusters from the dynamic programming matrix
 	for k := K - 1; k >= 0; k-- {

@@ -85,10 +85,9 @@ func ckmeans(x, w []float64, kmin, kmax int) (int, []int) {
 	}
 
 	cluster_sorted := make([]int, N)
-	centers := make([]float64, N)
 	withinss := make([]float64, N)
 	size := make([]float64, kmax)
-	backtrackWeightedX(x, w, J, cluster_sorted, centers, withinss, size)
+	backtrackWeightedX(x, w, J, cluster_sorted, withinss, size)
 
 	return kopt, cluster_sorted
 }
