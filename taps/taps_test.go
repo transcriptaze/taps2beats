@@ -32,16 +32,23 @@ var bins = [][]float64{
 }
 
 func TestTaps2Beats(t *testing.T) {
-	t.Skip()
 	expected := []Beat{
-		Beat{},
-		Beat{},
-		Beat{},
-		Beat{},
-		Beat{},
-		Beat{},
-		Beat{},
-		Beat{},
+		Beat{
+			at: time.Duration(4.523694381 * float64(time.Second))},
+		Beat{
+			at: time.Duration(5.057687493 * float64(time.Second))},
+		Beat{
+			at: time.Duration(5.578084204 * float64(time.Second))},
+		Beat{
+			at: time.Duration(6.100485910 * float64(time.Second))},
+		Beat{
+			at: time.Duration(6.618216081 * float64(time.Second))},
+		Beat{
+			at: time.Duration(7.153334491 * float64(time.Second))},
+		Beat{
+			at: time.Duration(7.685755996 * float64(time.Second))},
+		Beat{
+			at: time.Duration(8.210333335 * float64(time.Second))},
 	}
 
 	beats := taps2beats(seconds2taps(taps))
