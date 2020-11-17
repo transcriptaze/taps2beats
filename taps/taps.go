@@ -7,7 +7,8 @@ import (
 )
 
 type Beat struct {
-	at time.Duration
+	at       time.Duration
+	variance time.Duration
 }
 
 func taps2beats(taps [][]time.Duration) []Beat {
@@ -24,7 +25,8 @@ func taps2beats(taps [][]time.Duration) []Beat {
 
 	for _, c := range clusters {
 		beats = append(beats, Beat{
-			at: time.Duration(c.Center * float64(time.Second)),
+			at:       time.Duration(c.Center * float64(time.Second)),
+			variance: time.Duration(c.Variance * float64(time.Second)),
 		})
 	}
 

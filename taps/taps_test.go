@@ -33,28 +33,20 @@ var bins = [][]float64{
 
 func TestTaps2Beats(t *testing.T) {
 	expected := []Beat{
-		Beat{
-			at: time.Duration(4.523694381 * float64(time.Second))},
-		Beat{
-			at: time.Duration(5.057687493 * float64(time.Second))},
-		Beat{
-			at: time.Duration(5.578084204 * float64(time.Second))},
-		Beat{
-			at: time.Duration(6.100485910 * float64(time.Second))},
-		Beat{
-			at: time.Duration(6.618216081 * float64(time.Second))},
-		Beat{
-			at: time.Duration(7.153334491 * float64(time.Second))},
-		Beat{
-			at: time.Duration(7.685755996 * float64(time.Second))},
-		Beat{
-			at: time.Duration(8.210333335 * float64(time.Second))},
+		{at: seconds(4.523694381), variance: seconds(0.003525498)},
+		{at: seconds(5.057687493), variance: seconds(0.008223081)},
+		{at: seconds(5.578084204), variance: seconds(0.004277370)},
+		{at: seconds(6.100485910), variance: seconds(0.004944514)},
+		{at: seconds(6.618216081), variance: seconds(0.007153066)},
+		{at: seconds(7.153334490), variance: seconds(0.004573754)},
+		{at: seconds(7.685755996), variance: seconds(0.005071400)},
+		{at: seconds(8.210333335), variance: seconds(0.012172972)},
 	}
 
 	beats := taps2beats(seconds2taps(taps))
 
 	if !reflect.DeepEqual(expected, beats) {
-		t.Errorf("Invalid result - expected: %v, got: %v", expected, beats)
+		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
 	}
 }
 
@@ -64,10 +56,14 @@ func seconds2taps(floats [][]float64) [][]time.Duration {
 	for _, f := range floats {
 		p := []time.Duration{}
 		for _, g := range f {
-			p = append(p, time.Duration(g*float64(time.Second)))
+			p = append(p, seconds(g))
 		}
 		l = append(l, p)
 	}
 
 	return l
+}
+
+func seconds(g float64) time.Duration {
+	return time.Duration(g * float64(time.Second))
 }

@@ -8,3 +8,5 @@ github.com/twystd/ckmeans.1d.dp/go v0.0.0-20201112225406-7852f7c5b20c h1:Cb5saKy
 github.com/twystd/ckmeans.1d.dp/go v0.0.0-20201112225406-7852f7c5b20c/go.mod h1:pjCcyl+Gq3JN+CfQleMDudpMMt69hGdyDZ0ul6kZ9/Q=
 github.com/twystd/ckmeans.1d.dp/go v0.0.0-20201112234031-85268aaa7646 h1:3sqyshzlftr2QpgywT7mLWd7DZnVkKu1+0QFaOaJbfk=
 github.com/twystd/ckmeans.1d.dp/go v0.0.0-20201112234031-85268aaa7646/go.mod h1:pjCcyl+Gq3JN+CfQleMDudpMMt69hGdyDZ0ul6kZ9/Q=
+github.com/twystd/ckmeans.1d.dp/go v0.0.0-20201117002147-12dde72a0c1a h1:WVS8nQx7ZHzvk2ZVTKqWYA7mrIDzXiTVs1CbdXoNJAw=
+github.com/twystd/ckmeans.1d.dp/go v0.0.0-20201117002147-12dde72a0c1a/go.mod h1:pjCcyl+Gq3JN+CfQleMDudpMMt69hGdyDZ0ul6kZ9/Q=
