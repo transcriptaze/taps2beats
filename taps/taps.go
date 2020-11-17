@@ -11,9 +11,10 @@ type Beat struct {
 	at       time.Duration
 	mean     time.Duration
 	variance time.Duration
+	taps     []time.Duration
 }
 
-func taps2beats(taps [][]time.Duration) ([]Beat, error) {
+func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error) {
 	beats := []Beat{}
 
 	array := []float64{}
@@ -38,10 +39,17 @@ func taps2beats(taps [][]time.Duration) ([]Beat, error) {
 	}
 
 	for i, c := range clusters {
+		t := make([]time.Duration, len(c.Values))
+
+		for i, v := range c.Values {
+			t[i] = seconds(v)
+		}
+
 		beats = append(beats, Beat{
 			at:       seconds(at[i]),
-			mean:     time.Duration(c.Center * float64(time.Second)),
-			variance: time.Duration(c.Variance * float64(time.Second)),
+			mean:     seconds(c.Center),
+			variance: seconds(c.Variance),
+			taps:     t,
 		})
 	}
 
