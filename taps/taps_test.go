@@ -33,7 +33,7 @@ var bins = [][]float64{
 	{8.192470916, 8.203885893, 8.227207848, 8.215609871, 8.215537871, 8.13427303, 8.198270905, 8.244539814, 8.180805939, 8.238953824, 8.26211078},
 }
 
-func TestTaps2Beats(t *testing.T) {
+func TestTaps2BeatsWithoutPadding(t *testing.T) {
 	v := floats2seconds(bins)
 	expected := []Beat{
 		{At: seconds(4.524686644), Mean: seconds(4.523694381), Variance: seconds(0.003525498), Taps: v[0]},
@@ -46,7 +46,7 @@ func TestTaps2Beats(t *testing.T) {
 		{At: seconds(8.207211329), Mean: seconds(8.210333335), Variance: seconds(0.012172972), Taps: v[7]},
 	}
 
-	beats, err := taps2beats(floats2seconds(taps), seconds(0.0), seconds(8.5))
+	beats, err := taps2beats(floats2seconds(taps), seconds(4.5), seconds(8.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -82,26 +82,28 @@ func TestTaps2Beats(t *testing.T) {
 }
 
 func TestExtrapolate(t *testing.T) {
+
 	clusters := []ckmeans.Cluster{
-		{Center: 4.524686644},
-		{Center: 5.050761599},
-		{Center: 5.576836554},
-		{Center: 6.102911509},
-		{Center: 6.628986464},
-		{Center: 7.155061419},
-		{Center: 7.681136374},
-		{Center: 8.207211329},
+		{Center: 4.523694381, Variance: 0.003525498, Values: bins[0]},
+		{Center: 5.057687493, Variance: 0.008223081, Values: bins[1]},
+		{Center: 5.578084204, Variance: 0.004277370, Values: bins[2]},
+		{Center: 6.100485910, Variance: 0.004944514, Values: bins[3]},
+		{Center: 6.618216081, Variance: 0.007153066, Values: bins[4]},
+		{Center: 7.153334490, Variance: 0.004573754, Values: bins[5]},
+		{Center: 7.685755996, Variance: 0.005071400, Values: bins[6]},
+		{Center: 8.210333335, Variance: 0.012172972, Values: bins[7]},
 	}
 
+	v := floats2seconds(bins)
 	expected := []Beat{
-		{At: seconds(4.524686644)},
-		{At: seconds(5.050761599)},
-		{At: seconds(5.576836554)},
-		{At: seconds(6.102911509)},
-		{At: seconds(6.628986464)},
-		{At: seconds(7.155061419)},
-		{At: seconds(7.681136374)},
-		{At: seconds(8.207211329)},
+		{At: seconds(4.524686644), Mean: seconds(4.523694381), Variance: seconds(0.003525498), Taps: v[0]},
+		{At: seconds(5.050761599), Mean: seconds(5.057687493), Variance: seconds(0.008223081), Taps: v[1]},
+		{At: seconds(5.576836554), Mean: seconds(5.578084204), Variance: seconds(0.004277370), Taps: v[2]},
+		{At: seconds(6.102911509), Mean: seconds(6.100485910), Variance: seconds(0.004944514), Taps: v[3]},
+		{At: seconds(6.628986464), Mean: seconds(6.618216081), Variance: seconds(0.007153066), Taps: v[4]},
+		{At: seconds(7.155061419), Mean: seconds(7.153334490), Variance: seconds(0.004573754), Taps: v[5]},
+		{At: seconds(7.681136374), Mean: seconds(7.685755996), Variance: seconds(0.005071400), Taps: v[6]},
+		{At: seconds(8.207211329), Mean: seconds(8.210333335), Variance: seconds(0.012172972), Taps: v[7]},
 	}
 
 	beats, err := extrapolate(clusters, seconds(4.5), seconds(8.5))
@@ -118,22 +120,26 @@ func TestExtrapolate(t *testing.T) {
 					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At.Seconds(), beats[i].At.Seconds())
 				}
 
-				//				if v.mean != beats[i].mean {
-				//					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.mean, beats[i].mean)
-				//				}
-				//
-				//				if v.variance != beats[i].variance {
-				//					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.variance, beats[i].variance)
-				//				}
-				//
-				//				if !reflect.DeepEqual(v.taps, beats[i].taps) {
-				//					for j := range v.taps {
-				//						if math.Abs(beats[i].taps[j].Seconds()-v.taps[j].Seconds()) > 0.0001 {
-				//							t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-				//							break
-				//						}
-				//					}
-				//				}
+				if v.Mean != beats[i].Mean {
+					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
+				}
+
+				if v.Variance != beats[i].Variance {
+					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
+				}
+
+				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
+					if len(beats[i].Taps) != len(v.Taps) {
+						t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
+					} else {
+						for j := range v.Taps {
+							if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.0001 {
+								t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
+								break
+							}
+						}
+					}
+				}
 			}
 		}
 	}

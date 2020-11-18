@@ -20,7 +20,7 @@ func Taps2Beats(taps [][]float64) ([]Beat, error) {
 }
 
 func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error) {
-	beats := []Beat{}
+	//	beats := []Beat{}
 
 	array := []float64{}
 	for _, row := range taps {
@@ -38,57 +38,54 @@ func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error
 		t[i] = c.Center
 	}
 
-	extrapolate(clusters, start, end)
+	return extrapolate(clusters, start, end)
+}
 
-	at, err := regression.Trend(b, t, b)
+func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) ([]Beat, error) {
+	b := interpolate()
+	index := map[int]ckmeans.Cluster{}
+	x := make([]float64, len(clusters))
+	t := make([]float64, len(clusters))
+
+	for i, c := range clusters {
+		x[i] = float64(b[i])
+		t[i] = c.Center
+		index[b[i]] = c
+	}
+
+	m, c, err := regression.Fit(x, t)
 	if err != nil {
 		return nil, err
 	}
 
-	for i, c := range clusters {
-		t := make([]time.Duration, len(c.Values))
+	beats := []Beat{}
+	bmin := int(math.Floor((start.Seconds() - c) / m))
+	bmax := int(math.Ceil((end.Seconds() - c) / m))
 
-		for i, v := range c.Values {
-			t[i] = seconds(v)
+	for bb := bmin; bb <= bmax; bb++ {
+		tt := float64(bb)*m + c
+		if tt >= start.Seconds() && tt <= end.Seconds() {
+			cluster := index[bb]
+			taps := make([]time.Duration, len(cluster.Values))
+
+			for i, v := range cluster.Values {
+				taps[i] = seconds(v)
+			}
+
+			beats = append(beats, Beat{
+				At:       seconds(tt),
+				Mean:     seconds(cluster.Center),
+				Variance: seconds(cluster.Variance),
+				Taps:     taps,
+			})
 		}
-
-		beats = append(beats, Beat{
-			At:       seconds(at[i]),
-			Mean:     seconds(c.Center),
-			Variance: seconds(c.Variance),
-			Taps:     t,
-		})
 	}
 
 	return beats, nil
 }
 
-func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) ([]Beat, error) {
-	b := make([]float64, len(clusters))
-	t := make([]float64, len(clusters))
-
-	for i, c := range clusters {
-		b[i] = float64(i + 1)
-		t[i] = c.Center
-	}
-
-	m, c, err := regression.Fit(b, t)
-	if err != nil {
-		return nil, err
-	}
-
-	bmin := int(math.Floor((start.Seconds() - c) / m))
-	bmax := int(math.Ceil((end.Seconds() - c) / m))
-
-	beats := []Beat{}
-	for bb := bmin; bb <= bmax; bb++ {
-		tt := float64(bb)*m + c
-		if tt >= start.Seconds() && tt <= end.Seconds() {
-			beats = append(beats, Beat{At: seconds(tt)})
-		}
-	}
-
-	return beats, nil
+func interpolate() []int {
+	return []int{1, 2, 3, 4, 5, 6, 7, 8}
 }
 
 func floats2seconds(floats [][]float64) [][]time.Duration {
