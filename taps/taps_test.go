@@ -4,7 +4,8 @@ import (
 	"math"
 	"reflect"
 	"testing"
-	"time"
+
+	"github.com/twystd/ckmeans.1d.dp/go/ckmeans"
 )
 
 var taps = [][]float64{
@@ -33,51 +34,19 @@ var bins = [][]float64{
 }
 
 func TestTaps2Beats(t *testing.T) {
-	v := floats2time(bins)
+	v := floats2seconds(bins)
 	expected := []Beat{
-		{
-			at:       seconds(4.524686644),
-			mean:     seconds(4.523694381),
-			variance: seconds(0.003525498),
-			taps:     v[0]},
-		{
-			at:       seconds(5.050761599),
-			mean:     seconds(5.057687493),
-			variance: seconds(0.008223081),
-			taps:     v[1]},
-		{
-			at:       seconds(5.576836554),
-			mean:     seconds(5.578084204),
-			variance: seconds(0.004277370),
-			taps:     v[2]},
-		{
-			at:       seconds(6.102911509),
-			mean:     seconds(6.100485910),
-			variance: seconds(0.004944514),
-			taps:     v[3]},
-		{
-			at:       seconds(6.628986464),
-			mean:     seconds(6.618216081),
-			variance: seconds(0.007153066),
-			taps:     v[4]},
-		{
-			at:       seconds(7.155061419),
-			mean:     seconds(7.153334490),
-			variance: seconds(0.004573754),
-			taps:     v[5]},
-		{
-			at:       seconds(7.681136374),
-			mean:     seconds(7.685755996),
-			variance: seconds(0.005071400),
-			taps:     v[6]},
-		{
-			at:       seconds(8.207211329),
-			mean:     seconds(8.210333335),
-			variance: seconds(0.012172972),
-			taps:     v[7]},
+		{at: seconds(4.524686644), mean: seconds(4.523694381), variance: seconds(0.003525498), taps: v[0]},
+		{at: seconds(5.050761599), mean: seconds(5.057687493), variance: seconds(0.008223081), taps: v[1]},
+		{at: seconds(5.576836554), mean: seconds(5.578084204), variance: seconds(0.004277370), taps: v[2]},
+		{at: seconds(6.102911509), mean: seconds(6.100485910), variance: seconds(0.004944514), taps: v[3]},
+		{at: seconds(6.628986464), mean: seconds(6.618216081), variance: seconds(0.007153066), taps: v[4]},
+		{at: seconds(7.155061419), mean: seconds(7.153334490), variance: seconds(0.004573754), taps: v[5]},
+		{at: seconds(7.681136374), mean: seconds(7.685755996), variance: seconds(0.005071400), taps: v[6]},
+		{at: seconds(8.207211329), mean: seconds(8.210333335), variance: seconds(0.012172972), taps: v[7]},
 	}
 
-	beats, err := taps2beats(floats2time(taps), seconds(4.5), seconds(8.5))
+	beats, err := taps2beats(floats2seconds(taps), seconds(0.0), seconds(8.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -112,16 +81,60 @@ func TestTaps2Beats(t *testing.T) {
 	}
 }
 
-func floats2time(floats [][]float64) [][]time.Duration {
-	l := [][]time.Duration{}
-
-	for _, f := range floats {
-		p := []time.Duration{}
-		for _, g := range f {
-			p = append(p, seconds(g))
-		}
-		l = append(l, p)
+func TestExtrapolate(t *testing.T) {
+	clusters := []ckmeans.Cluster{
+		{Center: 4.524686644},
+		{Center: 5.050761599},
+		{Center: 5.576836554},
+		{Center: 6.102911509},
+		{Center: 6.628986464},
+		{Center: 7.155061419},
+		{Center: 7.681136374},
+		{Center: 8.207211329},
 	}
 
-	return l
+	expected := []Beat{
+		{at: seconds(4.524686644)},
+		{at: seconds(5.050761599)},
+		{at: seconds(5.576836554)},
+		{at: seconds(6.102911509)},
+		{at: seconds(6.628986464)},
+		{at: seconds(7.155061419)},
+		{at: seconds(7.681136374)},
+		{at: seconds(8.207211329)},
+	}
+
+	beats, err := extrapolate(clusters, seconds(4.5), seconds(8.5))
+	if err != nil {
+		t.Fatalf("Unexpected error (%v)", err)
+	}
+
+	if len(beats) != len(expected) {
+		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+	} else {
+		for i, v := range expected {
+			if !reflect.DeepEqual(v, beats[i]) {
+				if math.Abs(beats[i].at.Seconds()-v.at.Seconds()) > 0.0001 {
+					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.at.Seconds(), beats[i].at.Seconds())
+				}
+
+				//				if v.mean != beats[i].mean {
+				//					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.mean, beats[i].mean)
+				//				}
+				//
+				//				if v.variance != beats[i].variance {
+				//					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.variance, beats[i].variance)
+				//				}
+				//
+				//				if !reflect.DeepEqual(v.taps, beats[i].taps) {
+				//					for j := range v.taps {
+				//						if math.Abs(beats[i].taps[j].Seconds()-v.taps[j].Seconds()) > 0.0001 {
+				//							t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
+				//							break
+				//						}
+				//					}
+				//				}
+			}
+		}
+	}
 }

@@ -9,13 +9,17 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./...
+	go test ./... -run TestExtrapolate
 
 build: format
-	go build ./taps
+	mkdir -p bin
+	go build -o bin ./...
 
 test: build
 	go test ./...
+
+run: build
+	./bin/taps2beats ./runtime/taps.txt
 
 vet: build
 	go vet ./...

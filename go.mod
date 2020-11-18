@@ -1,4 +1,4 @@
-module github.com/twystd/beats
+module github.com/twystd/taps2beats
 
 go 1.14
 
