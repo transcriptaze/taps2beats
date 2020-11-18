@@ -9,14 +9,14 @@ import (
 )
 
 type Beat struct {
-	at       time.Duration
-	mean     time.Duration
-	variance time.Duration
-	taps     []time.Duration
+	At       time.Duration
+	Mean     time.Duration
+	Variance time.Duration
+	Taps     []time.Duration
 }
 
-func Taps2Beats(taps []float64) ([]Beat, error) {
-	return taps2beats(floats2seconds([][]float64{taps}), seconds(0), seconds(8.5))
+func Taps2Beats(taps [][]float64) ([]Beat, error) {
+	return taps2beats(floats2seconds(taps), seconds(0), seconds(8.5))
 }
 
 func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error) {
@@ -53,10 +53,10 @@ func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error
 		}
 
 		beats = append(beats, Beat{
-			at:       seconds(at[i]),
-			mean:     seconds(c.Center),
-			variance: seconds(c.Variance),
-			taps:     t,
+			At:       seconds(at[i]),
+			Mean:     seconds(c.Center),
+			Variance: seconds(c.Variance),
+			Taps:     t,
 		})
 	}
 
@@ -84,7 +84,7 @@ func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) ([]Beat, 
 	for bb := bmin; bb <= bmax; bb++ {
 		tt := float64(bb)*m + c
 		if tt >= start.Seconds() && tt <= end.Seconds() {
-			beats = append(beats, Beat{at: seconds(tt)})
+			beats = append(beats, Beat{At: seconds(tt)})
 		}
 	}
 

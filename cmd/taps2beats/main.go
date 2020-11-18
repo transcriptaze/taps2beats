@@ -9,6 +9,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/twystd/taps2beats/taps"
 )
@@ -75,30 +76,37 @@ func main() {
 	}
 }
 
-func read(f string) ([]float64, error) {
-	b, err := ioutil.ReadFile(f)
+func read(f string) ([][]float64, error) {
+	bytes, err := ioutil.ReadFile(f)
 	if err != nil {
 		return nil, err
 	}
 
-	data := []float64{}
-	tokens := regexp.MustCompile(`\s+`).Split(string(b), -1)
-
-	for _, t := range tokens {
-		if t != "" {
-			if v, err := strconv.ParseFloat(t, 64); err != nil {
-				fmt.Printf("  ** WARN: invalid value (%s)\n", t)
-			} else {
-				data = append(data, v)
+	data := [][]float64{}
+	re := regexp.MustCompile(`\s+`)
+	for _, line := range strings.Split(string(bytes), "\n") {
+		tokens := re.Split(line, -1)
+		row := []float64{}
+		for _, t := range tokens {
+			if t != "" {
+				if v, err := strconv.ParseFloat(t, 64); err != nil {
+					fmt.Printf("  ** WARN: invalid value (%s)\n", t)
+				} else {
+					row = append(row, v)
+				}
 			}
 		}
+
+		data = append(data, row)
 	}
 
 	return data, nil
 }
 
 func print(f io.Writer, beats []taps.Beat) {
-	// fmt.Printf("%v\n", beats)
+	for i, b := range beats {
+		fmt.Fprintf(f, "%d %v %v %v %v\n", i+1, b.At, b.Mean, b.Variance, b.Taps)
+	}
 	//	columns := 0
 	//	for _, b := range beats {
 	//		if len(b.Values) > columns {
