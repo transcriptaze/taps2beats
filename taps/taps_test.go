@@ -234,3 +234,21 @@ func TestExtrapolateWithPostPadding(t *testing.T) {
 		}
 	}
 }
+
+func TestInterpolateWithNoMissingBeats(t *testing.T) {
+	expected := []int{1, 2, 3, 4, 5, 6, 7, 8}
+	beats := interpolate(clusters)
+
+	if !reflect.DeepEqual(beats, expected) {
+		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+	}
+}
+
+func TestInterpolateWithOneMissingBeat(t *testing.T) {
+	expected := []int{1, 2, 3, 4, 5, 6, 8}
+	beats := interpolate([]ckmeans.Cluster{clusters[0], clusters[1], clusters[2], clusters[3], clusters[4], clusters[5], clusters[7]})
+
+	if !reflect.DeepEqual(beats, expected) {
+		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+	}
+}

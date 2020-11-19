@@ -42,7 +42,7 @@ func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error
 }
 
 func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) ([]Beat, error) {
-	b := interpolate()
+	b := interpolate(clusters)
 	index := map[int]ckmeans.Cluster{}
 	x := make([]float64, len(clusters))
 	t := make([]float64, len(clusters))
@@ -84,7 +84,7 @@ func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) ([]Beat, 
 	return beats, nil
 }
 
-func interpolate() []int {
+func interpolate(clusters []ckmeans.Cluster) []int {
 	return []int{1, 2, 3, 4, 5, 6, 7, 8}
 }
 
