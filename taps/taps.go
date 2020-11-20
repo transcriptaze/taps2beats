@@ -1,6 +1,7 @@
 package taps
 
 import (
+	//	"fmt"
 	"math"
 	"time"
 
@@ -20,8 +21,6 @@ func Taps2Beats(taps [][]float64) ([]Beat, error) {
 }
 
 func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error) {
-	//	beats := []Beat{}
-
 	array := []float64{}
 	for _, row := range taps {
 		for _, t := range row {
@@ -31,18 +30,11 @@ func taps2beats(taps [][]time.Duration, start, end time.Duration) ([]Beat, error
 
 	clusters := ckmeans.CKMeans1dDp(array, nil)
 
-	b := make([]float64, len(clusters))
-	t := make([]float64, len(clusters))
-	for i, c := range clusters {
-		b[i] = float64(i + 1)
-		t[i] = c.Center
-	}
-
 	return extrapolate(clusters, start, end)
 }
 
 func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) ([]Beat, error) {
-	b := interpolate(clusters)
+	b := []int{1, 2, 3, 4, 5, 6, 7, 8} // interpolate(clusters)
 	index := map[int]ckmeans.Cluster{}
 	x := make([]float64, len(clusters))
 	t := make([]float64, len(clusters))
@@ -84,8 +76,56 @@ func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) ([]Beat, 
 	return beats, nil
 }
 
+// TODO assumes clusters are time sorted
 func interpolate(clusters []ckmeans.Cluster) []int {
-	return []int{1, 2, 3, 4, 5, 6, 7, 8}
+	N := len(clusters)
+	beats := make([]int, N)
+
+	for i := range clusters {
+		beats[i] = i + 1
+	}
+
+	// ... trivial cases
+	if N < 3 {
+		return beats
+	}
+
+	// ... 3+ intervals
+
+	x0 := clusters[0].Center
+	xn := clusters[N-1].Center
+	y0 := 1.0
+
+	// TODO do forever/gradient descent
+	for i := 0; i < N*2; i++ {
+		yn := float64(N + i)
+		m := (yn - y0) / (xn - x0)
+		c := yn - m*xn
+
+		sumsq := 0.0
+		for j := 0; j < N; j++ {
+			x := clusters[j].Center
+			y := m*x + c
+			beatf := math.Round(y)
+			sumsq += y*y - 2*y*beatf + beatf*beatf
+		}
+
+		variance := sumsq / float64(N-1)
+
+		for j := 0; j < N; j++ {
+			x := clusters[j].Center
+			y := m*x + c
+			beats[j] = int(math.Round(y))
+		}
+
+		//		fmt.Printf("%d: %.8f %v\n", i+1, variance, beats)
+
+		if variance < 0.001 {
+			break
+		}
+	}
+
+	return beats
 }
 
 func floats2seconds(floats [][]float64) [][]time.Duration {

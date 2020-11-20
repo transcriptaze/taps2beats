@@ -235,20 +235,59 @@ func TestExtrapolateWithPostPadding(t *testing.T) {
 	}
 }
 
-func TestInterpolateWithNoMissingBeats(t *testing.T) {
-	expected := []int{1, 2, 3, 4, 5, 6, 7, 8}
-	beats := interpolate(clusters)
+func TestInterpolateForDegenerateCases(t *testing.T) {
+	beats := [][]int{
+		interpolate([]ckmeans.Cluster{}),
+		interpolate([]ckmeans.Cluster{clusters[0]}),
+		interpolate([]ckmeans.Cluster{clusters[0], clusters[7]}),
+	}
+
+	expected := [][]int{
+		{},
+		{1},
+		{1, 2},
+	}
 
 	if !reflect.DeepEqual(beats, expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+		t.Errorf("Invalid interpolation\n   expected: %v\n   got:      %v", expected, beats)
 	}
 }
 
-func TestInterpolateWithOneMissingBeat(t *testing.T) {
-	expected := []int{1, 2, 3, 4, 5, 6, 8}
-	beats := interpolate([]ckmeans.Cluster{clusters[0], clusters[1], clusters[2], clusters[3], clusters[4], clusters[5], clusters[7]})
+func TestInterpolateForThreeIntervals(t *testing.T) {
+	samples := [][]int{
+		{1, 2, 3},
+		{1, 2, 4},
+		{1, 3, 4},
+		{1, 2, 5},
+		{1, 3, 5},
+		{1, 4, 5},
+		{1, 2, 6},
+		{1, 3, 6},
+		{1, 4, 6},
+		{1, 5, 6},
+		{1, 2, 7},
+		{1, 3, 7},
+	}
 
-	if !reflect.DeepEqual(beats, expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+	expected := [][]int{
+		{1, 2, 3},
+		{1, 2, 4},
+		{1, 3, 4},
+		{1, 2, 5},
+		{1, 2, 3},
+		{1, 4, 5},
+		{1, 2, 6},
+		{1, 3, 6},
+		{1, 4, 6},
+		{1, 5, 6},
+		{1, 2, 7},
+		{1, 3, 7},
+	}
+	for i, v := range samples {
+		beats := interpolate([]ckmeans.Cluster{clusters[v[0]-1], clusters[v[1]-1], clusters[v[2]-1]})
+
+		if !reflect.DeepEqual(beats, expected[i]) {
+			t.Errorf("Invalid interpolation [%d] - expected:%v, got:%v", i+1, expected[i], beats)
+		}
 	}
 }
