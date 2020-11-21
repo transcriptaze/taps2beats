@@ -74,10 +74,7 @@ func TestTaps2Beats(t *testing.T) {
 		beats[16], beats[17], beats[18], beats[19],
 	}
 
-	beats, err := taps2beats(floats2seconds(taps), seconds(0), seconds(10.5))
-	if err != nil {
-		t.Fatalf("Unexpected error (%v)", err)
-	}
+	beats := taps2beats(floats2seconds(taps), seconds(0), seconds(10.5))
 
 	if len(beats) != len(expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
@@ -112,10 +109,7 @@ func TestTaps2Beats(t *testing.T) {
 func TestExtrapolate(t *testing.T) {
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
 
-	beats, err := extrapolate(clusters, seconds(4.5), seconds(8.5))
-	if err != nil {
-		t.Fatalf("Unexpected error (%v)", err)
-	}
+	beats := extrapolate(clusters, seconds(4.5), seconds(8.5))
 
 	if len(beats) != len(expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
@@ -154,10 +148,7 @@ func TestExtrapolate(t *testing.T) {
 func TestExtrapolateWithPrePadding(t *testing.T) {
 	expected := []Beat{beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7], beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
 
-	beats, err := extrapolate(clusters, seconds(0), seconds(8.5))
-	if err != nil {
-		t.Fatalf("Unexpected error (%v)", err)
-	}
+	beats := extrapolate(clusters, seconds(0), seconds(8.5))
 
 	if len(beats) != len(expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
@@ -196,10 +187,7 @@ func TestExtrapolateWithPrePadding(t *testing.T) {
 func TestExtrapolateWithPostPadding(t *testing.T) {
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15], beats[16], beats[17], beats[18], beats[19]}
 
-	beats, err := extrapolate(clusters, seconds(4), seconds(10.5))
-	if err != nil {
-		t.Fatalf("Unexpected error (%v)", err)
-	}
+	beats := extrapolate(clusters, seconds(4), seconds(10.5))
 
 	if len(beats) != len(expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
@@ -253,20 +241,14 @@ func TestInterpolateForDegenerateCases(t *testing.T) {
 	}
 }
 
-func TestInterpolateForThreeIntervals(t *testing.T) {
+func TestInterpolateForThreeBeats(t *testing.T) {
 	samples := [][]int{
 		{1, 2, 3},
-		{1, 2, 4},
-		{1, 3, 4},
-		{1, 2, 5},
-		{1, 3, 5},
-		{1, 4, 5},
-		{1, 2, 6},
-		{1, 3, 6},
-		{1, 4, 6},
-		{1, 5, 6},
-		{1, 2, 7},
-		{1, 3, 7},
+		{1, 2, 4}, {1, 3, 4},
+		{1, 2, 5}, {1, 3, 5}, {1, 4, 5},
+		{1, 2, 6}, {1, 3, 6}, {1, 4, 6}, {1, 5, 6},
+		{1, 2, 7}, {1, 3, 7}, {1, 4, 7}, {1, 5, 7}, {1, 6, 7},
+		{1, 2, 8}, {1, 3, 8}, {1, 4, 8}, {1, 5, 8}, {1, 6, 8}, {1, 7, 8},
 	}
 
 	expected := [][]int{
@@ -274,17 +256,124 @@ func TestInterpolateForThreeIntervals(t *testing.T) {
 		{1, 2, 4},
 		{1, 3, 4},
 		{1, 2, 5},
-		{1, 2, 3},
+		{1, 2, 3}, // {1, 3, 5}
 		{1, 4, 5},
 		{1, 2, 6},
 		{1, 3, 6},
 		{1, 4, 6},
 		{1, 5, 6},
 		{1, 2, 7},
-		{1, 3, 7},
+		{1, 2, 4}, // {1, 3, 7},
+		{1, 2, 3}, // {1, 4, 7},
+		{1, 3, 4}, // {1, 5, 7},
+		{1, 6, 7},
+		{1, 2, 8},
+		{1, 3, 8},
+		{1, 4, 8},
+		{1, 5, 8},
+		{1, 6, 8},
+		{1, 7, 8},
 	}
 	for i, v := range samples {
-		beats := interpolate([]ckmeans.Cluster{clusters[v[0]-1], clusters[v[1]-1], clusters[v[2]-1]})
+		c := []ckmeans.Cluster{}
+		for _, ix := range v {
+			c = append(c, clusters[ix-1])
+		}
+
+		beats := interpolate(c)
+
+		if !reflect.DeepEqual(beats, expected[i]) {
+			t.Errorf("Invalid interpolation [%d] - expected:%v, got:%v", i+1, expected[i], beats)
+		}
+	}
+}
+
+func TestInterpolateForFourBeats(t *testing.T) {
+	samples := [][]int{
+		{1, 2, 3, 4},
+		{1, 2, 3, 5}, {1, 2, 4, 5}, {1, 3, 4, 5},
+		{1, 2, 3, 6}, {1, 2, 4, 6}, {1, 2, 5, 6}, {1, 3, 4, 6}, {1, 3, 5, 6}, {1, 4, 5, 6},
+		{1, 2, 3, 7}, {1, 2, 4, 7}, {1, 2, 5, 7}, {1, 2, 6, 7}, {1, 3, 4, 7}, {1, 3, 5, 7}, {1, 3, 6, 7}, {1, 4, 5, 7}, {1, 4, 6, 7}, {1, 5, 6, 7},
+		{1, 2, 3, 8}, {1, 2, 4, 8}, {1, 2, 5, 8}, {1, 2, 6, 8}, {1, 2, 7, 8}, {1, 3, 4, 8}, {1, 3, 5, 8}, {1, 3, 6, 8}, {1, 3, 7, 8}, {1, 4, 5, 8},
+		{1, 4, 6, 8}, {1, 4, 7, 8}, {1, 5, 6, 8}, {1, 5, 7, 8}, {1, 6, 7, 8},
+	}
+
+	expected := [][]int{
+		{1, 2, 3, 4},
+		{1, 2, 3, 5},
+		{1, 2, 4, 5},
+		{1, 3, 4, 5},
+		{1, 2, 3, 6},
+		{1, 2, 4, 6},
+		{1, 2, 5, 6},
+		{1, 3, 4, 6},
+		{1, 3, 5, 6},
+		{1, 4, 5, 6},
+		{1, 2, 3, 7},
+		{1, 2, 4, 7},
+		{1, 2, 5, 7},
+		{1, 2, 6, 7},
+		{1, 3, 4, 7},
+		{1, 2, 3, 4}, // {1, 3, 5, 7},
+		{1, 3, 6, 7},
+		{1, 4, 5, 7},
+		{1, 4, 6, 7},
+		{1, 5, 6, 7},
+		{1, 2, 3, 8},
+		{1, 2, 4, 8},
+		{1, 2, 5, 8},
+		{1, 2, 6, 8},
+		{1, 2, 7, 8},
+		{1, 3, 4, 8},
+		{1, 3, 5, 8},
+		{1, 3, 6, 8},
+		{1, 3, 7, 8},
+		{1, 4, 5, 8},
+		{1, 4, 6, 8},
+		{1, 4, 7, 8},
+		{1, 5, 6, 8},
+		{1, 5, 7, 8},
+		{1, 6, 7, 8},
+	}
+
+	for i, v := range samples {
+		c := []ckmeans.Cluster{}
+		for _, ix := range v {
+			c = append(c, clusters[ix-1])
+		}
+
+		beats := interpolate(c)
+
+		if !reflect.DeepEqual(beats, expected[i]) {
+			t.Errorf("Invalid interpolation [%d] - expected:%v, got:%v", i+1, expected[i], beats)
+		}
+	}
+}
+
+func TestInterpolateForFiveBeats(t *testing.T) {
+	samples := [][]int{
+		{1, 2, 3, 4, 5},
+		{1, 2, 3, 4, 6}, {1, 2, 3, 5, 6}, {1, 2, 4, 5, 6}, {1, 3, 4, 5, 6},
+		{1, 2, 3, 4, 7}, {1, 2, 3, 5, 7}, {1, 2, 4, 5, 7}, {1, 3, 4, 5, 7}, {1, 2, 3, 6, 7}, {1, 2, 4, 6, 7}, {1, 2, 5, 6, 7}, {1, 3, 5, 6, 7}, {1, 4, 5, 6, 7},
+		{1, 2, 3, 4, 8}, {1, 2, 3, 5, 8}, {1, 2, 4, 5, 8}, {1, 3, 4, 5, 8}, {1, 2, 3, 6, 8}, {1, 2, 4, 6, 8}, {1, 2, 5, 6, 8}, {1, 3, 5, 6, 8}, {1, 4, 5, 6, 8},
+		{1, 2, 3, 7, 8}, {1, 2, 4, 7, 8}, {1, 2, 5, 7, 8}, {1, 3, 5, 7, 8}, {1, 4, 5, 7, 8}, {1, 2, 6, 7, 8}, {1, 3, 6, 7, 8}, {1, 4, 6, 7, 8}, {1, 5, 6, 7, 8},
+	}
+
+	expected := [][]int{
+		{1, 2, 3, 4, 5},
+		{1, 2, 3, 4, 6}, {1, 2, 3, 5, 6}, {1, 2, 4, 5, 6}, {1, 3, 4, 5, 6},
+		{1, 2, 3, 4, 7}, {1, 2, 3, 5, 7}, {1, 2, 4, 5, 7}, {1, 3, 4, 5, 7}, {1, 2, 3, 6, 7}, {1, 2, 4, 6, 7}, {1, 2, 5, 6, 7}, {1, 3, 5, 6, 7}, {1, 4, 5, 6, 7},
+		{1, 2, 3, 4, 8}, {1, 2, 3, 5, 8}, {1, 2, 4, 5, 8}, {1, 3, 4, 5, 8}, {1, 2, 3, 6, 8}, {1, 2, 4, 6, 8}, {1, 2, 5, 6, 8}, {1, 3, 5, 6, 8}, {1, 4, 5, 6, 8},
+		{1, 2, 3, 7, 8}, {1, 2, 4, 7, 8}, {1, 2, 5, 7, 8}, {1, 3, 5, 7, 8}, {1, 4, 5, 7, 8}, {1, 2, 6, 7, 8}, {1, 3, 6, 7, 8}, {1, 4, 6, 7, 8}, {1, 5, 6, 7, 8},
+	}
+
+	for i, v := range samples {
+		c := []ckmeans.Cluster{}
+		for _, ix := range v {
+			c = append(c, clusters[ix-1])
+		}
+
+		beats := interpolate(c)
 
 		if !reflect.DeepEqual(beats, expected[i]) {
 			t.Errorf("Invalid interpolation [%d] - expected:%v, got:%v", i+1, expected[i], beats)

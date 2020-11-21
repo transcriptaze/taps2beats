@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestInterpolate
+	go test ./... -run TestInterpolateDebug
 
 build: format
 	mkdir -p bin
