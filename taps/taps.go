@@ -36,9 +36,10 @@ func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) []Beat {
 	beats := []Beat{}
 
 	if len(clusters) < 2 {
+		// TODO
 	} else {
 
-		b := []int{1, 2, 3, 4, 5, 6, 7, 8} // interpolate(clusters)
+		b := interpolate(clusters)
 		index := map[int]ckmeans.Cluster{}
 		x := make([]float64, len(clusters))
 		t := make([]float64, len(clusters))
@@ -73,6 +74,7 @@ func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) []Beat {
 			}
 		}
 	}
+
 	return beats
 }
 

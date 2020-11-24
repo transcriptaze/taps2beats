@@ -1,6 +1,5 @@
 ## IN PROGRESS
 
-- [ ] Interpolate missing beats
 - [ ] Limit number of interpolation loops to a 'reasonable' number based on max BPM * 16beats/measure (or somesuch)
 - [ ] --no-quantize
 - [ ] Estimate BPM and offset
@@ -10,6 +9,7 @@
 - [ ] JSON output
 
 - [x] Extend beats to min/max
+- [x] Interpolate missing beats
 
 ## TODO
 

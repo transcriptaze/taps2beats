@@ -4,6 +4,7 @@ import (
 	"math"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/twystd/ckmeans.1d.dp/go/ckmeans"
 )
@@ -82,6 +83,66 @@ func TestTaps2Beats(t *testing.T) {
 		for i, v := range expected {
 			if !reflect.DeepEqual(v, beats[i]) {
 				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.00001 {
+					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At, beats[i].At)
+				}
+
+				if v.Mean != beats[i].Mean {
+					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
+				}
+
+				if v.Variance != beats[i].Variance {
+					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
+				}
+
+				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
+					for j := range v.Taps {
+						if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.0001 {
+							t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
+							break
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func TestTaps2BeatsWithMissingBeat(t *testing.T) {
+	taps := [][]float64{
+		{4.570271991, 5.063594027, 5.603539973, 6.102690998, 6.642708943, 7.710649857, 8.192470916},
+		{4.506176116, 5.045971061, 5.591722996, 6.114172975, 6.619153989, 7.693071891, 8.203885893},
+		{4.52956007, 5.057670039, 5.591721996, 6.13742393, 6.630941966, 7.69897488, 8.227207848},
+		{4.52956007, 5.069284016, 5.603428973, 6.102591998, 6.613455, 7.69912088, 8.215609871},
+		{4.517865093, 5.022782107, 5.580101018, 6.096715009, 6.654118921, 7.681405914, 8.215537871},
+		{5.133092891, 5.545395086, 6.067721066, 6.578564068, 7.652464971, 8.13427303},
+		{4.494581138, 5.040234073, 5.562732052, 6.079333043, 6.624973977, 7.664070948, 8.198270905},
+		{4.52940807, 5.040295073, 5.556940064, 6.131584941, 6.654145921, 7.722112835, 8.244539814},
+		{4.523631082, 5.046071061, 5.586102007, 6.09099502, 6.596029034, 7.652501971, 8.180805939},
+		{4.517979093, 5.046165061, 5.551068075, 6.073547054, 6.607636011, 7.687334903, 8.238953825},
+		{4.517911093, 5.069403016, 5.586174007, 6.108568986, 6.578649068, 7.681606914, 8.26211078},
+	}
+
+	expected := []Beat{
+		beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7],
+		beats[8],
+		beats[9],
+		beats[10],
+		beats[11],
+		beats[12],
+		Beat{At: seconds(7.155061419), Mean: seconds(0), Variance: seconds(0), Taps: []time.Duration{}},
+		beats[14],
+		beats[15],
+		beats[16], beats[17], beats[18], beats[19],
+	}
+
+	beats := taps2beats(floats2seconds(taps), seconds(0.0), seconds(10.5))
+
+	if len(beats) != len(expected) {
+		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+	} else {
+		for i, v := range expected {
+			if !reflect.DeepEqual(v, beats[i]) {
+				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.001 {
 					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At, beats[i].At)
 				}
 
