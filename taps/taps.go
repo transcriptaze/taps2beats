@@ -1,6 +1,7 @@
 package taps
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -15,11 +16,7 @@ type Beat struct {
 	Taps     []time.Duration
 }
 
-func Taps2Beats(taps [][]float64) ([]Beat, error) {
-	return taps2beats(floats2seconds(taps), seconds(0), seconds(8.5)), nil
-}
-
-func taps2beats(taps [][]time.Duration, start, end time.Duration) []Beat {
+func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 	array := []float64{}
 	for _, row := range taps {
 		for _, t := range row {
@@ -29,17 +26,39 @@ func taps2beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 
 	clusters := ckmeans.CKMeans1dDp(array, nil)
 
-	return extrapolate(clusters, start, end)
+	// TODO sort clusters by time (just in case)
+
+	b, err := interpolate(clusters)
+	if err != nil {
+		beats := make([]Beat, len(clusters))
+		for i, cluster := range clusters {
+			taps := make([]time.Duration, len(cluster.Values))
+
+			for i, v := range cluster.Values {
+				taps[i] = Seconds(v)
+			}
+
+			beats[i] = Beat{
+				At:       Seconds(cluster.Center),
+				Mean:     Seconds(cluster.Center),
+				Variance: Seconds(cluster.Variance),
+				Taps:     taps,
+			}
+		}
+
+		return beats
+	}
+
+	return extrapolate(clusters, b, start, end)
 }
 
-func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) []Beat {
+func extrapolate(clusters []ckmeans.Cluster, b []int, start, end time.Duration) []Beat {
 	beats := []Beat{}
 
 	if len(clusters) < 2 {
 		// TODO
 	} else {
 
-		b := interpolate(clusters)
 		index := map[int]ckmeans.Cluster{}
 		x := make([]float64, len(clusters))
 		t := make([]float64, len(clusters))
@@ -62,13 +81,13 @@ func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) []Beat {
 				taps := make([]time.Duration, len(cluster.Values))
 
 				for i, v := range cluster.Values {
-					taps[i] = seconds(v)
+					taps[i] = Seconds(v)
 				}
 
 				beats = append(beats, Beat{
-					At:       seconds(tt),
-					Mean:     seconds(cluster.Center),
-					Variance: seconds(cluster.Variance),
+					At:       Seconds(tt),
+					Mean:     Seconds(cluster.Center),
+					Variance: Seconds(cluster.Variance),
 					Taps:     taps,
 				})
 			}
@@ -78,8 +97,9 @@ func extrapolate(clusters []ckmeans.Cluster, start, end time.Duration) []Beat {
 	return beats
 }
 
-// TODO assumes clusters are time sorted
-func interpolate(clusters []ckmeans.Cluster) []int {
+/* NOTE: assumes clusters are time sorted
+ */
+func interpolate(clusters []ckmeans.Cluster) ([]int, error) {
 	N := len(clusters)
 	beats := make([]int, N)
 
@@ -89,7 +109,7 @@ func interpolate(clusters []ckmeans.Cluster) []int {
 
 	// ... trivial cases
 	if N <= 2 {
-		return beats
+		return beats, nil
 	}
 
 	// ... 3+ intervals
@@ -110,6 +130,7 @@ func interpolate(clusters []ckmeans.Cluster) []int {
 		y := m*x + c
 		beatf := math.Round(y)
 		sumsq += y*y - 2*y*beatf + beatf*beatf
+		beats[j] = int(math.Round(y))
 	}
 
 	variance := sumsq / float64(N-1)
@@ -140,16 +161,23 @@ func interpolate(clusters []ckmeans.Cluster) []int {
 		}
 	}
 
-	return beats
+	// check beats are unique and monotonically increasinge
+	for i := 1; i < len(beats); i++ {
+		if beats[i] <= beats[i-1] {
+			return nil, fmt.Errorf("Error interpolating beats: %v", beats)
+		}
+	}
+
+	return beats, nil
 }
 
-func floats2seconds(floats [][]float64) [][]time.Duration {
+func Floats2Seconds(floats [][]float64) [][]time.Duration {
 	l := [][]time.Duration{}
 
 	for _, f := range floats {
 		p := []time.Duration{}
 		for _, g := range f {
-			p = append(p, seconds(g))
+			p = append(p, Seconds(g))
 		}
 		l = append(l, p)
 	}
@@ -157,6 +185,6 @@ func floats2seconds(floats [][]float64) [][]time.Duration {
 	return l
 }
 
-func seconds(g float64) time.Duration {
+func Seconds(g float64) time.Duration {
 	return time.Duration(g * float64(time.Second))
 }
