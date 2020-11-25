@@ -45,6 +45,17 @@ var clusters = []ckmeans.Cluster{
 	{Center: 8.210333335, Variance: 0.012172972, Values: bins[7]},
 }
 
+var clustersm = map[int]ckmeans.Cluster{
+	1: clusters[0],
+	2: clusters[1],
+	3: clusters[2],
+	4: clusters[3],
+	5: clusters[4],
+	6: clusters[5],
+	7: clusters[6],
+	8: clusters[7],
+}
+
 var beats = []Beat{
 	{At: Seconds(0.316087003)},
 	{At: Seconds(0.842161958)},
@@ -133,28 +144,28 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 
 func TestExtrapolate(t *testing.T) {
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(clusters, []int{1, 2, 3, 4, 5, 6, 7, 8}, Seconds(4.5), Seconds(8.5))
+	beats := extrapolate(clustersm, Seconds(4.5), Seconds(8.5))
 
 	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithPrePadding(t *testing.T) {
 	expected := []Beat{beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7], beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(clusters, []int{1, 2, 3, 4, 5, 6, 7, 8}, Seconds(0), Seconds(8.5))
+	beats := extrapolate(clustersm, Seconds(0), Seconds(8.5))
 
 	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithPostPadding(t *testing.T) {
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15], beats[16], beats[17], beats[18], beats[19]}
-	beats := extrapolate(clusters, []int{1, 2, 3, 4, 5, 6, 7, 8}, Seconds(4), Seconds(10.5))
+	beats := extrapolate(clustersm, Seconds(4), Seconds(10.5))
 
 	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithNoClusters(t *testing.T) {
 	expected := []Beat{}
-	beats := extrapolate([]ckmeans.Cluster{}, []int{}, Seconds(4.5), Seconds(8.5))
+	beats := extrapolate(map[int]ckmeans.Cluster{}, Seconds(4.5), Seconds(8.5))
 
 	if !reflect.DeepEqual(beats, expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
@@ -171,7 +182,9 @@ func TestExtrapolateWithOneCluster(t *testing.T) {
 		},
 	}
 
-	beats := extrapolate([]ckmeans.Cluster{clusters[0]}, []int{1}, Seconds(4.5), Seconds(8.5))
+	beats := extrapolate(map[int]ckmeans.Cluster{
+		1: clusters[0],
+	}, Seconds(4.5), Seconds(8.5))
 
 	compare(beats, expected, t)
 }
@@ -228,7 +241,10 @@ func TestExtrapolateWithTwoClusters(t *testing.T) {
 		},
 	}
 
-	beats := extrapolate([]ckmeans.Cluster{clusters[0], clusters[2]}, []int{1, 2}, Seconds(0), Seconds(8.5))
+	beats := extrapolate(map[int]ckmeans.Cluster{
+		1: clusters[0],
+		2: clusters[2],
+	}, Seconds(0), Seconds(8.5))
 
 	compare(beats, expected, t)
 }

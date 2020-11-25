@@ -30,76 +30,54 @@ func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 
 	b, err := interpolate(clusters)
 	if err != nil {
-		beats := make([]Beat, len(clusters))
-		for i, cluster := range clusters {
-			taps := make([]time.Duration, len(cluster.Values))
-
-			for i, v := range cluster.Values {
-				taps[i] = Seconds(v)
-			}
-
-			beats[i] = Beat{
-				At:       Seconds(cluster.Center),
-				Mean:     Seconds(cluster.Center),
-				Variance: Seconds(cluster.Variance),
-				Taps:     taps,
-			}
+		beats := []Beat{}
+		for _, cluster := range clusters {
+			beats = append(beats, makeBeat(cluster.Center, cluster))
 		}
 
 		return beats
 	}
 
-	beats := extrapolate(clusters, b, start, end)
+	m := map[int]ckmeans.Cluster{}
+
+	for i, c := range clusters {
+		m[b[i]] = c
+	}
+
+	beats := extrapolate(m, start, end)
 
 	// TODO sort beats by time
 
 	return beats
 }
 
-func extrapolate(clusters []ckmeans.Cluster, b []int, start, end time.Duration) []Beat {
-	if len(clusters) != len(b) {
-		panic("Expected 'b' index array to match list of clusters")
-	}
-
+func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) []Beat {
 	beats := []Beat{}
 
 	if len(clusters) < 2 {
 		for _, cluster := range clusters {
 			beats = append(beats, makeBeat(cluster.Center, cluster))
 		}
-	} else {
-		index := map[int]ckmeans.Cluster{}
-		x := make([]float64, len(clusters))
-		t := make([]float64, len(clusters))
 
-		for i, c := range clusters {
-			x[i] = float64(b[i])
-			t[i] = c.Center
-			index[b[i]] = c
-		}
+		return beats
+	}
 
-		m, c := regression.OLS(x, t)
+	x := []float64{}
+	t := []float64{}
+	for ix, c := range clusters {
+		x = append(x, float64(ix))
+		t = append(t, c.Center)
+	}
 
-		bmin := int(math.Floor((start.Seconds() - c) / m))
-		bmax := int(math.Ceil((end.Seconds() - c) / m))
+	m, c := regression.OLS(x, t)
 
-		for bb := bmin; bb <= bmax; bb++ {
-			tt := float64(bb)*m + c
-			if tt >= start.Seconds() && tt <= end.Seconds() {
-				cluster := index[bb]
-				taps := make([]time.Duration, len(cluster.Values))
+	bmin := int(math.Floor((start.Seconds() - c) / m))
+	bmax := int(math.Ceil((end.Seconds() - c) / m))
 
-				for i, v := range cluster.Values {
-					taps[i] = Seconds(v)
-				}
-
-				beats = append(beats, Beat{
-					At:       Seconds(tt),
-					Mean:     Seconds(cluster.Center),
-					Variance: Seconds(cluster.Variance),
-					Taps:     taps,
-				})
-			}
+	for bb := bmin; bb <= bmax; bb++ {
+		tt := float64(bb)*m + c
+		if tt >= start.Seconds() && tt <= end.Seconds() {
+			beats = append(beats, makeBeat(tt, clusters[bb]))
 		}
 	}
 
