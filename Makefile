@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestTaps2BeatsWithWeirdData
+	go test ./... -run TestExtrapolateWithTwoClusters
 
 build: format
 	mkdir -p bin

@@ -77,34 +77,7 @@ func TestTaps2Beats(t *testing.T) {
 
 	beats := Taps2Beats(Floats2Seconds(taps), Seconds(0), Seconds(10.5))
 
-	if len(beats) != len(expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
-	} else {
-		for i, v := range expected {
-			if !reflect.DeepEqual(v, beats[i]) {
-				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.00001 {
-					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At, beats[i].At)
-				}
-
-				if v.Mean != beats[i].Mean {
-					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
-				}
-
-				if v.Variance != beats[i].Variance {
-					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
-				}
-
-				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
-					for j := range v.Taps {
-						if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.0001 {
-							t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-							break
-						}
-					}
-				}
-			}
-		}
-	}
+	compare(beats, expected, t)
 }
 
 func TestTaps2BeatsWithMissingBeat(t *testing.T) {
@@ -137,38 +110,7 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 
 	beats := Taps2Beats(Floats2Seconds(taps), Seconds(0.0), Seconds(10.5))
 
-	if len(beats) != len(expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
-	} else {
-		for i, v := range expected {
-			if !reflect.DeepEqual(v, beats[i]) {
-				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.001 {
-					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At, beats[i].At)
-				}
-
-				if math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()) > 0.001 {
-					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
-				}
-
-				if math.Abs(beats[i].Variance.Seconds()-v.Variance.Seconds()) > 0.001 {
-					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
-				}
-
-				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
-					if len(beats[i].Taps) != len(v.Taps) {
-						t.Errorf("Invalid beat %d 'taps'\n   expected: %v\n   got:      %v", i+1, v.Taps, beats[i].Taps)
-					} else {
-						for j := range v.Taps {
-							if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.001 {
-								t.Errorf("Invalid beat %d 'taps'\n   expected: %v\n   got:      %v", i+1, v.Taps, beats[i].Taps)
-								break
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	compare(beats, expected, t)
 }
 
 func TestTaps2BeatsWithWeirdData(t *testing.T) {
@@ -186,155 +128,109 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 
 	beats := Taps2Beats(Floats2Seconds(taps), Seconds(0.0), Seconds(60.0))
 
-	if len(beats) != len(expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
-	} else {
-		for i, v := range expected {
-			if !reflect.DeepEqual(v, beats[i]) {
-				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.001 {
-					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At, beats[i].At)
-				}
-
-				if math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()) > 0.001 {
-					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
-				}
-
-				if math.Abs(beats[i].Variance.Seconds()-v.Variance.Seconds()) > 0.001 {
-					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
-				}
-
-				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
-					if len(beats[i].Taps) != len(v.Taps) {
-						t.Errorf("Invalid beat %d 'taps'\n   expected: %v\n   got:      %v", i+1, v.Taps, beats[i].Taps)
-					} else {
-						for j := range v.Taps {
-							if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.001 {
-								t.Errorf("Invalid beat %d 'taps'\n   expected: %v\n   got:      %v", i+1, v.Taps, beats[i].Taps)
-								break
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	compare(beats, expected, t)
 }
 
 func TestExtrapolate(t *testing.T) {
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-
 	beats := extrapolate(clusters, []int{1, 2, 3, 4, 5, 6, 7, 8}, Seconds(4.5), Seconds(8.5))
 
-	if len(beats) != len(expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
-	} else {
-		for i, v := range expected {
-			if !reflect.DeepEqual(v, beats[i]) {
-				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.0001 {
-					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At.Seconds(), beats[i].At.Seconds())
-				}
-
-				if v.Mean != beats[i].Mean {
-					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
-				}
-
-				if v.Variance != beats[i].Variance {
-					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
-				}
-
-				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
-					if len(beats[i].Taps) != len(v.Taps) {
-						t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-					} else {
-						for j := range v.Taps {
-							if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.0001 {
-								t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-								break
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithPrePadding(t *testing.T) {
 	expected := []Beat{beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7], beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-
 	beats := extrapolate(clusters, []int{1, 2, 3, 4, 5, 6, 7, 8}, Seconds(0), Seconds(8.5))
 
-	if len(beats) != len(expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
-	} else {
-		for i, v := range expected {
-			if !reflect.DeepEqual(v, beats[i]) {
-				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.0001 {
-					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At.Seconds(), beats[i].At.Seconds())
-				}
-
-				if v.Mean != beats[i].Mean {
-					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
-				}
-
-				if v.Variance != beats[i].Variance {
-					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
-				}
-
-				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
-					if len(beats[i].Taps) != len(v.Taps) {
-						t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-					} else {
-						for j := range v.Taps {
-							if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.0001 {
-								t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-								break
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithPostPadding(t *testing.T) {
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15], beats[16], beats[17], beats[18], beats[19]}
-
 	beats := extrapolate(clusters, []int{1, 2, 3, 4, 5, 6, 7, 8}, Seconds(4), Seconds(10.5))
 
-	if len(beats) != len(expected) {
+	compare(beats, expected, t)
+}
+
+func TestExtrapolateWithNoClusters(t *testing.T) {
+	expected := []Beat{}
+	beats := extrapolate([]ckmeans.Cluster{}, []int{}, Seconds(4.5), Seconds(8.5))
+
+	if !reflect.DeepEqual(beats, expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
-	} else {
-		for i, v := range expected {
-			if !reflect.DeepEqual(v, beats[i]) {
-				if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.0001 {
-					t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v", i+1, v.At.Seconds(), beats[i].At.Seconds())
-				}
-
-				if v.Mean != beats[i].Mean {
-					t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v", i+1, v.Mean, beats[i].Mean)
-				}
-
-				if v.Variance != beats[i].Variance {
-					t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v", i+1, v.Variance, beats[i].Variance)
-				}
-
-				if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
-					if len(beats[i].Taps) != len(v.Taps) {
-						t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-					} else {
-						for j := range v.Taps {
-							if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.0001 {
-								t.Errorf("Invalid beat %d\n   expected: %v\n   got:      %v", i+1, v, beats[i])
-								break
-							}
-						}
-					}
-				}
-			}
-		}
 	}
+}
+
+func TestExtrapolateWithOneCluster(t *testing.T) {
+	expected := []Beat{
+		Beat{
+			At:       Seconds(4.523694381),
+			Mean:     Seconds(4.523694381),
+			Variance: Seconds(0.003525498),
+			Taps:     seconds(4.570271991, 4.506176116, 4.52956007, 4.52956007, 4.517865093, 4.494581138, 4.52940807, 4.523631082, 4.517979093, 4.517911093),
+		},
+	}
+
+	beats := extrapolate([]ckmeans.Cluster{clusters[0]}, []int{1}, Seconds(4.5), Seconds(8.5))
+
+	compare(beats, expected, t)
+}
+
+func TestExtrapolateWithTwoClusters(t *testing.T) {
+	expected := []Beat{
+		Beat{
+			At:       Seconds(0.306),
+			Mean:     Seconds(0),
+			Variance: Seconds(0),
+			Taps:     seconds(),
+		},
+		Beat{
+			At:       Seconds(1.361),
+			Mean:     Seconds(0),
+			Variance: Seconds(0),
+			Taps:     seconds(),
+		},
+		Beat{
+			At:       Seconds(2.415),
+			Mean:     Seconds(0),
+			Variance: Seconds(0),
+			Taps:     seconds(),
+		},
+		Beat{
+			At:       Seconds(3.469),
+			Mean:     Seconds(0),
+			Variance: Seconds(0),
+			Taps:     seconds(),
+		},
+		Beat{
+			At:       Seconds(4.524),
+			Mean:     Seconds(4.524),
+			Variance: Seconds(0.003),
+			Taps:     seconds(4.570, 4.506, 4.530, 4.530, 4.518, 4.495, 4.529, 4.524, 4.518, 4.518),
+		},
+		Beat{
+			At:       Seconds(5.578),
+			Mean:     Seconds(5.578),
+			Variance: Seconds(0.004),
+			Taps:     seconds(5.604, 5.592, 5.592, 5.603, 5.580, 5.545, 5.563, 5.557, 5.586, 5.551, 5.586),
+		},
+		Beat{
+			At:       Seconds(6.632),
+			Mean:     Seconds(0),
+			Variance: Seconds(0),
+			Taps:     seconds(),
+		},
+		Beat{
+			At:       Seconds(7.687),
+			Mean:     Seconds(0),
+			Variance: Seconds(0),
+			Taps:     seconds(),
+		},
+	}
+
+	beats := extrapolate([]ckmeans.Cluster{clusters[0], clusters[2]}, []int{1, 2}, Seconds(0), Seconds(8.5))
+
+	compare(beats, expected, t)
 }
 
 func TestInterpolateForDegenerateCases(t *testing.T) {
@@ -529,5 +425,52 @@ func TestInterpolateWithPathologicalData(t *testing.T) {
 	_, err := interpolate(clusters)
 	if err == nil {
 		t.Fatalf("Expected error, got %v", err)
+	}
+}
+
+func seconds(floats ...float64) []time.Duration {
+	l := []time.Duration{}
+
+	for _, f := range floats {
+		l = append(l, Seconds(f))
+	}
+
+	return l
+}
+
+func compare(beats, expected []Beat, t *testing.T) {
+	if len(beats) != len(expected) {
+		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+		return
+	}
+
+	for i, v := range expected {
+		if !reflect.DeepEqual(v, beats[i]) {
+			if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.001 {
+				t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v (delta:%.4f)", i+1, v.At, beats[i].At, math.Abs(beats[i].At.Seconds()-v.At.Seconds()))
+			}
+
+			if math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()) > 0.001 {
+				t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v (delta:%.4f)", i+1, v.Mean, beats[i].Mean, math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()))
+			}
+
+			if math.Abs(beats[i].Variance.Seconds()-v.Variance.Seconds()) > 0.001 {
+				t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v (delta:%.4f)", i+1, v.Variance, beats[i].Variance, math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()))
+			}
+
+			if !reflect.DeepEqual(v.Taps, beats[i].Taps) {
+				if len(beats[i].Taps) != len(v.Taps) {
+					t.Errorf("Invalid beat %d 'taps'\n   expected: %v\n   got:      %v", i+1, v.Taps, beats[i].Taps)
+					continue
+				}
+
+				for j := range v.Taps {
+					if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.001 {
+						t.Errorf("Invalid beat %d 'taps'\n   expected: %v\n   got:      %v (delta:%.4f)", i+1, v.Taps, beats[i].Taps, math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()))
+						break
+					}
+				}
+			}
+		}
 	}
 }
