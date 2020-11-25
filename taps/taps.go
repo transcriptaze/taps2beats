@@ -16,6 +16,11 @@ type Beat struct {
 	Taps     []time.Duration
 }
 
+const (
+	MaxBPM         int = 200
+	MinSubdivision int = 8
+)
+
 func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 	array := []float64{}
 	for _, row := range taps {
@@ -105,57 +110,43 @@ func interpolate(clusters []ckmeans.Cluster) ([]int, error) {
 	xn := clusters[N-1].Center
 	y0 := 1.0
 
-	// ... b0
+	dt := Seconds(xn - x0).Minutes()
+	bmax := int(math.Ceil(dt * float64(MaxBPM*MinSubdivision/4)))
 
-	yn := float64(N)
-	m := (yn - y0) / (xn - x0)
-	c := yn - m*xn
-
-	sumsq := 0.0
-	for j := 0; j < N; j++ {
-		x := clusters[j].Center
-		y := m*x + c
-		beatf := math.Round(y)
-		sumsq += y*y - 2*y*beatf + beatf*beatf
-		beats[j] = int(math.Round(y))
-	}
-
-	variance := sumsq / float64(N-1)
-
-	// TODO gradient descent (?)
-	for bn := N + 1; variance > 0.001; bn++ {
-		yn := float64(bn)
+loop:
+	for i := N; i <= bmax; i++ {
+		yn := float64(i)
 		m := (yn - y0) / (xn - x0)
 		c := yn - m*xn
 
-		sumsq := 0.0
-		for j := 0; j < N; j++ {
+		x := clusters[0].Center
+		y := m*x + c
+		b0 := math.Round(y)
+		beats[0] = int(b0)
+		sumsq := y*y - 2*y*b0 + b0*b0
+
+		for j := 1; j < N; j++ {
 			x := clusters[j].Center
 			y := m*x + c
-			beatf := math.Round(y)
-			sumsq += y*y - 2*y*beatf + beatf*beatf
-		}
+			bn := math.Round(y)
 
-		v := sumsq / float64(N-1)
-
-		if v < variance {
-			for j := 0; j < N; j++ {
-				x := clusters[j].Center
-				y := m*x + c
-				beats[j] = int(math.Round(y))
+			beats[j] = int(bn)
+			if beats[j] <= beats[j-1] {
+				continue loop
 			}
-			variance = v
+
+			sumsq += y*y - 2*y*bn + bn*bn
+		}
+
+		variance := sumsq / float64(N-1)
+
+		if variance < 0.001 {
+			fmt.Printf("GOTCHA: %.6f %v", variance, beats)
+			return beats, nil
 		}
 	}
 
-	// check beats are unique and monotonically increasinge
-	for i := 1; i < len(beats); i++ {
-		if beats[i] <= beats[i-1] {
-			return nil, fmt.Errorf("Error interpolating beats: %v", beats)
-		}
-	}
-
-	return beats, nil
+	return nil, fmt.Errorf("Error interpolating beats: %v", beats)
 }
 
 func Floats2Seconds(floats [][]float64) [][]time.Duration {
