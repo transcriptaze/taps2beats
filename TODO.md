@@ -3,10 +3,15 @@
 - [ ] Estimate BPM and offset
 - [ ] Exponential forgetting factor
 - [ ] --no-quantize
-- [ ] Adjust for latency (--latency)
-- [ ] Web page
+- [ ] --latency
+- [ ] --range [start,end]
+- [ ] Format output nicely
 - [ ] JSON output
+- [ ] JSON input
+- [ ] (TEMPORARILY) copy ckmeans implementation into this project
+- [ ] Web page
 
+- [x] --precision
 - [x] Limit precision to 1ms
 - [x] Limit number of interpolation loops to a 'reasonable' number based on max BPM * 16beats/measure (or somesuch)
 - [x] Interpolation for pathological data

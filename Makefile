@@ -19,7 +19,7 @@ test: build
 	go test ./...
 
 run: build
-	./bin/taps2beats ./runtime/taps.txt
+	./bin/taps2beats --debug --precision 1ms ./runtime/taps.txt
 
 vet: build
 	go vet ./...

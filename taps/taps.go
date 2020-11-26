@@ -21,13 +21,13 @@ const (
 	MinSubdivision int = 8
 )
 
-var precision = time.Millisecond
+var Precision = time.Millisecond
 
 func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 	array := []float64{}
 	for _, row := range taps {
 		for _, t := range row {
-			array = append(array, t.Round(precision).Seconds())
+			array = append(array, t.Round(Precision).Seconds())
 		}
 	}
 
@@ -165,7 +165,7 @@ func Floats2Seconds(floats [][]float64) [][]time.Duration {
 }
 
 func Seconds(g float64) time.Duration {
-	return time.Duration(g * float64(time.Second)).Round(precision)
+	return time.Duration(g * float64(time.Second)).Round(Precision)
 }
 
 func makeBeat(at float64, cluster ckmeans.Cluster) Beat {
@@ -176,9 +176,9 @@ func makeBeat(at float64, cluster ckmeans.Cluster) Beat {
 	}
 
 	return Beat{
-		At:       Seconds(at).Round(precision),
-		Mean:     Seconds(cluster.Center).Round(precision),
-		Variance: Seconds(cluster.Variance).Round(precision),
+		At:       Seconds(at).Round(Precision),
+		Mean:     Seconds(cluster.Center).Round(Precision),
+		Variance: Seconds(cluster.Variance).Round(Precision),
 		Taps:     taps,
 	}
 }

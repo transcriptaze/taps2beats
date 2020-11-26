@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/twystd/taps2beats/taps"
 )
@@ -17,14 +18,17 @@ import (
 const VERSION = "v0.0.0"
 
 var options = struct {
-	outfile string
-	debug   bool
+	precision time.Duration
+	outfile   string
+	debug     bool
 }{
-	outfile: "",
-	debug:   false,
+	precision: time.Millisecond,
+	outfile:   "",
+	debug:     false,
 }
 
 func main() {
+	flag.DurationVar(&options.precision, "precision", options.precision, "time precision")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
 	flag.Parse()
@@ -36,6 +40,10 @@ func main() {
 	if len(flag.Args()) == 0 {
 		usage()
 		os.Exit(1)
+	}
+
+	if options.debug {
+		fmt.Printf("  ... using %v precision\n", options.precision)
 	}
 
 	file := flag.Args()[0]
@@ -53,6 +61,7 @@ func main() {
 		fmt.Printf("  ... %v values read from %s\n", len(data), file)
 	}
 
+	taps.Precision = options.precision
 	beats, err := taps.Taps2Beats(taps.Floats2Seconds(data), taps.Seconds(0), taps.Seconds(8.5)), nil
 	if err != nil {
 		fmt.Printf("\n  ** ERROR: unable to translate taps to beats (%v)\n\n", err)
