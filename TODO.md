@@ -1,8 +1,7 @@
 ## IN PROGRESS
 
-- [ ] --latency
-- [ ] Estimate BPM and offset
 - [ ] Exponential forgetting factor
+- [ ] Estimate BPM and offset
 - [ ] --no-quantize
 - [ ] --range [start,end]
 - [ ] --shift
@@ -12,6 +11,7 @@
 - [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] Web page
 
+- [x] --latency
 - [x] --precision
 - [x] Limit precision to 1ms
 - [x] Limit number of interpolation loops to a 'reasonable' number based on max BPM * 16beats/measure (or somesuch)

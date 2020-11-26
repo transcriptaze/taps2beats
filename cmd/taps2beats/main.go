@@ -59,12 +59,7 @@ func main() {
 		fmt.Printf("  ... %v values read from %s\n", len(data), file)
 	}
 
-	t2b := taps.T2B{
-		Precision: options.precision,
-		Latency:   options.latency,
-	}
-
-	beats, err := t2b.Taps2Beats(t2b.Floats2Seconds(data), 0, 8500*time.Millisecond), nil
+	beats, err := taps.Taps2Beats(taps.Floats2Seconds(data), 0, 8500*time.Millisecond, taps.Precision, taps.Latency), nil
 	if err != nil {
 		fmt.Printf("\n  ** ERROR: unable to translate taps to beats (%v)\n\n", err)
 		os.Exit(1)
