@@ -1,13 +1,13 @@
 ## IN PROGRESS
 
-- [ ] Limit precision to 1ms
-- [ ] --no-quantize
 - [ ] Estimate BPM and offset
 - [ ] Exponential forgetting factor
+- [ ] --no-quantize
 - [ ] Adjust for latency (--latency)
 - [ ] Web page
 - [ ] JSON output
 
+- [x] Limit precision to 1ms
 - [x] Limit number of interpolation loops to a 'reasonable' number based on max BPM * 16beats/measure (or somesuch)
 - [x] Interpolation for pathological data
 - [x] Extend beats to min/max

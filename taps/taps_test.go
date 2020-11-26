@@ -45,38 +45,27 @@ var clusters = []ckmeans.Cluster{
 	{Center: 8.210333335, Variance: 0.012172972, Values: bins[7]},
 }
 
-var clustersm = map[int]ckmeans.Cluster{
-	1: clusters[0],
-	2: clusters[1],
-	3: clusters[2],
-	4: clusters[3],
-	5: clusters[4],
-	6: clusters[5],
-	7: clusters[6],
-	8: clusters[7],
-}
-
 var beats = []Beat{
-	{At: Seconds(0.316087003)},
-	{At: Seconds(0.842161958)},
-	{At: Seconds(1.368236913)},
-	{At: Seconds(1.894311868)},
-	{At: Seconds(2.420386823)},
-	{At: Seconds(2.946461778)},
-	{At: Seconds(3.472536733)},
-	{At: Seconds(3.998611688)},
-	{At: Seconds(4.524686644), Mean: Seconds(4.523694381), Variance: Seconds(0.003525498), Taps: Floats2Seconds(bins)[0]},
-	{At: Seconds(5.050761599), Mean: Seconds(5.057687493), Variance: Seconds(0.008223081), Taps: Floats2Seconds(bins)[1]},
-	{At: Seconds(5.576836554), Mean: Seconds(5.578084204), Variance: Seconds(0.004277370), Taps: Floats2Seconds(bins)[2]},
-	{At: Seconds(6.102911509), Mean: Seconds(6.100485910), Variance: Seconds(0.004944514), Taps: Floats2Seconds(bins)[3]},
-	{At: Seconds(6.628986464), Mean: Seconds(6.618216081), Variance: Seconds(0.007153066), Taps: Floats2Seconds(bins)[4]},
-	{At: Seconds(7.155061419), Mean: Seconds(7.153334490), Variance: Seconds(0.004573754), Taps: Floats2Seconds(bins)[5]},
-	{At: Seconds(7.681136374), Mean: Seconds(7.685755996), Variance: Seconds(0.005071400), Taps: Floats2Seconds(bins)[6]},
-	{At: Seconds(8.207211329), Mean: Seconds(8.210333335), Variance: Seconds(0.012172972), Taps: Floats2Seconds(bins)[7]},
-	{At: Seconds(8.733286283)},
-	{At: Seconds(9.259361238)},
-	{At: Seconds(9.785436193)},
-	{At: Seconds(10.311511148)},
+	{At: Seconds(0.316)},
+	{At: Seconds(0.842)},
+	{At: Seconds(1.368)},
+	{At: Seconds(1.894)},
+	{At: Seconds(2.420)},
+	{At: Seconds(2.946)},
+	{At: Seconds(3.472)},
+	{At: Seconds(3.998)},
+	{At: Seconds(4.525), Mean: Seconds(4.524), Variance: Seconds(0.003), Taps: Floats2Seconds(bins)[0]},
+	{At: Seconds(5.051), Mean: Seconds(5.057), Variance: Seconds(0.008), Taps: Floats2Seconds(bins)[1]},
+	{At: Seconds(5.577), Mean: Seconds(5.578), Variance: Seconds(0.004), Taps: Floats2Seconds(bins)[2]},
+	{At: Seconds(6.103), Mean: Seconds(6.101), Variance: Seconds(0.004), Taps: Floats2Seconds(bins)[3]},
+	{At: Seconds(6.629), Mean: Seconds(6.618), Variance: Seconds(0.007), Taps: Floats2Seconds(bins)[4]},
+	{At: Seconds(7.155), Mean: Seconds(7.153), Variance: Seconds(0.004), Taps: Floats2Seconds(bins)[5]},
+	{At: Seconds(7.681), Mean: Seconds(7.685), Variance: Seconds(0.005), Taps: Floats2Seconds(bins)[6]},
+	{At: Seconds(8.207), Mean: Seconds(8.210), Variance: Seconds(0.012), Taps: Floats2Seconds(bins)[7]},
+	{At: Seconds(8.733)},
+	{At: Seconds(9.260)},
+	{At: Seconds(9.786)},
+	{At: Seconds(10.312)},
 }
 
 func TestTaps2Beats(t *testing.T) {
@@ -197,22 +186,55 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 }
 
 func TestExtrapolate(t *testing.T) {
+	m := map[int]ckmeans.Cluster{
+		1: clusters[0],
+		2: clusters[1],
+		3: clusters[2],
+		4: clusters[3],
+		5: clusters[4],
+		6: clusters[5],
+		7: clusters[6],
+		8: clusters[7],
+	}
+
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(clustersm, Seconds(4.5), Seconds(8.5))
+	beats := extrapolate(m, Seconds(4.5), Seconds(8.5))
 
 	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithPrePadding(t *testing.T) {
+	m := map[int]ckmeans.Cluster{
+		1: clusters[0],
+		2: clusters[1],
+		3: clusters[2],
+		4: clusters[3],
+		5: clusters[4],
+		6: clusters[5],
+		7: clusters[6],
+		8: clusters[7],
+	}
+
 	expected := []Beat{beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7], beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(clustersm, Seconds(0), Seconds(8.5))
+	beats := extrapolate(m, Seconds(0), Seconds(8.5))
 
 	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithPostPadding(t *testing.T) {
+	m := map[int]ckmeans.Cluster{
+		1: clusters[0],
+		2: clusters[1],
+		3: clusters[2],
+		4: clusters[3],
+		5: clusters[4],
+		6: clusters[5],
+		7: clusters[6],
+		8: clusters[7],
+	}
+
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15], beats[16], beats[17], beats[18], beats[19]}
-	beats := extrapolate(clustersm, Seconds(4), Seconds(10.5))
+	beats := extrapolate(m, Seconds(4), Seconds(10.5))
 
 	compare(beats, expected, t)
 }
@@ -516,15 +538,15 @@ func compare(beats, expected []Beat, t *testing.T) {
 
 	for i, v := range expected {
 		if !reflect.DeepEqual(v, beats[i]) {
-			if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.001 {
+			if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.0011 {
 				t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v (delta:%.4f)", i+1, v.At, beats[i].At, math.Abs(beats[i].At.Seconds()-v.At.Seconds()))
 			}
 
-			if math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()) > 0.001 {
+			if math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()) > 0.0011 {
 				t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v (delta:%.4f)", i+1, v.Mean, beats[i].Mean, math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()))
 			}
 
-			if math.Abs(beats[i].Variance.Seconds()-v.Variance.Seconds()) > 0.001 {
+			if math.Abs(beats[i].Variance.Seconds()-v.Variance.Seconds()) > 0.0011 {
 				t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v (delta:%.4f)", i+1, v.Variance, beats[i].Variance, math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()))
 			}
 

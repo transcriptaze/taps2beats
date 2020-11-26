@@ -21,11 +21,13 @@ const (
 	MinSubdivision int = 8
 )
 
+var precision = time.Millisecond
+
 func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 	array := []float64{}
 	for _, row := range taps {
 		for _, t := range row {
-			array = append(array, t.Seconds())
+			array = append(array, t.Round(precision).Seconds())
 		}
 	}
 
@@ -141,7 +143,6 @@ loop:
 		variance := sumsq / float64(N-1)
 
 		if variance < 0.001 {
-			fmt.Printf("GOTCHA: %.6f %v", variance, beats)
 			return beats, nil
 		}
 	}
@@ -164,7 +165,7 @@ func Floats2Seconds(floats [][]float64) [][]time.Duration {
 }
 
 func Seconds(g float64) time.Duration {
-	return time.Duration(g * float64(time.Second))
+	return time.Duration(g * float64(time.Second)).Round(precision)
 }
 
 func makeBeat(at float64, cluster ckmeans.Cluster) Beat {
@@ -175,9 +176,9 @@ func makeBeat(at float64, cluster ckmeans.Cluster) Beat {
 	}
 
 	return Beat{
-		At:       Seconds(at),
-		Mean:     Seconds(cluster.Center),
-		Variance: Seconds(cluster.Variance),
+		At:       Seconds(at).Round(precision),
+		Mean:     Seconds(cluster.Center).Round(precision),
+		Variance: Seconds(cluster.Variance).Round(precision),
 		Taps:     taps,
 	}
 }
