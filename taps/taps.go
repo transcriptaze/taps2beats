@@ -16,18 +16,27 @@ type Beat struct {
 	Taps     []time.Duration
 }
 
+type T2B struct {
+	Precision time.Duration
+	Latency   time.Duration
+}
+
 const (
 	MaxBPM         int = 200
 	MinSubdivision int = 8
 )
 
-var Precision = time.Millisecond
+var Default = T2B{
+	Precision: time.Millisecond,
+	Latency:   0,
+}
 
-func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
+func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
+	// ... cluster taps into beats
 	array := []float64{}
 	for _, row := range taps {
 		for _, t := range row {
-			array = append(array, t.Round(Precision).Seconds())
+			array = append(array, t.Round(t2b.Precision).Seconds())
 		}
 	}
 
@@ -35,11 +44,12 @@ func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 
 	// TODO sort clusters by time (just in case)
 
-	b, err := interpolate(clusters)
+	// ... fill in gaps
+	b, err := t2b.interpolate(clusters)
 	if err != nil {
 		beats := []Beat{}
 		for _, cluster := range clusters {
-			beats = append(beats, makeBeat(cluster.Center, cluster))
+			beats = append(beats, t2b.makeBeat(cluster.Center, cluster))
 		}
 
 		return beats
@@ -51,19 +61,28 @@ func Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 		m[b[i]] = c
 	}
 
-	beats := extrapolate(m, start, end)
+	beats := t2b.extrapolate(m, start, end)
 
 	// TODO sort beats by time
+
+	// ... compensate for latency
+	for i, b := range beats {
+		beats[i].At = (b.At - t2b.Latency).Round(t2b.Precision)
+
+		if len(b.Taps) > 0 {
+			beats[i].Mean = (b.Mean - t2b.Latency).Round(t2b.Precision)
+		}
+	}
 
 	return beats
 }
 
-func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) []Beat {
+func (t2b *T2B) extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) []Beat {
 	beats := []Beat{}
 
 	if len(clusters) < 2 {
 		for _, cluster := range clusters {
-			beats = append(beats, makeBeat(cluster.Center, cluster))
+			beats = append(beats, t2b.makeBeat(cluster.Center, cluster))
 		}
 
 		return beats
@@ -84,7 +103,7 @@ func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) []B
 	for bb := bmin; bb <= bmax; bb++ {
 		tt := float64(bb)*m + c
 		if tt >= start.Seconds() && tt <= end.Seconds() {
-			beats = append(beats, makeBeat(tt, clusters[bb]))
+			beats = append(beats, t2b.makeBeat(tt, clusters[bb]))
 		}
 	}
 
@@ -93,7 +112,7 @@ func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) []B
 
 /* NOTE: assumes clusters are time sorted
  */
-func interpolate(clusters []ckmeans.Cluster) ([]int, error) {
+func (t2b *T2B) interpolate(clusters []ckmeans.Cluster) ([]int, error) {
 	N := len(clusters)
 	beats := make([]int, N)
 
@@ -112,7 +131,7 @@ func interpolate(clusters []ckmeans.Cluster) ([]int, error) {
 	xn := clusters[N-1].Center
 	y0 := 1.0
 
-	dt := Seconds(xn - x0).Minutes()
+	dt := t2b.Seconds(xn - x0).Minutes()
 	bmax := int(math.Ceil(dt * float64(MaxBPM*MinSubdivision/4)))
 
 loop:
@@ -150,13 +169,13 @@ loop:
 	return nil, fmt.Errorf("Error interpolating beats: %v", beats)
 }
 
-func Floats2Seconds(floats [][]float64) [][]time.Duration {
+func (t2b *T2B) Floats2Seconds(floats [][]float64) [][]time.Duration {
 	l := [][]time.Duration{}
 
 	for _, f := range floats {
 		p := []time.Duration{}
 		for _, g := range f {
-			p = append(p, Seconds(g))
+			p = append(p, t2b.Seconds(g))
 		}
 		l = append(l, p)
 	}
@@ -164,21 +183,21 @@ func Floats2Seconds(floats [][]float64) [][]time.Duration {
 	return l
 }
 
-func Seconds(g float64) time.Duration {
-	return time.Duration(g * float64(time.Second)).Round(Precision)
+func (t2b *T2B) Seconds(g float64) time.Duration {
+	return time.Duration(g * float64(time.Second)).Round(t2b.Precision)
 }
 
-func makeBeat(at float64, cluster ckmeans.Cluster) Beat {
+func (t2b *T2B) makeBeat(at float64, cluster ckmeans.Cluster) Beat {
 	taps := make([]time.Duration, len(cluster.Values))
 
 	for i, v := range cluster.Values {
-		taps[i] = Seconds(v)
+		taps[i] = t2b.Seconds(v)
 	}
 
 	return Beat{
-		At:       Seconds(at).Round(Precision),
-		Mean:     Seconds(cluster.Center).Round(Precision),
-		Variance: Seconds(cluster.Variance).Round(Precision),
+		At:       t2b.Seconds(at),
+		Mean:     t2b.Seconds(cluster.Center),
+		Variance: t2b.Seconds(cluster.Variance),
 		Taps:     taps,
 	}
 }

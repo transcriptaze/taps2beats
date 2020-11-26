@@ -1,10 +1,11 @@
 ## IN PROGRESS
 
+- [ ] --latency
 - [ ] Estimate BPM and offset
 - [ ] Exponential forgetting factor
 - [ ] --no-quantize
-- [ ] --latency
 - [ ] --range [start,end]
+- [ ] --shift
 - [ ] Format output nicely
 - [ ] JSON output
 - [ ] JSON input

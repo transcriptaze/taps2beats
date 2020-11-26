@@ -19,6 +19,7 @@ const VERSION = "v0.0.0"
 
 var options = struct {
 	precision time.Duration
+	latency   time.Duration
 	outfile   string
 	debug     bool
 }{
@@ -28,7 +29,8 @@ var options = struct {
 }
 
 func main() {
-	flag.DurationVar(&options.precision, "precision", options.precision, "time precision")
+	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats'")
+	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
 	flag.Parse()
@@ -40,10 +42,6 @@ func main() {
 	if len(flag.Args()) == 0 {
 		usage()
 		os.Exit(1)
-	}
-
-	if options.debug {
-		fmt.Printf("  ... using %v precision\n", options.precision)
 	}
 
 	file := flag.Args()[0]
@@ -61,8 +59,12 @@ func main() {
 		fmt.Printf("  ... %v values read from %s\n", len(data), file)
 	}
 
-	taps.Precision = options.precision
-	beats, err := taps.Taps2Beats(taps.Floats2Seconds(data), taps.Seconds(0), taps.Seconds(8.5)), nil
+	t2b := taps.T2B{
+		Precision: options.precision,
+		Latency:   options.latency,
+	}
+
+	beats, err := t2b.Taps2Beats(t2b.Floats2Seconds(data), 0, 8500*time.Millisecond), nil
 	if err != nil {
 		fmt.Printf("\n  ** ERROR: unable to translate taps to beats (%v)\n\n", err)
 		os.Exit(1)
@@ -70,6 +72,8 @@ func main() {
 
 	if options.debug {
 		fmt.Printf("  ... %v beats\n", len(beats))
+		fmt.Printf("  ... rounding to %v precision\n", options.precision)
+		fmt.Printf("  ... compensating for %v latency\n", options.latency)
 	}
 
 	var b bytes.Buffer

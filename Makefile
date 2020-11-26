@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestTaps2BeatsX
+	go test ./... -run TestTaps2BeatsWithLatency
 
 build: format
 	mkdir -p bin
@@ -19,7 +19,7 @@ test: build
 	go test ./...
 
 run: build
-	./bin/taps2beats --debug --precision 1ms ./runtime/taps.txt
+	./bin/taps2beats --debug --precision 1ms --latency 7ms ./runtime/taps.txt
 
 vet: build
 	go vet ./...

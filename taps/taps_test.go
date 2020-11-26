@@ -46,27 +46,29 @@ var clusters = []ckmeans.Cluster{
 }
 
 var beats = []Beat{
-	{At: Seconds(0.316)},
-	{At: Seconds(0.842)},
-	{At: Seconds(1.368)},
-	{At: Seconds(1.894)},
-	{At: Seconds(2.420)},
-	{At: Seconds(2.946)},
-	{At: Seconds(3.472)},
-	{At: Seconds(3.998)},
-	{At: Seconds(4.525), Mean: Seconds(4.524), Variance: Seconds(0.003), Taps: Floats2Seconds(bins)[0]},
-	{At: Seconds(5.051), Mean: Seconds(5.057), Variance: Seconds(0.008), Taps: Floats2Seconds(bins)[1]},
-	{At: Seconds(5.577), Mean: Seconds(5.578), Variance: Seconds(0.004), Taps: Floats2Seconds(bins)[2]},
-	{At: Seconds(6.103), Mean: Seconds(6.101), Variance: Seconds(0.004), Taps: Floats2Seconds(bins)[3]},
-	{At: Seconds(6.629), Mean: Seconds(6.618), Variance: Seconds(0.007), Taps: Floats2Seconds(bins)[4]},
-	{At: Seconds(7.155), Mean: Seconds(7.153), Variance: Seconds(0.004), Taps: Floats2Seconds(bins)[5]},
-	{At: Seconds(7.681), Mean: Seconds(7.685), Variance: Seconds(0.005), Taps: Floats2Seconds(bins)[6]},
-	{At: Seconds(8.207), Mean: Seconds(8.210), Variance: Seconds(0.012), Taps: Floats2Seconds(bins)[7]},
-	{At: Seconds(8.733)},
-	{At: Seconds(9.260)},
-	{At: Seconds(9.786)},
-	{At: Seconds(10.312)},
+	{At: 316 * time.Millisecond},
+	{At: 842 * time.Millisecond},
+	{At: 1368 * time.Millisecond},
+	{At: 1894 * time.Millisecond},
+	{At: 2420 * time.Millisecond},
+	{At: 2946 * time.Millisecond},
+	{At: 3472 * time.Millisecond},
+	{At: 3998 * time.Millisecond},
+	{At: 4525 * time.Millisecond, Mean: 4524 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[0]},
+	{At: 5051 * time.Millisecond, Mean: 5057 * time.Millisecond, Variance: 8 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[1]},
+	{At: 5577 * time.Millisecond, Mean: 5578 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[2]},
+	{At: 6103 * time.Millisecond, Mean: 6101 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[3]},
+	{At: 6629 * time.Millisecond, Mean: 6618 * time.Millisecond, Variance: 7 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[4]},
+	{At: 7155 * time.Millisecond, Mean: 7153 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[5]},
+	{At: 7681 * time.Millisecond, Mean: 7685 * time.Millisecond, Variance: 5 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[6]},
+	{At: 8207 * time.Millisecond, Mean: 8210 * time.Millisecond, Variance: 12 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[7]},
+	{At: 8733 * time.Millisecond},
+	{At: 9260 * time.Millisecond},
+	{At: 9786 * time.Millisecond},
+	{At: 10312 * time.Millisecond},
 }
+
+var t2b = Default
 
 func TestTaps2Beats(t *testing.T) {
 	expected := []Beat{
@@ -75,7 +77,7 @@ func TestTaps2Beats(t *testing.T) {
 		beats[16], beats[17], beats[18], beats[19],
 	}
 
-	beats := Taps2Beats(Floats2Seconds(taps), Seconds(0), Seconds(10.5))
+	beats := t2b.Taps2Beats(t2b.Floats2Seconds(taps), 0, seconds(10.5)[0])
 
 	compare(beats, expected, t)
 }
@@ -102,13 +104,13 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 		beats[10],
 		beats[11],
 		beats[12],
-		Beat{At: Seconds(7.155061419), Mean: Seconds(0), Variance: Seconds(0), Taps: []time.Duration{}},
+		Beat{At: t2b.Seconds(7.155061419), Mean: 0, Variance: 0, Taps: []time.Duration{}},
 		beats[14],
 		beats[15],
 		beats[16], beats[17], beats[18], beats[19],
 	}
 
-	beats := Taps2Beats(Floats2Seconds(taps), Seconds(0.0), Seconds(10.5))
+	beats := t2b.Taps2Beats(t2b.Floats2Seconds(taps), 0.0, t2b.Seconds(10.5))
 
 	compare(beats, expected, t)
 }
@@ -121,66 +123,100 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 	}
 
 	expected := []Beat{
-		{At: Seconds(0.978), Mean: Seconds(1), Variance: Seconds(0.1), Taps: seconds(1, 1.1, 1.2, 0.9, 0.8)},
-		{At: Seconds(2.021729079), Mean: Seconds(2), Variance: Seconds(0.1), Taps: seconds(2, 2.1, 2.2, 1.9, 1.8)},
-		{At: Seconds(3.064)},
-		{At: Seconds(4.107)},
-		{At: Seconds(5.150)},
-		{At: Seconds(6.193)},
-		{At: Seconds(7.236)},
-		{At: Seconds(8.279)},
-		{At: Seconds(9.322)},
-		{At: Seconds(10.365)},
-		{At: Seconds(11.408)},
-		{At: Seconds(12.451)},
-		{At: Seconds(13.494)},
-		{At: Seconds(14.537)},
-		{At: Seconds(15.580)},
-		{At: Seconds(16.623)},
-		{At: Seconds(17.666)},
-		{At: Seconds(18.709)},
-		{At: Seconds(19.752)},
-		{At: Seconds(20.795)},
-		{At: Seconds(21.838)},
-		{At: Seconds(22.881)},
-		{At: Seconds(23.924)},
-		{At: Seconds(24.967)},
-		{At: Seconds(26.010)},
-		{At: Seconds(27.053)},
-		{At: Seconds(28.096)},
-		{At: Seconds(29.139)},
-		{At: Seconds(30.182)},
-		{At: Seconds(31.225)},
-		{At: Seconds(32.268)},
-		{At: Seconds(33.311)},
-		{At: Seconds(34.354)},
-		{At: Seconds(35.397)},
-		{At: Seconds(36.440)},
-		{At: Seconds(37.483)},
-		{At: Seconds(38.526)},
-		{At: Seconds(39.569)},
-		{At: Seconds(40.612)},
-		{At: Seconds(41.655)},
-		{At: Seconds(42.698)},
-		{At: Seconds(43.741)},
-		{At: Seconds(44.784)},
-		{At: Seconds(45.827)},
-		{At: Seconds(46.870)},
-		{At: Seconds(47.913)},
-		{At: Seconds(48.956)},
-		{At: Seconds(50.000), Mean: Seconds(50), Variance: Seconds(0.100), Taps: seconds(50, 50.1, 50.2, 49.9, 49.8)},
-		{At: Seconds(51.042)},
-		{At: Seconds(52.085)},
-		{At: Seconds(53.128)},
-		{At: Seconds(54.171)},
-		{At: Seconds(55.214)},
-		{At: Seconds(56.257)},
-		{At: Seconds(57.300)},
-		{At: Seconds(58.343)},
-		{At: Seconds(59.386)},
+		{At: t2b.Seconds(0.978), Mean: t2b.Seconds(1), Variance: t2b.Seconds(0.1), Taps: seconds(1, 1.1, 1.2, 0.9, 0.8)},
+		{At: t2b.Seconds(2.021729079), Mean: t2b.Seconds(2), Variance: t2b.Seconds(0.1), Taps: seconds(2, 2.1, 2.2, 1.9, 1.8)},
+		{At: t2b.Seconds(3.064)},
+		{At: t2b.Seconds(4.107)},
+		{At: t2b.Seconds(5.150)},
+		{At: t2b.Seconds(6.193)},
+		{At: t2b.Seconds(7.236)},
+		{At: t2b.Seconds(8.279)},
+		{At: t2b.Seconds(9.322)},
+		{At: t2b.Seconds(10.365)},
+		{At: t2b.Seconds(11.408)},
+		{At: t2b.Seconds(12.451)},
+		{At: t2b.Seconds(13.494)},
+		{At: t2b.Seconds(14.537)},
+		{At: t2b.Seconds(15.580)},
+		{At: t2b.Seconds(16.623)},
+		{At: t2b.Seconds(17.666)},
+		{At: t2b.Seconds(18.709)},
+		{At: t2b.Seconds(19.752)},
+		{At: t2b.Seconds(20.795)},
+		{At: t2b.Seconds(21.838)},
+		{At: t2b.Seconds(22.881)},
+		{At: t2b.Seconds(23.924)},
+		{At: t2b.Seconds(24.967)},
+		{At: t2b.Seconds(26.010)},
+		{At: t2b.Seconds(27.053)},
+		{At: t2b.Seconds(28.096)},
+		{At: t2b.Seconds(29.139)},
+		{At: t2b.Seconds(30.182)},
+		{At: t2b.Seconds(31.225)},
+		{At: t2b.Seconds(32.268)},
+		{At: t2b.Seconds(33.311)},
+		{At: t2b.Seconds(34.354)},
+		{At: t2b.Seconds(35.397)},
+		{At: t2b.Seconds(36.440)},
+		{At: t2b.Seconds(37.483)},
+		{At: t2b.Seconds(38.526)},
+		{At: t2b.Seconds(39.569)},
+		{At: t2b.Seconds(40.612)},
+		{At: t2b.Seconds(41.655)},
+		{At: t2b.Seconds(42.698)},
+		{At: t2b.Seconds(43.741)},
+		{At: t2b.Seconds(44.784)},
+		{At: t2b.Seconds(45.827)},
+		{At: t2b.Seconds(46.870)},
+		{At: t2b.Seconds(47.913)},
+		{At: t2b.Seconds(48.956)},
+		{At: t2b.Seconds(50.000), Mean: t2b.Seconds(50), Variance: t2b.Seconds(0.100), Taps: seconds(50, 50.1, 50.2, 49.9, 49.8)},
+		{At: t2b.Seconds(51.042)},
+		{At: t2b.Seconds(52.085)},
+		{At: t2b.Seconds(53.128)},
+		{At: t2b.Seconds(54.171)},
+		{At: t2b.Seconds(55.214)},
+		{At: t2b.Seconds(56.257)},
+		{At: t2b.Seconds(57.300)},
+		{At: t2b.Seconds(58.343)},
+		{At: t2b.Seconds(59.386)},
 	}
 
-	beats := Taps2Beats(Floats2Seconds(taps), Seconds(0.0), Seconds(60.0))
+	beats := t2b.Taps2Beats(t2b.Floats2Seconds(taps), 0, t2b.Seconds(60.0))
+
+	compare(beats, expected, t)
+}
+
+func TestTaps2BeatsWithLatency(t *testing.T) {
+	expected := []Beat{
+		{At: (316 - 37) * time.Millisecond},
+		{At: (842 - 37) * time.Millisecond},
+		{At: (1368 - 37) * time.Millisecond},
+		{At: (1894 - 37) * time.Millisecond},
+		{At: (2420 - 37) * time.Millisecond},
+		{At: (2946 - 37) * time.Millisecond},
+		{At: (3472 - 37) * time.Millisecond},
+		{At: (3998 - 37) * time.Millisecond},
+		{At: (4525 - 37) * time.Millisecond, Mean: (4524 - 37) * time.Millisecond, Variance: 3 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[0]},
+		{At: (5051 - 37) * time.Millisecond, Mean: (5057 - 37) * time.Millisecond, Variance: 8 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[1]},
+		{At: (5577 - 37) * time.Millisecond, Mean: (5578 - 37) * time.Millisecond, Variance: 4 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[2]},
+		{At: (6103 - 37) * time.Millisecond, Mean: (6101 - 37) * time.Millisecond, Variance: 4 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[3]},
+		{At: (6629 - 37) * time.Millisecond, Mean: (6618 - 37) * time.Millisecond, Variance: 7 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[4]},
+		{At: (7155 - 37) * time.Millisecond, Mean: (7153 - 37) * time.Millisecond, Variance: 4 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[5]},
+		{At: (7681 - 37) * time.Millisecond, Mean: (7685 - 37) * time.Millisecond, Variance: 5 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[6]},
+		{At: (8207 - 37) * time.Millisecond, Mean: (8210 - 37) * time.Millisecond, Variance: 12 * time.Millisecond, Taps: t2b.Floats2Seconds(bins)[7]},
+		{At: (8733 - 37) * time.Millisecond},
+		{At: (9260 - 37) * time.Millisecond},
+		{At: (9786 - 37) * time.Millisecond},
+		{At: (10312 - 37) * time.Millisecond},
+	}
+
+	t2x := T2B{
+		Precision: time.Millisecond,
+		Latency:   37 * time.Millisecond,
+	}
+
+	beats := t2x.Taps2Beats(t2x.Floats2Seconds(taps), 0, t2x.Seconds(10.5))
 
 	compare(beats, expected, t)
 }
@@ -198,7 +234,7 @@ func TestExtrapolate(t *testing.T) {
 	}
 
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(m, Seconds(4.5), Seconds(8.5))
+	beats := t2b.extrapolate(m, t2b.Seconds(4.5), t2b.Seconds(8.5))
 
 	compare(beats, expected, t)
 }
@@ -216,7 +252,7 @@ func TestExtrapolateWithPrePadding(t *testing.T) {
 	}
 
 	expected := []Beat{beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7], beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(m, Seconds(0), Seconds(8.5))
+	beats := t2b.extrapolate(m, t2b.Seconds(0), t2b.Seconds(8.5))
 
 	compare(beats, expected, t)
 }
@@ -234,14 +270,14 @@ func TestExtrapolateWithPostPadding(t *testing.T) {
 	}
 
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15], beats[16], beats[17], beats[18], beats[19]}
-	beats := extrapolate(m, Seconds(4), Seconds(10.5))
+	beats := t2b.extrapolate(m, t2b.Seconds(4), t2b.Seconds(10.5))
 
 	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithNoClusters(t *testing.T) {
 	expected := []Beat{}
-	beats := extrapolate(map[int]ckmeans.Cluster{}, Seconds(4.5), Seconds(8.5))
+	beats := t2b.extrapolate(map[int]ckmeans.Cluster{}, t2b.Seconds(4.5), t2b.Seconds(8.5))
 
 	if !reflect.DeepEqual(beats, expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
@@ -251,16 +287,16 @@ func TestExtrapolateWithNoClusters(t *testing.T) {
 func TestExtrapolateWithOneCluster(t *testing.T) {
 	expected := []Beat{
 		Beat{
-			At:       Seconds(4.523694381),
-			Mean:     Seconds(4.523694381),
-			Variance: Seconds(0.003525498),
+			At:       t2b.Seconds(4.523694381),
+			Mean:     t2b.Seconds(4.523694381),
+			Variance: t2b.Seconds(0.003525498),
 			Taps:     seconds(4.570271991, 4.506176116, 4.52956007, 4.52956007, 4.517865093, 4.494581138, 4.52940807, 4.523631082, 4.517979093, 4.517911093),
 		},
 	}
 
-	beats := extrapolate(map[int]ckmeans.Cluster{
+	beats := t2b.extrapolate(map[int]ckmeans.Cluster{
 		1: clusters[0],
-	}, Seconds(4.5), Seconds(8.5))
+	}, t2b.Seconds(4.5), t2b.Seconds(8.5))
 
 	compare(beats, expected, t)
 }
@@ -268,59 +304,59 @@ func TestExtrapolateWithOneCluster(t *testing.T) {
 func TestExtrapolateWithTwoClusters(t *testing.T) {
 	expected := []Beat{
 		Beat{
-			At:       Seconds(0.306),
-			Mean:     Seconds(0),
-			Variance: Seconds(0),
+			At:       t2b.Seconds(0.306),
+			Mean:     t2b.Seconds(0),
+			Variance: t2b.Seconds(0),
 			Taps:     seconds(),
 		},
 		Beat{
-			At:       Seconds(1.361),
-			Mean:     Seconds(0),
-			Variance: Seconds(0),
+			At:       t2b.Seconds(1.361),
+			Mean:     t2b.Seconds(0),
+			Variance: t2b.Seconds(0),
 			Taps:     seconds(),
 		},
 		Beat{
-			At:       Seconds(2.415),
-			Mean:     Seconds(0),
-			Variance: Seconds(0),
+			At:       t2b.Seconds(2.415),
+			Mean:     t2b.Seconds(0),
+			Variance: t2b.Seconds(0),
 			Taps:     seconds(),
 		},
 		Beat{
-			At:       Seconds(3.469),
-			Mean:     Seconds(0),
-			Variance: Seconds(0),
+			At:       t2b.Seconds(3.469),
+			Mean:     t2b.Seconds(0),
+			Variance: t2b.Seconds(0),
 			Taps:     seconds(),
 		},
 		Beat{
-			At:       Seconds(4.524),
-			Mean:     Seconds(4.524),
-			Variance: Seconds(0.003),
+			At:       t2b.Seconds(4.524),
+			Mean:     t2b.Seconds(4.524),
+			Variance: t2b.Seconds(0.003),
 			Taps:     seconds(4.570, 4.506, 4.530, 4.530, 4.518, 4.495, 4.529, 4.524, 4.518, 4.518),
 		},
 		Beat{
-			At:       Seconds(5.578),
-			Mean:     Seconds(5.578),
-			Variance: Seconds(0.004),
+			At:       t2b.Seconds(5.578),
+			Mean:     t2b.Seconds(5.578),
+			Variance: t2b.Seconds(0.004),
 			Taps:     seconds(5.604, 5.592, 5.592, 5.603, 5.580, 5.545, 5.563, 5.557, 5.586, 5.551, 5.586),
 		},
 		Beat{
-			At:       Seconds(6.632),
-			Mean:     Seconds(0),
-			Variance: Seconds(0),
+			At:       t2b.Seconds(6.632),
+			Mean:     t2b.Seconds(0),
+			Variance: t2b.Seconds(0),
 			Taps:     seconds(),
 		},
 		Beat{
-			At:       Seconds(7.687),
-			Mean:     Seconds(0),
-			Variance: Seconds(0),
+			At:       t2b.Seconds(7.687),
+			Mean:     t2b.Seconds(0),
+			Variance: t2b.Seconds(0),
 			Taps:     seconds(),
 		},
 	}
 
-	beats := extrapolate(map[int]ckmeans.Cluster{
+	beats := t2b.extrapolate(map[int]ckmeans.Cluster{
 		1: clusters[0],
 		2: clusters[2],
-	}, Seconds(0), Seconds(8.5))
+	}, t2b.Seconds(0), t2b.Seconds(8.5))
 
 	compare(beats, expected, t)
 }
@@ -339,7 +375,7 @@ func TestInterpolateForDegenerateCases(t *testing.T) {
 	}
 
 	for i, v := range tests {
-		beats, err := interpolate(v)
+		beats, err := t2b.interpolate(v)
 		if err != nil {
 			t.Fatalf("[%d] unexpected error (%v)", i+1, err)
 		}
@@ -389,7 +425,7 @@ func TestInterpolateForThreeBeats(t *testing.T) {
 			c = append(c, clusters[ix-1])
 		}
 
-		beats, err := interpolate(c)
+		beats, err := t2b.interpolate(c)
 		if err != nil {
 			t.Fatalf("[%d] unexpected error (%v)", i+1, err)
 		}
@@ -443,7 +479,7 @@ func TestInterpolateForFourBeats(t *testing.T) {
 			c = append(c, clusters[ix-1])
 		}
 
-		beats, err := interpolate(c)
+		beats, err := t2b.interpolate(c)
 		if err != nil {
 			t.Fatalf("[%d] unexpected error (%v)", i+1, err)
 		}
@@ -469,7 +505,7 @@ func TestTapCombinations(t *testing.T) {
 			c[i] = clusters[ix-1]
 		}
 
-		beats, err := interpolate(c)
+		beats, err := t2b.interpolate(c)
 		if err != nil {
 			t.Fatalf("[%v] unexpected error (%v)", v, err)
 		}
@@ -514,7 +550,7 @@ func TestInterpolateWithPathologicalData(t *testing.T) {
 		{Center: 11.0, Variance: 0.001, Values: []float64{}},
 	}
 
-	_, err := interpolate(clusters)
+	_, err := t2b.interpolate(clusters)
 	if err == nil {
 		t.Fatalf("Expected error, got %v", err)
 	}
@@ -524,7 +560,7 @@ func seconds(floats ...float64) []time.Duration {
 	l := []time.Duration{}
 
 	for _, f := range floats {
-		l = append(l, Seconds(f))
+		l = append(l, t2b.Seconds(f))
 	}
 
 	return l
