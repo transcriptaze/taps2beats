@@ -77,7 +77,13 @@ func TestTaps2Beats(t *testing.T) {
 
 	beats := Default.Taps2Beats(Floats2Seconds(taps), 0, Seconds(10.5))
 
-	compare(beats, expected, t)
+	if beats.BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, beats.BPM)
+	} else if *beats.BPM != 114 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, *beats.BPM)
+	}
+
+	compare(beats.Beats, expected, t)
 }
 
 func TestTaps2BeatsWithMissingBeat(t *testing.T) {
@@ -110,7 +116,13 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 
 	beats := Default.Taps2Beats(Floats2Seconds(taps), 0.0, Seconds(10.5))
 
-	compare(beats, expected, t)
+	if beats.BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, beats.BPM)
+	} else if *beats.BPM != 114 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, *beats.BPM)
+	}
+
+	compare(beats.Beats, expected, t)
 }
 
 func TestTaps2BeatsWithWeirdData(t *testing.T) {
@@ -182,7 +194,13 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 
 	beats := Default.Taps2Beats(Floats2Seconds(taps), 0, Seconds(60.0))
 
-	compare(beats, expected, t)
+	if beats.BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 58, beats.BPM)
+	} else if *beats.BPM != 58 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 58, *beats.BPM)
+	}
+
+	compare(beats.Beats, expected, t)
 }
 
 func TestTaps2BeatsWithLatency(t *testing.T) {
@@ -217,7 +235,13 @@ func TestTaps2BeatsWithLatency(t *testing.T) {
 
 	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0, Seconds(10.5))
 
-	compare(beats, expected, t)
+	if beats.BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, beats.BPM)
+	} else if *beats.BPM != 114 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, *beats.BPM)
+	}
+
+	compare(beats.Beats, expected, t)
 }
 
 func TestTaps2BeatsWithForgetting(t *testing.T) {
@@ -252,7 +276,13 @@ func TestTaps2BeatsWithForgetting(t *testing.T) {
 
 	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0, Seconds(10.5))
 
-	compare(beats, expected, t)
+	if beats.BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, beats.BPM)
+	} else if *beats.BPM != 114 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, *beats.BPM)
+	}
+
+	compare(beats.Beats, expected, t)
 }
 
 func TestExtrapolate(t *testing.T) {
@@ -268,7 +298,13 @@ func TestExtrapolate(t *testing.T) {
 	}
 
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(m, Seconds(4.5), Seconds(8.5))
+	beats, BPM := extrapolate(m, Seconds(4.5), Seconds(8.5))
+
+	if BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, BPM)
+	} else if *BPM != 114 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, *BPM)
+	}
 
 	compare(beats, expected, t)
 }
@@ -286,7 +322,13 @@ func TestExtrapolateWithPrePadding(t *testing.T) {
 	}
 
 	expected := []Beat{beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7], beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
-	beats := extrapolate(m, Seconds(0), Seconds(8.5))
+	beats, BPM := extrapolate(m, Seconds(0), Seconds(8.5))
+
+	if BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, BPM)
+	} else if *BPM != 114 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, *BPM)
+	}
 
 	compare(beats, expected, t)
 }
@@ -304,14 +346,24 @@ func TestExtrapolateWithPostPadding(t *testing.T) {
 	}
 
 	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15], beats[16], beats[17], beats[18], beats[19]}
-	beats := extrapolate(m, Seconds(4), Seconds(10.5))
+	beats, BPM := extrapolate(m, Seconds(4), Seconds(10.5))
+
+	if BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, BPM)
+	} else if *BPM != 114 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 114, *BPM)
+	}
 
 	compare(beats, expected, t)
 }
 
 func TestExtrapolateWithNoClusters(t *testing.T) {
 	expected := []Beat{}
-	beats := extrapolate(map[int]ckmeans.Cluster{}, Seconds(4.5), Seconds(8.5))
+	beats, BPM := extrapolate(map[int]ckmeans.Cluster{}, Seconds(4.5), Seconds(8.5))
+
+	if BPM != nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", nil, *BPM)
+	}
 
 	if !reflect.DeepEqual(beats, expected) {
 		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
@@ -328,9 +380,13 @@ func TestExtrapolateWithOneCluster(t *testing.T) {
 		},
 	}
 
-	beats := extrapolate(map[int]ckmeans.Cluster{
+	beats, BPM := extrapolate(map[int]ckmeans.Cluster{
 		1: clusters[0],
 	}, Seconds(4.5), Seconds(8.5))
+
+	if BPM != nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", nil, *BPM)
+	}
 
 	compare(beats, expected, t)
 }
@@ -387,10 +443,16 @@ func TestExtrapolateWithTwoClusters(t *testing.T) {
 		},
 	}
 
-	beats := extrapolate(map[int]ckmeans.Cluster{
+	beats, BPM := extrapolate(map[int]ckmeans.Cluster{
 		1: clusters[0],
 		2: clusters[2],
 	}, Seconds(0), Seconds(8.5))
+
+	if BPM == nil {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 57, BPM)
+	} else if *BPM != 57 {
+		t.Errorf("Incorrect BPM - expected:%v, got:%v", 57, *BPM)
+	}
 
 	compare(beats, expected, t)
 }

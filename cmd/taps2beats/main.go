@@ -82,7 +82,7 @@ func main() {
 	}
 
 	if options.debug {
-		fmt.Printf("  ... %v beats\n", len(beats))
+		fmt.Printf("  ... %v beats\n", len(beats.Beats))
 	}
 
 	var b bytes.Buffer
@@ -125,8 +125,12 @@ func read(f string) ([][]float64, error) {
 	return data, nil
 }
 
-func print(f io.Writer, beats []taps.Beat) {
-	for i, b := range beats {
+func print(f io.Writer, beats taps.Beats) {
+	if beats.BPM != nil {
+		fmt.Fprintf(f, "BPM: %d\n\n", *beats.BPM)
+	}
+
+	for i, b := range beats.Beats {
 		fmt.Fprintf(f, "%d %v %v %v %v\n", i+1, b.At, b.Mean, b.Variance, b.Taps)
 	}
 	//	columns := 0

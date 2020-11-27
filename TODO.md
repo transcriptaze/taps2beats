@@ -1,8 +1,9 @@
 ## IN PROGRESS
 
 - [ ] Estimate BPM and offset
-- [ ] --no-quantize
 - [ ] --range [start,end]
+- [ ] --no-quantize
+- [ ] --cluster-only
 - [ ] --shift to adjust so that first beat is 0.0
 - [ ] Format output nicely
 - [ ] usage()
@@ -26,3 +27,4 @@
 
 1. Look at beat detection algorithms
 2. Gradient descent for interpolation (?)
+3. https://moultano.wordpress.com/2018/11/08/minhashing-3kbzhsxyg4467-6
