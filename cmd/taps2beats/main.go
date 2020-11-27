@@ -18,19 +18,23 @@ import (
 const VERSION = "v0.0.0"
 
 var options = struct {
-	precision time.Duration
-	latency   time.Duration
-	outfile   string
-	debug     bool
+	precision  time.Duration
+	latency    time.Duration
+	forgetting float64
+	outfile    string
+	debug      bool
 }{
-	precision: time.Millisecond,
-	outfile:   "",
-	debug:     false,
+	precision:  taps.Default.Precision,
+	latency:    taps.Default.Latency,
+	forgetting: taps.Default.Forgetting,
+	outfile:    "",
+	debug:      false,
 }
 
 func main() {
 	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats'")
 	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate")
+	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
 	flag.Parse()
@@ -59,7 +63,19 @@ func main() {
 		fmt.Printf("  ... %v values read from %s\n", len(data), file)
 	}
 
-	beats, err := taps.Taps2Beats(taps.Floats2Seconds(data), 0, 8500*time.Millisecond, taps.Precision, taps.Latency), nil
+	t2b := taps.T2B{
+		Precision:  options.precision,
+		Latency:    options.latency,
+		Forgetting: options.forgetting,
+	}
+
+	if options.debug {
+		fmt.Printf("  ... rounding to %v precision\n", t2b.Precision)
+		fmt.Printf("  ... compensating for %v latency\n", t2b.Latency)
+		fmt.Printf("  ... using forgetting factor %v latency\n", t2b.Forgetting)
+	}
+
+	beats, err := t2b.Taps2Beats(taps.Floats2Seconds(data), 0, 8500*time.Millisecond), nil
 	if err != nil {
 		fmt.Printf("\n  ** ERROR: unable to translate taps to beats (%v)\n\n", err)
 		os.Exit(1)
@@ -67,8 +83,6 @@ func main() {
 
 	if options.debug {
 		fmt.Printf("  ... %v beats\n", len(beats))
-		fmt.Printf("  ... rounding to %v precision\n", options.precision)
-		fmt.Printf("  ... compensating for %v latency\n", options.latency)
 	}
 
 	var b bytes.Buffer

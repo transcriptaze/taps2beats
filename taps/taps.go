@@ -17,8 +17,9 @@ type Beat struct {
 }
 
 type T2B struct {
-	Precision time.Duration
-	Latency   time.Duration
+	Precision  time.Duration
+	Latency    time.Duration
+	Forgetting float64
 }
 
 const (
@@ -26,19 +27,27 @@ const (
 	MinSubdivision int = 8
 )
 
-var Precision = 1 * time.Millisecond
-var Latency = 0 * time.Millisecond
+var Default = T2B{
+	Precision:  1 * time.Millisecond,
+	Latency:    0 * time.Millisecond,
+	Forgetting: 0.0,
+}
 
-func Taps2Beats(taps [][]time.Duration, start, end, precision, latency time.Duration) []Beat {
+func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) []Beat {
 	// ... cluster taps into beats
-	array := []float64{}
+	data := []float64{}
+	weights := []float64{}
+	w := 1.0
 	for _, row := range taps {
 		for _, t := range row {
-			array = append(array, t.Seconds())
+			data = append(data, t.Seconds())
+			weights = append(weights, w)
 		}
+
+		w = w * (1.0 - t2b.Forgetting)
 	}
 
-	clusters := ckmeans.CKMeans1dDp(array, nil)
+	clusters := ckmeans.CKMeans1dDp(data, weights)
 
 	// TODO sort clusters by time (just in case)
 
@@ -65,21 +74,21 @@ func Taps2Beats(taps [][]time.Duration, start, end, precision, latency time.Dura
 
 	// ... compensate for latency
 	for i, b := range beats {
-		beats[i].At = (b.At - latency)
+		beats[i].At = (b.At - t2b.Latency)
 
 		if len(b.Taps) > 0 {
-			beats[i].Mean = (b.Mean - latency)
+			beats[i].Mean = (b.Mean - t2b.Latency)
 		}
 	}
 
 	// ... round to precision
 	for i, b := range beats {
-		beats[i].At = b.At.Round(precision)
-		beats[i].Mean = b.Mean.Round(precision)
-		beats[i].Variance = b.Variance.Round(precision)
+		beats[i].At = b.At.Round(t2b.Precision)
+		beats[i].Mean = b.Mean.Round(t2b.Precision)
+		beats[i].Variance = b.Variance.Round(t2b.Precision)
 
 		for j, t := range b.Taps {
-			beats[i].Taps[j] = t.Round(precision)
+			beats[i].Taps[j] = t.Round(t2b.Precision)
 		}
 	}
 

@@ -1,16 +1,19 @@
 ## IN PROGRESS
 
-- [ ] Exponential forgetting factor
 - [ ] Estimate BPM and offset
 - [ ] --no-quantize
 - [ ] --range [start,end]
-- [ ] --shift
+- [ ] --shift to adjust so that first beat is 0.0
 - [ ] Format output nicely
+- [ ] usage()
+- [ ] --help
 - [ ] JSON output
 - [ ] JSON input
 - [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] Web page
+- [ ] README
 
+- [x] Exponential forgetting factor
 - [x] --latency
 - [x] --precision
 - [x] Limit precision to 1ms
