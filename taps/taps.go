@@ -61,6 +61,7 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 	// ... estimate beats
 	var beats = []Beat{}
 	var BPM *uint
+	var offset *time.Duration
 
 	if b, err := interpolate(clusters); err != nil {
 		for _, cluster := range clusters {
@@ -72,10 +73,15 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 			m[b[i]] = c
 		}
 
-		beats, BPM = extrapolate(m, start, end)
+		beats, BPM, offset = extrapolate(m, start, end)
 	}
 
 	// ... compensate for latency
+	if offset != nil {
+		v := (*offset) - t2b.Latency
+		offset = &v
+	}
+
 	for i, b := range beats {
 		beats[i].At = (b.At - t2b.Latency)
 
@@ -85,6 +91,12 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 	}
 
 	// ... round to precision
+
+	if offset != nil {
+		v := (*offset).Round(t2b.Precision)
+		offset = &v
+	}
+
 	for i, b := range beats {
 		beats[i].At = b.At.Round(t2b.Precision)
 		beats[i].Mean = b.Mean.Round(t2b.Precision)
@@ -98,12 +110,13 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
 
 	return Beats{
-		BPM:   BPM,
-		Beats: beats,
+		BPM:    BPM,
+		Offset: offset,
+		Beats:  beats,
 	}
 }
 
-func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, *uint) {
+func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, *uint, *time.Duration) {
 	beats := []Beat{}
 
 	if len(clusters) < 2 {
@@ -111,7 +124,7 @@ func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]
 			beats = append(beats, makeBeat(cluster.Center, cluster))
 		}
 
-		return beats, nil
+		return beats, nil, nil
 	}
 
 	x := []float64{}
@@ -135,7 +148,16 @@ func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]
 
 	bpm := uint(math.Round(60.0 / m))
 
-	return beats, &bpm
+	b0 := int(math.Floor(-c / m))
+	t0 := float64(b0)*m + c
+	for t0 < 0.0 {
+		b0++
+		t0 = float64(b0)*m + c
+	}
+
+	offset := Seconds(t0)
+
+	return beats, &bpm, &offset
 }
 
 /* NOTE: assumes clusters are time sorted

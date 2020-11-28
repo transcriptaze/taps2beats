@@ -1,6 +1,5 @@
 ## IN PROGRESS
 
-- [ ] Estimate BPM and offset
 - [ ] --range [start,end]
 - [ ] --no-quantize
 - [ ] --cluster-only
@@ -10,10 +9,11 @@
 - [ ] --help
 - [ ] JSON output
 - [ ] JSON input
-- [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] Web page
 - [ ] README
+- [ ] (TEMPORARILY) copy ckmeans implementation into this project
 
+- [x] Estimate BPM and offset
 - [x] Exponential forgetting factor
 - [x] --latency
 - [x] --precision
