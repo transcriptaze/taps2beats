@@ -27,6 +27,7 @@ type T2B struct {
 	Precision  time.Duration
 	Latency    time.Duration
 	Forgetting float64
+	Quantize   bool
 }
 
 const (
@@ -38,6 +39,7 @@ var Default = T2B{
 	Precision:  1 * time.Millisecond,
 	Latency:    0 * time.Millisecond,
 	Forgetting: 0.0,
+	Quantize:   false,
 }
 
 func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Beats {
@@ -105,6 +107,17 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 		for j, t := range b.Taps {
 			beats[i].Taps[j] = t.Round(t2b.Precision)
 		}
+	}
+
+	// ... quantization
+
+	if !t2b.Quantize {
+		for i, b := range beats {
+			if len(beats[i].Taps) > 0 {
+				beats[i].At = b.Mean
+			}
+		}
+
 	}
 
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })

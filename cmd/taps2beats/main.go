@@ -21,12 +21,14 @@ var options = struct {
 	precision  time.Duration
 	latency    time.Duration
 	forgetting float64
+	quantize   bool
 	outfile    string
 	debug      bool
 }{
 	precision:  taps.Default.Precision,
 	latency:    taps.Default.Latency,
 	forgetting: taps.Default.Forgetting,
+	quantize:   taps.Default.Quantize,
 	outfile:    "",
 	debug:      false,
 }
@@ -35,6 +37,7 @@ func main() {
 	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats'")
 	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate")
 	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
+	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
 	flag.Parse()
@@ -67,12 +70,19 @@ func main() {
 		Precision:  options.precision,
 		Latency:    options.latency,
 		Forgetting: options.forgetting,
+		Quantize:   options.quantize,
 	}
 
 	if options.debug {
 		fmt.Printf("  ... rounding to %v precision\n", t2b.Precision)
 		fmt.Printf("  ... compensating for %v latency\n", t2b.Latency)
 		fmt.Printf("  ... using forgetting factor %v latency\n", t2b.Forgetting)
+
+		if t2b.Quantize {
+			fmt.Printf("  ... quantizing tapped beats to match estimated BPM\n")
+		} else {
+			fmt.Printf("  ... tapped beats are not quantized to match estimated BPM\n")
+		}
 	}
 
 	beats, err := t2b.Taps2Beats(taps.Floats2Seconds(data), 0, 8500*time.Millisecond), nil

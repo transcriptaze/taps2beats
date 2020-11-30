@@ -1,8 +1,7 @@
 ## IN PROGRESS
 
+- [ ] --interpolate
 - [ ] --range [start,end]
-- [ ] --no-quantize
-- [ ] --cluster-only
 - [ ] --shift to adjust so that first beat is 0.0
 - [ ] Format output nicely
 - [ ] usage()
@@ -13,6 +12,7 @@
 - [ ] README
 - [ ] (TEMPORARILY) copy ckmeans implementation into this project
 
+- [x] --quantize
 - [x] Estimate BPM and offset
 - [x] Exponential forgetting factor
 - [x] --latency
