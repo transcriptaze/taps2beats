@@ -18,19 +18,21 @@ import (
 const VERSION = "v0.0.0"
 
 var options = struct {
-	precision  time.Duration
-	latency    time.Duration
-	forgetting float64
-	quantize   bool
-	outfile    string
-	debug      bool
+	precision   time.Duration
+	latency     time.Duration
+	forgetting  float64
+	quantize    bool
+	interpolate bool
+	outfile     string
+	debug       bool
 }{
-	precision:  taps.Default.Precision,
-	latency:    taps.Default.Latency,
-	forgetting: taps.Default.Forgetting,
-	quantize:   taps.Default.Quantize,
-	outfile:    "",
-	debug:      false,
+	precision:   taps.Default.Precision,
+	latency:     taps.Default.Latency,
+	forgetting:  taps.Default.Forgetting,
+	quantize:    taps.Default.Quantize,
+	interpolate: taps.Default.Interpolate,
+	outfile:     "",
+	debug:       false,
 }
 
 func main() {
@@ -38,6 +40,7 @@ func main() {
 	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate")
 	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
+	flag.BoolVar(&options.interpolate, "interpolate", options.interpolate, "adds beats in gaps between tapped beats")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
 	flag.Parse()
@@ -67,10 +70,11 @@ func main() {
 	}
 
 	t2b := taps.T2B{
-		Precision:  options.precision,
-		Latency:    options.latency,
-		Forgetting: options.forgetting,
-		Quantize:   options.quantize,
+		Precision:   options.precision,
+		Latency:     options.latency,
+		Forgetting:  options.forgetting,
+		Quantize:    options.quantize,
+		Interpolate: options.interpolate,
 	}
 
 	if options.debug {
@@ -82,6 +86,12 @@ func main() {
 			fmt.Printf("  ... quantizing tapped beats to match estimated BPM\n")
 		} else {
 			fmt.Printf("  ... tapped beats are not quantized to match estimated BPM\n")
+		}
+
+		if t2b.Interpolate {
+			fmt.Printf("  ... interpolating missing beats\n")
+		} else {
+			fmt.Printf("  ... ignoring missing beats\n")
 		}
 	}
 

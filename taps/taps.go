@@ -24,10 +24,11 @@ type Beat struct {
 }
 
 type T2B struct {
-	Precision  time.Duration
-	Latency    time.Duration
-	Forgetting float64
-	Quantize   bool
+	Precision   time.Duration
+	Latency     time.Duration
+	Forgetting  float64
+	Quantize    bool
+	Interpolate bool
 }
 
 const (
@@ -117,7 +118,19 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 				beats[i].At = b.Mean
 			}
 		}
+	}
 
+	// ... interpolation
+
+	if !t2b.Interpolate {
+		list := []Beat{}
+		for _, b := range beats {
+			if len(b.Taps) > 0 {
+				list = append(list, b)
+			}
+		}
+
+		beats = list
 	}
 
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })

@@ -1,17 +1,17 @@
 ## IN PROGRESS
 
-- [ ] --interpolate
 - [ ] --range [start,end]
 - [ ] --shift to adjust so that first beat is 0.0
-- [ ] Format output nicely
-- [ ] usage()
 - [ ] --help
+- [ ] usage()
+- [ ] (TEMPORARILY) copy ckmeans implementation into this project
+- [ ] Format output nicely
 - [ ] JSON output
 - [ ] JSON input
 - [ ] Web page
 - [ ] README
-- [ ] (TEMPORARILY) copy ckmeans implementation into this project
 
+- [x] --interpolate
 - [x] --quantize
 - [x] Estimate BPM and offset
 - [x] Exponential forgetting factor
