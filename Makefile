@@ -19,7 +19,7 @@ test: build
 	go test ./...
 
 run: build
-	./bin/taps2beats --debug --precision 1ms --latency 7ms --quantize --interpolate ./runtime/taps.txt
+	./bin/taps2beats --debug --precision 1ms --latency 7ms --quantize --interpolate --range 3.4s:10.2s ./runtime/taps.txt
 
 vet: build
 	go vet ./...

@@ -17,12 +17,18 @@ import (
 
 const VERSION = "v0.0.0"
 
+type region struct {
+	start *time.Duration
+	end   *time.Duration
+}
+
 var options = struct {
 	precision   time.Duration
 	latency     time.Duration
 	forgetting  float64
 	quantize    bool
 	interpolate bool
+	region      region
 	outfile     string
 	debug       bool
 }{
@@ -31,6 +37,7 @@ var options = struct {
 	forgetting:  taps.Default.Forgetting,
 	quantize:    taps.Default.Quantize,
 	interpolate: taps.Default.Interpolate,
+	region:      region{},
 	outfile:     "",
 	debug:       false,
 }
@@ -41,6 +48,7 @@ func main() {
 	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
 	flag.BoolVar(&options.interpolate, "interpolate", options.interpolate, "adds beats in gaps between tapped beats")
+	flag.Var(&options.region, "range", "start and end times (in seconds) for which to return beats e.g. 0.8:10.0")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
 	flag.Parse()
@@ -59,9 +67,12 @@ func main() {
 		fmt.Printf("  ... reading data from %s\n", file)
 	}
 
-	data, err := read(file)
+	N, data, err := read(file)
 	if err != nil {
 		fmt.Printf("\n  ** ERROR: unable to read data from file %s (%v)\n\n", file, err)
+		os.Exit(1)
+	} else if N == 0 {
+		fmt.Printf("\n  ** ERROR: no data in file %s (%v)\n\n", file, err)
 		os.Exit(1)
 	}
 
@@ -95,11 +106,28 @@ func main() {
 		}
 	}
 
-	beats, err := t2b.Taps2Beats(taps.Floats2Seconds(data), 0, 8500*time.Millisecond), nil
-	if err != nil {
-		fmt.Printf("\n  ** ERROR: unable to translate taps to beats (%v)\n\n", err)
-		os.Exit(1)
+	beats := t2b.Taps2Beats(taps.Floats2Seconds(data), taps.Seconds(-0.5), taps.Seconds(13.5))
+
+	ix := 0
+	for i, b := range beats.Beats {
+		ix = i
+		if options.region.start == nil && len(b.Taps) > 0 {
+			break
+		} else if options.region.start != nil && *options.region.start <= b.At {
+			break
+		}
 	}
+
+	jx := ix
+	for i, b := range beats.Beats {
+		if options.region.end == nil && len(b.Taps) > 0 {
+			jx = i + 1
+		} else if options.region.end != nil && *options.region.end >= b.At {
+			jx = i + 1
+		}
+	}
+
+	beats.Beats = beats.Beats[ix:jx]
 
 	if options.debug {
 		fmt.Printf("  ... %v beats\n", len(beats.Beats))
@@ -118,12 +146,13 @@ func main() {
 	}
 }
 
-func read(f string) ([][]float64, error) {
+func read(f string) (int, [][]float64, error) {
 	bytes, err := ioutil.ReadFile(f)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
+	count := 0
 	data := [][]float64{}
 	re := regexp.MustCompile(`\s+`)
 	for _, line := range strings.Split(string(bytes), "\n") {
@@ -135,6 +164,7 @@ func read(f string) ([][]float64, error) {
 					fmt.Printf("  ** WARN: invalid value (%s)\n", t)
 				} else {
 					row = append(row, v)
+					count++
 				}
 			}
 		}
@@ -142,7 +172,7 @@ func read(f string) ([][]float64, error) {
 		data = append(data, row)
 	}
 
-	return data, nil
+	return count, data, nil
 }
 
 func print(f io.Writer, beats taps.Beats) {
@@ -223,4 +253,60 @@ func usage() {
 	fmt.Println()
 	fmt.Println("    --debug     Displays internal information for diagnosing errors")
 	fmt.Println()
+}
+
+func (r *region) String() string {
+	if r.start != nil && r.end != nil {
+		return fmt.Sprintf("%.1f:%.1f", r.start.Seconds(), r.end.Seconds())
+	} else if r.start != nil {
+		return fmt.Sprintf("%.1f", r.start.Seconds())
+	} else if r.end != nil {
+		return fmt.Sprintf(":%.1f", r.end.Seconds())
+	}
+
+	return ""
+}
+
+func (r *region) Set(s string) error {
+	re := regexp.MustCompile(`[0-9]+(\.[0-9]*)?`)
+	tokens := strings.Split(s, ":")
+
+	if len(tokens) > 1 {
+		if re.MatchString(tokens[0]) {
+			start, err := time.ParseDuration(tokens[0])
+			if err != nil {
+				return err
+			}
+
+			r.start = &start
+		}
+
+		if re.MatchString(tokens[1]) {
+			end, err := time.ParseDuration(tokens[1])
+			if err != nil {
+				return err
+			}
+
+			if r.start == nil || end > *r.start {
+				r.end = &end
+			}
+		}
+
+		return nil
+	}
+
+	if len(tokens) > 0 {
+		if re.MatchString(tokens[0]) {
+			start, err := time.ParseDuration(tokens[0])
+			if err != nil {
+				return err
+			}
+
+			r.start = &start
+
+			return nil
+		}
+	}
+
+	return nil
 }

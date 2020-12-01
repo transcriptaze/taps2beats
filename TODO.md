@@ -1,6 +1,6 @@
 ## IN PROGRESS
 
-- [ ] --range [start,end]
+- [ ] split quantize and interpolate out as callable functions and let taps2beat just do clustering
 - [ ] --shift to adjust so that first beat is 0.0
 - [ ] --help
 - [ ] usage()
@@ -10,7 +10,9 @@
 - [ ] JSON input
 - [ ] Web page
 - [ ] README
+- [ ] Read from stdin
 
+- [x] --range [start,end]
 - [x] --interpolate
 - [x] --quantize
 - [x] Estimate BPM and offset
