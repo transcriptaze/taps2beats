@@ -11,8 +11,8 @@ import (
 )
 
 type Beats struct {
-	BPM    *uint
-	Offset *time.Duration
+	BPM    uint
+	Offset time.Duration
 	Beats  []Beat
 }
 
@@ -63,8 +63,8 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 
 	// ... estimate beats
 	var beats = []Beat{}
-	var BPM *uint
-	var offset *time.Duration
+	var BPM uint
+	var offset time.Duration
 
 	if b, err := interpolate(clusters); err != nil {
 		for _, cluster := range clusters {
@@ -80,10 +80,7 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 	}
 
 	// ... compensate for latency
-	if offset != nil {
-		v := (*offset) - t2b.Latency
-		offset = &v
-	}
+	offset = offset - t2b.Latency
 
 	for i, b := range beats {
 		beats[i].At = (b.At - t2b.Latency)
@@ -95,10 +92,7 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 
 	// ... round to precision
 
-	if offset != nil {
-		v := (*offset).Round(t2b.Precision)
-		offset = &v
-	}
+	offset = offset.Round(t2b.Precision)
 
 	for i, b := range beats {
 		beats[i].At = b.At.Round(t2b.Precision)
@@ -143,19 +137,11 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 }
 
 func (t2b *T2B) Shift(beats Beats) Beats {
-	shifted := Beats{}
-
-	if beats.BPM != nil {
-		bpm := *beats.BPM
-		shifted.BPM = &bpm
+	shifted := Beats{
+		BPM:    beats.BPM,
+		Offset: 0,
+		Beats:  make([]Beat, len(beats.Beats)),
 	}
-
-	if beats.Offset != nil {
-		offset := 0 * time.Second
-		shifted.Offset = &offset
-	}
-
-	shifted.Beats = make([]Beat, len(beats.Beats))
 
 	if len(beats.Beats) > 0 {
 		sort.SliceStable(beats.Beats, func(i, j int) bool { return beats.Beats[i].At < beats.Beats[j].At })
@@ -181,7 +167,7 @@ func (t2b *T2B) Shift(beats Beats) Beats {
 	return shifted
 }
 
-func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, *uint, *time.Duration) {
+func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, uint, time.Duration) {
 	beats := []Beat{}
 
 	if len(clusters) < 2 {
@@ -189,7 +175,7 @@ func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]
 			beats = append(beats, makeBeat(cluster.Center, cluster))
 		}
 
-		return beats, nil, nil
+		return beats, 0, 0
 	}
 
 	x := []float64{}
@@ -222,7 +208,7 @@ func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]
 
 	offset := Seconds(t0)
 
-	return beats, &bpm, &offset
+	return beats, bpm, offset
 }
 
 /* NOTE: assumes clusters are time sorted

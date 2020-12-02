@@ -186,14 +186,8 @@ func read(f string) (int, [][]float64, error) {
 }
 
 func print(f io.Writer, beats taps.Beats) {
-	if beats.BPM != nil && beats.Offset != nil {
-		fmt.Fprintf(f, "BPM:    %v\n", *beats.BPM)
-		fmt.Fprintf(f, "Offset: %v\n\n", beats.Offset)
-	} else if beats.BPM != nil {
-		fmt.Fprintf(f, "BPM: %v\n\n", beats.BPM)
-	} else if beats.Offset != nil {
-		fmt.Fprintf(f, "Offset: %v\n\n", beats.Offset)
-	}
+	fmt.Fprintf(f, "BPM:    %v\n", beats.BPM)
+	fmt.Fprintf(f, "Offset: %v\n\n", beats.Offset)
 
 	for i, b := range beats.Beats {
 		fmt.Fprintf(f, "%d %v %v %v %v\n", i+1, b.At, b.Mean, b.Variance, b.Taps)

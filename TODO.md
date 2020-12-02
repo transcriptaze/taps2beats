@@ -1,6 +1,5 @@
 ## IN PROGRESS
 
-- [ ] make BPM and Offset not pointers
 - [ ] split quantize and interpolate out as callable functions and let taps2beats just do clustering
 - [ ] --help
 - [ ] usage()
@@ -13,6 +12,7 @@
 - [ ] Read from stdin
 - [ ] godoc
 
+- [x] make BPM and Offset not pointers
 - [x] --shift to adjust so that first beat is 0.0
 - [x] --range [start,end]
 - [x] --interpolate

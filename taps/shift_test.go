@@ -7,6 +7,8 @@ import (
 
 func TestShift(t *testing.T) {
 	expected := Beats{
+		BPM:    123,
+		Offset: 0 * time.Millisecond,
 		Beats: []Beat{
 			{
 				At:       0 * time.Millisecond,
@@ -51,11 +53,9 @@ func TestShift(t *testing.T) {
 		},
 	}
 
-	bpm := uint(123)
-	offset := 117 * time.Millisecond
 	beats := Beats{
-		BPM:    &bpm,
-		Offset: &offset,
+		BPM:    123,
+		Offset: 117 * time.Millisecond,
 		Beats: []Beat{
 			beats[8], beats[10], beats[9], beats[11], beats[13], beats[12], beats[15], beats[14],
 		},
@@ -71,12 +71,12 @@ func TestShift(t *testing.T) {
 
 	beats = t2b.Shift(beats)
 
-	if beats.BPM == nil || *beats.BPM != uint(123) {
-		t.Errorf("BPM unexpectedly modified - expected:%v, got:%v", 123, beats.BPM)
+	if beats.BPM != expected.BPM {
+		t.Errorf("BPM unexpectedly modified - expected:%v, got:%v", expected.BPM, beats.BPM)
 	}
 
-	if beats.Offset == nil || *beats.Offset != 0*time.Second {
-		t.Errorf("Incorrect offset - expected:%v, got:%v", 0*time.Second, beats.Offset)
+	if beats.Offset != expected.Offset {
+		t.Errorf("Incorrect offset - expected:%v, got:%v", expected.Offset, beats.Offset)
 	}
 
 	compare(beats.Beats, expected.Beats, t)
@@ -84,14 +84,14 @@ func TestShift(t *testing.T) {
 
 func TestShiftWithNoData(t *testing.T) {
 	expected := Beats{
-		Beats: []Beat{},
+		BPM:    123,
+		Offset: 0 * time.Millisecond,
+		Beats:  []Beat{},
 	}
 
-	bpm := uint(123)
-	offset := 117 * time.Millisecond
 	beats := Beats{
-		BPM:    &bpm,
-		Offset: &offset,
+		BPM:    123,
+		Offset: 117 * time.Millisecond,
 		Beats:  []Beat{},
 	}
 
@@ -105,12 +105,12 @@ func TestShiftWithNoData(t *testing.T) {
 
 	beats = t2b.Shift(beats)
 
-	if beats.BPM == nil || *beats.BPM != uint(123) {
-		t.Errorf("BPM unexpectedly modified - expected:%v, got:%v", 123, beats.BPM)
+	if beats.BPM != expected.BPM {
+		t.Errorf("BPM unexpectedly modified - expected:%v, got:%v", expected.BPM, beats.BPM)
 	}
 
-	if beats.Offset == nil || *beats.Offset != 0*time.Second {
-		t.Errorf("Incorrect offset - expected:%v, got:%v", 0*time.Second, beats.Offset)
+	if beats.Offset != expected.Offset {
+		t.Errorf("Incorrect offset - expected:%v, got:%v", expected.Offset, beats.Offset)
 	}
 
 	compare(beats.Beats, expected.Beats, t)
@@ -118,6 +118,8 @@ func TestShiftWithNoData(t *testing.T) {
 
 func TestShiftWithExtrapolatedData(t *testing.T) {
 	expected := Beats{
+		BPM:    123,
+		Offset: 0 * time.Millisecond,
 		Beats: []Beat{
 			{At: 0 * time.Millisecond},
 			{At: 526 * time.Millisecond},
@@ -166,11 +168,9 @@ func TestShiftWithExtrapolatedData(t *testing.T) {
 		},
 	}
 
-	bpm := uint(123)
-	offset := 117 * time.Millisecond
 	beats := Beats{
-		BPM:    &bpm,
-		Offset: &offset,
+		BPM:    123,
+		Offset: 117 * time.Millisecond,
 		Beats: []Beat{
 			beats[6], beats[7],
 			beats[8], beats[10], beats[9], beats[11], beats[13], beats[12], beats[15], beats[14],
@@ -188,12 +188,12 @@ func TestShiftWithExtrapolatedData(t *testing.T) {
 
 	beats = t2b.Shift(beats)
 
-	if beats.BPM == nil || *beats.BPM != uint(123) {
-		t.Errorf("BPM unexpectedly modified - expected:%v, got:%v", 123, beats.BPM)
+	if beats.BPM != expected.BPM {
+		t.Errorf("BPM unexpectedly modified - expected:%v, got:%v", expected.BPM, beats.BPM)
 	}
 
-	if beats.Offset == nil || *beats.Offset != 0*time.Second {
-		t.Errorf("Incorrect offset - expected:%v, got:%v", 0*time.Second, beats.Offset)
+	if beats.Offset != expected.Offset {
+		t.Errorf("Incorrect offset - expected:%v, got:%v", expected.Offset, beats.Offset)
 	}
 
 	compare(beats.Beats, expected.Beats, t)
