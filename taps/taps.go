@@ -142,6 +142,45 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 	}
 }
 
+func (t2b *T2B) Shift(beats Beats) Beats {
+	shifted := Beats{}
+
+	if beats.BPM != nil {
+		bpm := *beats.BPM
+		shifted.BPM = &bpm
+	}
+
+	if beats.Offset != nil {
+		offset := 0 * time.Second
+		shifted.Offset = &offset
+	}
+
+	shifted.Beats = make([]Beat, len(beats.Beats))
+
+	if len(beats.Beats) > 0 {
+		sort.SliceStable(beats.Beats, func(i, j int) bool { return beats.Beats[i].At < beats.Beats[j].At })
+
+		shift := beats.Beats[0].At
+		for i, b := range beats.Beats {
+			shifted.Beats[i] = Beat{
+				At:       b.At - shift,
+				Mean:     b.Mean,
+				Variance: b.Variance,
+				Taps:     make([]time.Duration, len(b.Taps)),
+			}
+
+			if len(b.Taps) > 0 {
+				shifted.Beats[i].Mean = b.Mean - shift
+				for j, t := range b.Taps {
+					shifted.Beats[i].Taps[j] = t - shift
+				}
+			}
+		}
+	}
+
+	return shifted
+}
+
 func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, *uint, *time.Duration) {
 	beats := []Beat{}
 

@@ -29,6 +29,7 @@ var options = struct {
 	quantize    bool
 	interpolate bool
 	region      region
+	shift       bool
 	outfile     string
 	debug       bool
 }{
@@ -49,6 +50,7 @@ func main() {
 	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
 	flag.BoolVar(&options.interpolate, "interpolate", options.interpolate, "adds beats in gaps between tapped beats")
 	flag.Var(&options.region, "range", "start and end times (in seconds) for which to return beats e.g. 0.8:10.0")
+	flag.BoolVar(&options.shift, "shift", options.shift, "shifts all times so that the first beat is on 0")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
 	flag.Parse()
@@ -131,6 +133,14 @@ func main() {
 
 	if options.debug {
 		fmt.Printf("  ... %v beats\n", len(beats.Beats))
+	}
+
+	if options.shift {
+		if options.debug {
+			fmt.Printf("  ... shifting beats to start at 0\n")
+		}
+
+		beats = t2b.Shift(beats)
 	}
 
 	var b bytes.Buffer
