@@ -36,7 +36,7 @@ var options = struct {
 	precision:   taps.Default.Precision,
 	latency:     taps.Default.Latency,
 	forgetting:  taps.Default.Forgetting,
-	quantize:    taps.Default.Quantize,
+	quantize:    false,
 	interpolate: taps.Default.Interpolate,
 	region:      region{},
 	outfile:     "",
@@ -86,7 +86,6 @@ func main() {
 		Precision:   options.precision,
 		Latency:     options.latency,
 		Forgetting:  options.forgetting,
-		Quantize:    options.quantize,
 		Interpolate: options.interpolate,
 	}
 
@@ -94,12 +93,6 @@ func main() {
 		fmt.Printf("  ... rounding to %v precision\n", t2b.Precision)
 		fmt.Printf("  ... compensating for %v latency\n", t2b.Latency)
 		fmt.Printf("  ... using forgetting factor %v latency\n", t2b.Forgetting)
-
-		if t2b.Quantize {
-			fmt.Printf("  ... quantizing tapped beats to match estimated BPM\n")
-		} else {
-			fmt.Printf("  ... tapped beats are not quantized to match estimated BPM\n")
-		}
 
 		if t2b.Interpolate {
 			fmt.Printf("  ... interpolating missing beats\n")
@@ -109,6 +102,22 @@ func main() {
 	}
 
 	beats := t2b.Taps2Beats(taps.Floats2Seconds(data), taps.Seconds(-0.5), taps.Seconds(13.5))
+
+	// ... quantize
+
+	if options.quantize {
+		if options.debug {
+			fmt.Printf("  ... quantizing tapped beats to match estimated BPM\n")
+		}
+
+		beats, err = t2b.Quantize(beats)
+		if err != nil {
+			fmt.Printf("\n  ** ERROR: unable to quantize beats (%v)\n\n", err)
+			os.Exit(1)
+		}
+	} else if options.debug {
+		fmt.Printf("  ... tapped beats are not quantized to match estimated BPM\n")
+	}
 
 	ix := 0
 	for i, b := range beats.Beats {

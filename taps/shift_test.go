@@ -65,7 +65,6 @@ func TestShift(t *testing.T) {
 		Precision:   Default.Precision,
 		Latency:     Default.Latency,
 		Forgetting:  Default.Forgetting,
-		Quantize:    true,
 		Interpolate: true,
 	}
 
@@ -99,7 +98,6 @@ func TestShiftWithNoData(t *testing.T) {
 		Precision:   Default.Precision,
 		Latency:     Default.Latency,
 		Forgetting:  Default.Forgetting,
-		Quantize:    true,
 		Interpolate: true,
 	}
 
@@ -182,7 +180,6 @@ func TestShiftWithExtrapolatedData(t *testing.T) {
 		Precision:   Default.Precision,
 		Latency:     Default.Latency,
 		Forgetting:  Default.Forgetting,
-		Quantize:    true,
 		Interpolate: true,
 	}
 

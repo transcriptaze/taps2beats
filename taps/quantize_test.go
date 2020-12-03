@@ -23,11 +23,10 @@ func TestQuantize(t *testing.T) {
 		Precision:   Default.Precision,
 		Latency:     Default.Latency,
 		Forgetting:  Default.Forgetting,
-		Quantize:    true,
 		Interpolate: true,
 	}
 
-	beats, err := t2b.QuantizeX(data)
+	beats, err := t2b.Quantize(data)
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -60,11 +59,10 @@ func TestQuantizeWithNoData(t *testing.T) {
 		Precision:   Default.Precision,
 		Latency:     Default.Latency,
 		Forgetting:  Default.Forgetting,
-		Quantize:    true,
 		Interpolate: true,
 	}
 
-	beats, err := t2b.QuantizeX(data)
+	beats, err := t2b.Quantize(data)
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -97,11 +95,10 @@ func TestQuantizeWithOneDataPoint(t *testing.T) {
 		Precision:   Default.Precision,
 		Latency:     Default.Latency,
 		Forgetting:  Default.Forgetting,
-		Quantize:    true,
 		Interpolate: true,
 	}
 
-	beats, err := t2b.QuantizeX(data)
+	beats, err := t2b.Quantize(data)
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}

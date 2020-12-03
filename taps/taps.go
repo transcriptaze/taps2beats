@@ -27,7 +27,6 @@ type T2B struct {
 	Precision   time.Duration
 	Latency     time.Duration
 	Forgetting  float64
-	Quantize    bool
 	Interpolate bool
 }
 
@@ -40,7 +39,6 @@ var Default = T2B{
 	Precision:  1 * time.Millisecond,
 	Latency:    0 * time.Millisecond,
 	Forgetting: 0.0,
-	Quantize:   false,
 }
 
 func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Beats {
@@ -104,13 +102,11 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 		}
 	}
 
-	// ... quantization
-
-	if !t2b.Quantize {
-		for i, b := range beats {
-			if len(beats[i].Taps) > 0 {
-				beats[i].At = b.Mean
-			}
+	// ... remove quantization
+	// FIXME - shouldn't be necessary after interpolate is factored out
+	for i, b := range beats {
+		if len(beats[i].Taps) > 0 {
+			beats[i].At = b.Mean
 		}
 	}
 
@@ -136,7 +132,7 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 	}
 }
 
-func (t2b *T2B) QuantizeX(beats Beats) (Beats, error) {
+func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
 	if len(beats.Beats) < 2 {
 		quantized := Beats{
 			BPM:    0,
