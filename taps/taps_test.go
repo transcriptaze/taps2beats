@@ -54,6 +54,37 @@ var beats = []Beat{
 	{At: 2946 * time.Millisecond},
 	{At: 3472 * time.Millisecond},
 	{At: 3998 * time.Millisecond},
+	{At: 4524 * time.Millisecond, Mean: 4524 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
+	{At: 5057 * time.Millisecond, Mean: 5057 * time.Millisecond, Variance: 8 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
+	{At: 5578 * time.Millisecond, Mean: 5578 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
+	{At: 6101 * time.Millisecond, Mean: 6101 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[3]},
+	{At: 6618 * time.Millisecond, Mean: 6618 * time.Millisecond, Variance: 7 * time.Millisecond, Taps: Floats2Seconds(bins)[4]},
+	{At: 7153 * time.Millisecond, Mean: 7153 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[5]},
+	{At: 7685 * time.Millisecond, Mean: 7685 * time.Millisecond, Variance: 5 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
+	{At: 8210 * time.Millisecond, Mean: 8210 * time.Millisecond, Variance: 12 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
+	//	{At: 4525 * time.Millisecond, Mean: 4524 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
+	//	{At: 5051 * time.Millisecond, Mean: 5057 * time.Millisecond, Variance: 8 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
+	//	{At: 5577 * time.Millisecond, Mean: 5578 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
+	//	{At: 6103 * time.Millisecond, Mean: 6101 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[3]},
+	//	{At: 6629 * time.Millisecond, Mean: 6618 * time.Millisecond, Variance: 7 * time.Millisecond, Taps: Floats2Seconds(bins)[4]},
+	//	{At: 7155 * time.Millisecond, Mean: 7153 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[5]},
+	//	{At: 7681 * time.Millisecond, Mean: 7685 * time.Millisecond, Variance: 5 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
+	//	{At: 8207 * time.Millisecond, Mean: 8210 * time.Millisecond, Variance: 12 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
+	{At: 8733 * time.Millisecond},
+	{At: 9260 * time.Millisecond},
+	{At: 9786 * time.Millisecond},
+	{At: 10312 * time.Millisecond},
+}
+
+var quantized = []Beat{
+	{At: 316 * time.Millisecond},
+	{At: 842 * time.Millisecond},
+	{At: 1368 * time.Millisecond},
+	{At: 1894 * time.Millisecond},
+	{At: 2420 * time.Millisecond},
+	{At: 2946 * time.Millisecond},
+	{At: 3472 * time.Millisecond},
+	{At: 3998 * time.Millisecond},
 	{At: 4525 * time.Millisecond, Mean: 4524 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
 	{At: 5051 * time.Millisecond, Mean: 5057 * time.Millisecond, Variance: 8 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
 	{At: 5577 * time.Millisecond, Mean: 5578 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
@@ -73,9 +104,9 @@ func TestTaps2Beats(t *testing.T) {
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
 		Beats: []Beat{
-			beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7],
-			beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15],
-			beats[16], beats[17], beats[18], beats[19],
+			quantized[0], quantized[1], quantized[2], quantized[3], quantized[4], quantized[5], quantized[6], quantized[7],
+			quantized[8], quantized[9], quantized[10], quantized[11], quantized[12], quantized[13], quantized[14], quantized[15],
+			quantized[16], quantized[17], quantized[18], quantized[19],
 		},
 	}
 
@@ -144,7 +175,7 @@ func TestTaps2BeatsWithoutInterpolation(t *testing.T) {
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
 		Beats: []Beat{
-			beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15],
+			quantized[8], quantized[9], quantized[10], quantized[11], quantized[12], quantized[13], quantized[14], quantized[15],
 		},
 	}
 
@@ -174,16 +205,16 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
 		Beats: []Beat{
-			beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7],
-			beats[8],
-			beats[9],
-			beats[10],
-			beats[11],
-			beats[12],
+			quantized[0], quantized[1], quantized[2], quantized[3], quantized[4], quantized[5], quantized[6], quantized[7],
+			quantized[8],
+			quantized[9],
+			quantized[10],
+			quantized[11],
+			quantized[12],
 			Beat{At: Seconds(7.155061419), Mean: 0, Variance: 0, Taps: []time.Duration{}},
-			beats[14],
-			beats[15],
-			beats[16], beats[17], beats[18], beats[19],
+			quantized[14],
+			quantized[15],
+			quantized[16], quantized[17], quantized[18], quantized[19],
 		},
 	}
 
@@ -413,7 +444,7 @@ func TestTaps2BeatsWithForgetting(t *testing.T) {
 }
 
 func TestExtrapolate(t *testing.T) {
-	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
+	expected := []Beat{quantized[8], quantized[9], quantized[10], quantized[11], quantized[12], quantized[13], quantized[14], quantized[15]}
 
 	m := map[int]ckmeans.Cluster{
 		1: clusters[0],
@@ -451,7 +482,11 @@ func TestExtrapolateWithPrePadding(t *testing.T) {
 		8: clusters[7],
 	}
 
-	expected := []Beat{beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7], beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]}
+	expected := []Beat{
+		quantized[0], quantized[1], quantized[2], quantized[3], quantized[4], quantized[5], quantized[6], quantized[7],
+		quantized[8], quantized[9], quantized[10], quantized[11], quantized[12], quantized[13], quantized[14], quantized[15],
+	}
+
 	beats, BPM, offset := extrapolate(m, Seconds(0), Seconds(8.5))
 
 	if BPM != 114 {
@@ -477,7 +512,7 @@ func TestExtrapolateWithPostPadding(t *testing.T) {
 		8: clusters[7],
 	}
 
-	expected := []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15], beats[16], beats[17], beats[18], beats[19]}
+	expected := []Beat{quantized[8], quantized[9], quantized[10], quantized[11], quantized[12], quantized[13], quantized[14], quantized[15], quantized[16], quantized[17], quantized[18], quantized[19]}
 	beats, BPM, offset := extrapolate(m, Seconds(4), Seconds(10.5))
 
 	if BPM != 114 {

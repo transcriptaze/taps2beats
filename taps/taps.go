@@ -136,6 +136,63 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 	}
 }
 
+func (t2b *T2B) QuantizeX(beats Beats) (Beats, error) {
+	if len(beats.Beats) < 2 {
+		quantized := Beats{
+			BPM:    0,
+			Offset: 0 * time.Millisecond,
+			Beats:  make([]Beat, len(beats.Beats)),
+		}
+
+		copy(quantized.Beats, beats.Beats)
+
+		if len(quantized.Beats) > 0 {
+			quantized.Offset = quantized.Beats[0].At
+		}
+
+		return quantized, nil
+	}
+
+	index, err := remap(beats)
+	if err != nil {
+		return beats, err
+	}
+
+	quantized := []Beat{}
+	x := []float64{}
+	t := []float64{}
+	for ix, b := range index {
+		x = append(x, float64(ix))
+		t = append(t, b.At.Seconds())
+	}
+
+	m, c := regression.OLS(x, t)
+
+	for ix, b := range index {
+		quantized = append(quantized, Beat{
+			At:       Seconds(float64(ix)*m + c),
+			Mean:     b.Mean,
+			Variance: b.Variance,
+			Taps:     b.Taps,
+		})
+	}
+
+	sort.SliceStable(quantized, func(i, j int) bool { return quantized[i].At < quantized[j].At })
+
+	b0 := int(math.Floor(-c / m))
+	t0 := float64(b0)*m + c
+	for t0 < 0.0 {
+		b0++
+		t0 = float64(b0)*m + c
+	}
+
+	return Beats{
+		BPM:    uint(math.Round(60.0 / m)),
+		Offset: Seconds(t0),
+		Beats:  quantized,
+	}, nil
+}
+
 func (t2b *T2B) Shift(beats Beats) Beats {
 	shifted := Beats{
 		BPM:    beats.BPM,
@@ -268,6 +325,82 @@ loop:
 	}
 
 	return nil, fmt.Errorf("Error interpolating beats: %v", beats)
+}
+
+func remap(beats Beats) (map[int]Beat, error) {
+	sort.SliceStable(beats.Beats, func(i, j int) bool { return beats.Beats[i].At < beats.Beats[j].At })
+
+	at := make([]float64, len(beats.Beats))
+	for i, b := range beats.Beats {
+		at[i] = b.At.Seconds()
+	}
+
+	N := len(at)
+	index := make([]int, N)
+
+	for i := range index {
+		index[i] = i + 1
+	}
+
+	// ... trivial cases
+	if N <= 2 {
+		m := map[int]Beat{}
+
+		for i, ix := range index {
+			m[ix] = beats.Beats[i]
+		}
+
+		return m, nil
+	}
+
+	// ... 3+ intervals
+
+	x0 := at[0]
+	xn := at[N-1]
+	y0 := 1.0
+
+	dt := Seconds(xn - x0).Minutes()
+	bmax := int(math.Ceil(dt * float64(MaxBPM*MinSubdivision/4)))
+
+loop:
+	for i := N; i <= bmax; i++ {
+		yn := float64(i)
+		m := (yn - y0) / (xn - x0)
+		c := yn - m*xn
+
+		x := at[0]
+		y := m*x + c
+		b0 := math.Round(y)
+		index[0] = int(b0)
+		sumsq := y*y - 2*y*b0 + b0*b0
+
+		for j := 1; j < N; j++ {
+			x := at[j]
+			y := m*x + c
+			bn := math.Round(y)
+
+			index[j] = int(bn)
+			if index[j] <= index[j-1] {
+				continue loop
+			}
+
+			sumsq += y*y - 2*y*bn + bn*bn
+		}
+
+		variance := sumsq / float64(N-1)
+
+		if variance < 0.001 {
+			m := map[int]Beat{}
+
+			for i, ix := range index {
+				m[ix] = beats.Beats[i]
+			}
+
+			return m, nil
+		}
+	}
+
+	return nil, fmt.Errorf("Error mapping taps to beats: %v", beats)
 }
 
 func makeBeat(at float64, cluster ckmeans.Cluster) Beat {

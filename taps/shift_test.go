@@ -57,7 +57,7 @@ func TestShift(t *testing.T) {
 		BPM:    123,
 		Offset: 117 * time.Millisecond,
 		Beats: []Beat{
-			beats[8], beats[10], beats[9], beats[11], beats[13], beats[12], beats[15], beats[14],
+			quantized[8], quantized[10], quantized[9], quantized[11], quantized[13], quantized[12], quantized[15], quantized[14],
 		},
 	}
 
@@ -172,9 +172,9 @@ func TestShiftWithExtrapolatedData(t *testing.T) {
 		BPM:    123,
 		Offset: 117 * time.Millisecond,
 		Beats: []Beat{
-			beats[6], beats[7],
-			beats[8], beats[10], beats[9], beats[11], beats[13], beats[12], beats[15], beats[14],
-			beats[16], beats[17],
+			quantized[6], quantized[7],
+			quantized[8], quantized[10], quantized[9], quantized[11], quantized[13], quantized[12], quantized[15], quantized[14],
+			quantized[16], quantized[17],
 		},
 	}
 

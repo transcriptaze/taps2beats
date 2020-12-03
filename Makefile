@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestShiftWithExtrapolatedData
+	go test ./... -run TestQuantizeX
 
 build: format
 	mkdir -p bin

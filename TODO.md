@@ -1,9 +1,9 @@
 ## IN PROGRESS
 
 - [ ] split quantize and interpolate out as callable functions and let taps2beats just do clustering
+- [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] --help
 - [ ] usage()
-- [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] Format output nicely
 - [ ] JSON output
 - [ ] JSON input
