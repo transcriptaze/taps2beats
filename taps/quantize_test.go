@@ -107,7 +107,7 @@ func TestQuantizeWithOneDataPoint(t *testing.T) {
 		t.Errorf("BPM unexpectedly modified - expected:%v, got:%v", expected.BPM, beats.BPM)
 	}
 
-	if beats.Offset != expected.Offset {
+	if math.Abs(beats.Offset.Seconds()-expected.Offset.Seconds()) >= 0.0011 {
 		t.Errorf("Incorrect offset - expected:%v, got:%v", expected.Offset, beats.Offset)
 	}
 

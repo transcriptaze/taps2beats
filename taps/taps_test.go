@@ -51,17 +51,17 @@ var beats = []Beat{
 	{At: 1368 * time.Millisecond},
 	{At: 1894 * time.Millisecond},
 	{At: 2420 * time.Millisecond},
-	{At: 2946 * time.Millisecond},
+	{At: 2947 * time.Millisecond},
 	{At: 3472 * time.Millisecond},
-	{At: 3998 * time.Millisecond},
-	{At: 4524 * time.Millisecond, Mean: 4524 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
-	{At: 5057 * time.Millisecond, Mean: 5057 * time.Millisecond, Variance: 8 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
-	{At: 5578 * time.Millisecond, Mean: 5578 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
-	{At: 6101 * time.Millisecond, Mean: 6101 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[3]},
-	{At: 6618 * time.Millisecond, Mean: 6618 * time.Millisecond, Variance: 7 * time.Millisecond, Taps: Floats2Seconds(bins)[4]},
-	{At: 7153 * time.Millisecond, Mean: 7153 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[5]},
-	{At: 7685 * time.Millisecond, Mean: 7685 * time.Millisecond, Variance: 5 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
-	{At: 8210 * time.Millisecond, Mean: 8210 * time.Millisecond, Variance: 12 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
+	{At: 3999 * time.Millisecond},
+	{At: Seconds(4.523694381), Mean: 4524 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
+	{At: Seconds(5.057687493), Mean: 5057 * time.Millisecond, Variance: 8 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
+	{At: Seconds(5.578084204), Mean: 5578 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
+	{At: Seconds(6.100485910), Mean: 6101 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[3]},
+	{At: Seconds(6.618216081), Mean: 6618 * time.Millisecond, Variance: 7 * time.Millisecond, Taps: Floats2Seconds(bins)[4]},
+	{At: Seconds(7.153334490), Mean: 7153 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[5]},
+	{At: Seconds(7.685755996), Mean: 7685 * time.Millisecond, Variance: 5 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
+	{At: Seconds(8.210333335), Mean: 8210 * time.Millisecond, Variance: 12 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
 	{At: 8733 * time.Millisecond},
 	{At: 9260 * time.Millisecond},
 	{At: 9786 * time.Millisecond},
@@ -91,7 +91,7 @@ var quantized = []Beat{
 	{At: 10312 * time.Millisecond},
 }
 
-func TestTaps2Beats(t *testing.T) {
+func TestTaps2BeatsX(t *testing.T) {
 	expected := Beats{
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
@@ -788,21 +788,21 @@ func seconds(floats ...float64) []time.Duration {
 
 func compare(beats, expected []Beat, t *testing.T) {
 	if len(beats) != len(expected) {
-		t.Errorf("Invalid result\n   expected: %v\n   got:      %v", expected, beats)
+		t.Errorf("Invalid result\n   expected: %v beats\n   got:      %v beats", len(expected), len(beats))
 		return
 	}
 
 	for i, v := range expected {
 		if !reflect.DeepEqual(v, beats[i]) {
-			if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) > 0.0011 {
+			if math.Abs(beats[i].At.Seconds()-v.At.Seconds()) >= 0.0011 {
 				t.Errorf("Invalid beat %d 'at' - expected:%v, got:%v (delta:%.4f)", i+1, v.At, beats[i].At, math.Abs(beats[i].At.Seconds()-v.At.Seconds()))
 			}
 
-			if math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()) > 0.0011 {
+			if math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()) >= 0.0011 {
 				t.Errorf("Invalid beat %d 'mean' - expected:%v, got:%v (delta:%.4f)", i+1, v.Mean, beats[i].Mean, math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()))
 			}
 
-			if math.Abs(beats[i].Variance.Seconds()-v.Variance.Seconds()) > 0.0011 {
+			if math.Abs(beats[i].Variance.Seconds()-v.Variance.Seconds()) >= 0.0011 {
 				t.Errorf("Invalid beat %d 'variance' - expected:%v, got:%v (delta:%.4f)", i+1, v.Variance, beats[i].Variance, math.Abs(beats[i].Mean.Seconds()-v.Mean.Seconds()))
 			}
 
@@ -813,7 +813,7 @@ func compare(beats, expected []Beat, t *testing.T) {
 				}
 
 				for j := range v.Taps {
-					if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) > 0.001 {
+					if math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()) >= 0.0011 {
 						t.Errorf("Invalid beat %d 'taps'\n   expected: %v\n   got:      %v (delta:%.4f)", i+1, v.Taps, beats[i].Taps, math.Abs(beats[i].Taps[j].Seconds()-v.Taps[j].Seconds()))
 						break
 					}

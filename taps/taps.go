@@ -154,7 +154,6 @@ func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
 		return beats, err
 	}
 
-	quantized := []Beat{}
 	x := []float64{}
 	t := []float64{}
 	for ix, b := range index {
@@ -164,6 +163,7 @@ func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
 
 	m, c := regression.OLS(x, t)
 
+	quantized := []Beat{}
 	for ix, b := range index {
 		quantized = append(quantized, Beat{
 			At:       Seconds(float64(ix)*m + c),
@@ -186,6 +186,89 @@ func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
 		BPM:    uint(math.Round(60.0 / m)),
 		Offset: Seconds(t0),
 		Beats:  quantized,
+	}, nil
+}
+
+func (t2b *T2B) InterpolateX(beats Beats, start, end time.Duration) (Beats, error) {
+	if len(beats.Beats) == 0 {
+		return beats, fmt.Errorf("Insufficient data")
+	}
+
+	if len(beats.Beats) == 1 {
+		if beats.BPM == 0 {
+			return beats, fmt.Errorf("Insufficient data")
+		}
+
+		m := 60.0 / float64(beats.BPM)
+		c := beats.Beats[0].At.Seconds() - m
+		bmin := int(math.Floor((start.Seconds() - c) / m))
+		bmax := int(math.Ceil((end.Seconds() - c) / m))
+
+		interpolated := []Beat{}
+		for b := bmin; b <= bmax; b++ {
+			tt := float64(b)*m + c
+			if tt >= start.Seconds() && tt <= end.Seconds() {
+				if b == 1 {
+					interpolated = append(interpolated, beats.Beats[0])
+				} else {
+					interpolated = append(interpolated, Beat{At: Seconds(tt)})
+				}
+			}
+		}
+
+		b0 := int(math.Floor(-c / m))
+		t0 := float64(b0)*m + c
+		for t0 < 0.0 {
+			b0++
+			t0 = float64(b0)*m + c
+		}
+
+		return Beats{
+			BPM:    uint(math.Round(60.0 / m)),
+			Offset: Seconds(t0),
+			Beats:  interpolated,
+		}, nil
+	}
+
+	index, err := remap(beats)
+	if err != nil {
+		return beats, err
+	}
+
+	x := []float64{}
+	t := []float64{}
+	for ix, b := range index {
+		x = append(x, float64(ix))
+		t = append(t, b.At.Seconds())
+	}
+
+	m, c := regression.OLS(x, t)
+	bmin := int(math.Floor((start.Seconds() - c) / m))
+	bmax := int(math.Ceil((end.Seconds() - c) / m))
+
+	interpolated := []Beat{}
+	for b := bmin; b <= bmax; b++ {
+		tt := float64(b)*m + c
+		if tt >= start.Seconds() && tt <= end.Seconds() {
+			if beat, ok := index[b]; ok {
+				interpolated = append(interpolated, beat)
+			} else {
+				interpolated = append(interpolated, Beat{At: Seconds(tt)})
+			}
+		}
+	}
+
+	b0 := int(math.Floor(-c / m))
+	t0 := float64(b0)*m + c
+	for t0 < 0.0 {
+		b0++
+		t0 = float64(b0)*m + c
+	}
+
+	return Beats{
+		BPM:    uint(math.Round(60.0 / m)),
+		Offset: Seconds(t0),
+		Beats:  interpolated,
 	}, nil
 }
 

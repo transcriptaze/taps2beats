@@ -9,7 +9,10 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestQuantizeX
+	go test ./... -run TestTaps2BeatsX
+
+debugx: build
+	go test ./... -run TestInterpolate
 
 build: format
 	mkdir -p bin
