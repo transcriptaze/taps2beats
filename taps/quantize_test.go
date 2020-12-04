@@ -20,10 +20,9 @@ func TestQuantize(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats, err := t2b.Quantize(data)
@@ -56,10 +55,9 @@ func TestQuantizeWithNoData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats, err := t2b.Quantize(data)
@@ -92,10 +90,9 @@ func TestQuantizeWithOneDataPoint(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats, err := t2b.Quantize(data)

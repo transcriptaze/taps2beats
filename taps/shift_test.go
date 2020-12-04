@@ -62,10 +62,9 @@ func TestShift(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats = t2b.Shift(beats)
@@ -95,10 +94,9 @@ func TestShiftWithNoData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats = t2b.Shift(beats)
@@ -177,10 +175,9 @@ func TestShiftWithExtrapolatedData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats = t2b.Shift(beats)

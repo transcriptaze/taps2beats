@@ -91,38 +91,7 @@ var quantized = []Beat{
 	{At: 10312 * time.Millisecond},
 }
 
-func TestTaps2BeatsX(t *testing.T) {
-	expected := Beats{
-		BPM:    114,
-		Offset: 316 * time.Millisecond,
-		Beats: []Beat{
-			beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7],
-			beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15],
-			beats[16], beats[17], beats[18], beats[19],
-		},
-	}
-
-	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
-	}
-
-	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0, Seconds(10.5))
-
-	if beats.BPM != expected.BPM {
-		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.BPM, beats.BPM)
-	}
-
-	if math.Abs(beats.Offset.Seconds()-expected.Offset.Seconds()) > 0.0011 {
-		t.Errorf("Incorrect offset - expected:%v, got:%v", expected.Offset, beats.Offset)
-	}
-
-	compare(beats.Beats, expected.Beats, t)
-}
-
-func TestTaps2BeatsWithoutInterpolation(t *testing.T) {
+func TestTaps2Beats(t *testing.T) {
 	expected := Beats{
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
@@ -130,10 +99,9 @@ func TestTaps2BeatsWithoutInterpolation(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: false,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0, Seconds(10.5))
@@ -153,18 +121,7 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 	expected := Beats{
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
-		Beats: []Beat{
-			beats[0], beats[1], beats[2], beats[3], beats[4], beats[5], beats[6], beats[7],
-			beats[8],
-			beats[9],
-			beats[10],
-			beats[11],
-			beats[12],
-			Beat{At: Seconds(7.155061419), Mean: 0, Variance: 0, Taps: []time.Duration{}},
-			beats[14],
-			beats[15],
-			beats[16], beats[17], beats[18], beats[19],
-		},
+		Beats:  []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[14], beats[15]},
 	}
 
 	taps := [][]float64{
@@ -182,10 +139,9 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0.0, Seconds(10.5))
@@ -208,61 +164,7 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 		Beats: []Beat{
 			{At: Seconds(1.000), Mean: Seconds(1), Variance: Seconds(0.1), Taps: seconds(1, 1.1, 1.2, 0.9, 0.8)},
 			{At: Seconds(2.000), Mean: Seconds(2), Variance: Seconds(0.1), Taps: seconds(2, 2.1, 2.2, 1.9, 1.8)},
-			{At: Seconds(3.064)},
-			{At: Seconds(4.107)},
-			{At: Seconds(5.150)},
-			{At: Seconds(6.193)},
-			{At: Seconds(7.236)},
-			{At: Seconds(8.279)},
-			{At: Seconds(9.322)},
-			{At: Seconds(10.365)},
-			{At: Seconds(11.408)},
-			{At: Seconds(12.451)},
-			{At: Seconds(13.494)},
-			{At: Seconds(14.537)},
-			{At: Seconds(15.580)},
-			{At: Seconds(16.623)},
-			{At: Seconds(17.666)},
-			{At: Seconds(18.709)},
-			{At: Seconds(19.752)},
-			{At: Seconds(20.795)},
-			{At: Seconds(21.838)},
-			{At: Seconds(22.881)},
-			{At: Seconds(23.924)},
-			{At: Seconds(24.967)},
-			{At: Seconds(26.010)},
-			{At: Seconds(27.053)},
-			{At: Seconds(28.096)},
-			{At: Seconds(29.139)},
-			{At: Seconds(30.182)},
-			{At: Seconds(31.225)},
-			{At: Seconds(32.268)},
-			{At: Seconds(33.311)},
-			{At: Seconds(34.354)},
-			{At: Seconds(35.397)},
-			{At: Seconds(36.440)},
-			{At: Seconds(37.483)},
-			{At: Seconds(38.526)},
-			{At: Seconds(39.569)},
-			{At: Seconds(40.612)},
-			{At: Seconds(41.655)},
-			{At: Seconds(42.698)},
-			{At: Seconds(43.741)},
-			{At: Seconds(44.784)},
-			{At: Seconds(45.827)},
-			{At: Seconds(46.870)},
-			{At: Seconds(47.913)},
-			{At: Seconds(48.956)},
 			{At: Seconds(50.000), Mean: Seconds(50), Variance: Seconds(0.100), Taps: seconds(50, 50.1, 50.2, 49.9, 49.8)},
-			{At: Seconds(51.042)},
-			{At: Seconds(52.085)},
-			{At: Seconds(53.128)},
-			{At: Seconds(54.171)},
-			{At: Seconds(55.214)},
-			{At: Seconds(56.257)},
-			{At: Seconds(57.300)},
-			{At: Seconds(58.343)},
-			{At: Seconds(59.386)},
 		},
 	}
 
@@ -273,10 +175,9 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0, Seconds(60.0))
@@ -297,14 +198,6 @@ func TestTaps2BeatsWithLatency(t *testing.T) {
 		BPM:    114,
 		Offset: (316 - 37) * time.Millisecond,
 		Beats: []Beat{
-			{At: (316 - 37) * time.Millisecond},
-			{At: (842 - 37) * time.Millisecond},
-			{At: (1368 - 37) * time.Millisecond},
-			{At: (1894 - 37) * time.Millisecond},
-			{At: (2420 - 37) * time.Millisecond},
-			{At: (2946 - 37) * time.Millisecond},
-			{At: (3472 - 37) * time.Millisecond},
-			{At: (3998 - 37) * time.Millisecond},
 			{At: (4524 - 37) * time.Millisecond, Mean: (4524 - 37) * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
 			{At: (5057 - 37) * time.Millisecond, Mean: (5057 - 37) * time.Millisecond, Variance: 8 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
 			{At: (5578 - 37) * time.Millisecond, Mean: (5578 - 37) * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
@@ -313,18 +206,13 @@ func TestTaps2BeatsWithLatency(t *testing.T) {
 			{At: (7153 - 37) * time.Millisecond, Mean: (7153 - 37) * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[5]},
 			{At: (7685 - 37) * time.Millisecond, Mean: (7685 - 37) * time.Millisecond, Variance: 5 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
 			{At: (8210 - 37) * time.Millisecond, Mean: (8210 - 37) * time.Millisecond, Variance: 12 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
-			{At: (8733 - 37) * time.Millisecond},
-			{At: (9260 - 37) * time.Millisecond},
-			{At: (9786 - 37) * time.Millisecond},
-			{At: (10312 - 37) * time.Millisecond},
 		},
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     37 * time.Millisecond,
-		Forgetting:  Default.Forgetting,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    37 * time.Millisecond,
+		Forgetting: Default.Forgetting,
 	}
 
 	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0, Seconds(10.5))
@@ -345,14 +233,6 @@ func TestTaps2BeatsWithForgetting(t *testing.T) {
 		BPM:    114,
 		Offset: 323 * time.Millisecond,
 		Beats: []Beat{
-			{At: 323 * time.Millisecond},
-			{At: 849 * time.Millisecond},
-			{At: 1375 * time.Millisecond},
-			{At: 1900 * time.Millisecond},
-			{At: 2426 * time.Millisecond},
-			{At: 2951 * time.Millisecond},
-			{At: 3477 * time.Millisecond},
-			{At: 4002 * time.Millisecond},
 			{At: 4528 * time.Millisecond, Mean: 4527 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
 			{At: 5057 * time.Millisecond, Mean: 5057 * time.Millisecond, Variance: 5 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
 			{At: 5582 * time.Millisecond, Mean: 5582 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
@@ -361,18 +241,13 @@ func TestTaps2BeatsWithForgetting(t *testing.T) {
 			{At: 7153 * time.Millisecond, Mean: 7153 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[5]},
 			{At: 7689 * time.Millisecond, Mean: 7689 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
 			{At: 8207 * time.Millisecond, Mean: 8207 * time.Millisecond, Variance: 6 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
-			{At: 8733 * time.Millisecond},
-			{At: 9258 * time.Millisecond},
-			{At: 9784 * time.Millisecond},
-			{At: 10309 * time.Millisecond},
 		},
 	}
 
 	t2b := T2B{
-		Precision:   Default.Precision,
-		Latency:     Default.Latency,
-		Forgetting:  0.1,
-		Interpolate: true,
+		Precision:  Default.Precision,
+		Latency:    Default.Latency,
+		Forgetting: 0.1,
 	}
 
 	beats := t2b.Taps2Beats(Floats2Seconds(taps), 0, Seconds(10.5))

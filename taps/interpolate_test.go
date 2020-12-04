@@ -24,13 +24,12 @@ func TestInterpolate(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   100 * time.Microsecond,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: false,
+		Precision:  100 * time.Microsecond,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
-	beats, err := t2b.InterpolateX(data, Seconds(0), Seconds(10.5))
+	beats, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -54,13 +53,12 @@ func TestInterpolateWithNoData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   100 * time.Microsecond,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: false,
+		Precision:  100 * time.Microsecond,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
-	_, err := t2b.InterpolateX(data, Seconds(0), Seconds(10.5))
+	_, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
 	if err == nil {
 		t.Fatalf("Expected error, got (%v)", err)
 	}
@@ -74,13 +72,12 @@ func TestInterpolateWithInsufficientData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   100 * time.Microsecond,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: false,
+		Precision:  100 * time.Microsecond,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
-	_, err := t2b.InterpolateX(data, Seconds(0), Seconds(10.5))
+	_, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
 	if err == nil {
 		t.Fatalf("Expected error, got (%v)", err)
 	}
@@ -121,13 +118,12 @@ func TestInterpolateWithMinimalInformation(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   100 * time.Microsecond,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: false,
+		Precision:  100 * time.Microsecond,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
-	beats, err := t2b.InterpolateX(data, Seconds(0), Seconds(10.5))
+	beats, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -168,13 +164,12 @@ func TestInterpolateWithMissingBeat(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:   100 * time.Microsecond,
-		Latency:     Default.Latency,
-		Forgetting:  Default.Forgetting,
-		Interpolate: false,
+		Precision:  100 * time.Microsecond,
+		Latency:    Default.Latency,
+		Forgetting: Default.Forgetting,
 	}
 
-	beats, err := t2b.InterpolateX(data, Seconds(0), Seconds(10.5))
+	beats, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}

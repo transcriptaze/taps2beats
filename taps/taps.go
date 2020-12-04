@@ -24,10 +24,9 @@ type Beat struct {
 }
 
 type T2B struct {
-	Precision   time.Duration
-	Latency     time.Duration
-	Forgetting  float64
-	Interpolate bool
+	Precision  time.Duration
+	Latency    time.Duration
+	Forgetting float64
 }
 
 const (
@@ -74,7 +73,7 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 			m[b[i]] = c
 		}
 
-		beats, BPM, offset = extrapolate(m, start, end)
+		beats, BPM, offset = linearize(m, start, end)
 	}
 
 	// ... compensate for latency
@@ -108,19 +107,6 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 		if len(beats[i].Taps) > 0 {
 			beats[i].At = b.Mean
 		}
-	}
-
-	// ... interpolation
-
-	if !t2b.Interpolate {
-		list := []Beat{}
-		for _, b := range beats {
-			if len(b.Taps) > 0 {
-				list = append(list, b)
-			}
-		}
-
-		beats = list
 	}
 
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
@@ -189,7 +175,7 @@ func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
 	}, nil
 }
 
-func (t2b *T2B) InterpolateX(beats Beats, start, end time.Duration) (Beats, error) {
+func (t2b *T2B) Interpolate(beats Beats, start, end time.Duration) (Beats, error) {
 	if len(beats.Beats) == 0 {
 		return beats, fmt.Errorf("Insufficient data")
 	}
@@ -301,6 +287,39 @@ func (t2b *T2B) Shift(beats Beats) Beats {
 	}
 
 	return shifted
+}
+
+func linearize(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, uint, time.Duration) {
+	beats := []Beat{}
+
+	for _, cluster := range clusters {
+		beats = append(beats, makeBeat(cluster.Center, cluster))
+	}
+
+	if len(clusters) < 2 {
+		return beats, 0, 0
+	}
+
+	x := []float64{}
+	t := []float64{}
+	for ix, c := range clusters {
+		x = append(x, float64(ix))
+		t = append(t, c.Center)
+	}
+
+	m, c := regression.OLS(x, t)
+	bpm := uint(math.Round(60.0 / m))
+
+	b0 := int(math.Floor(-c / m))
+	t0 := float64(b0)*m + c
+	for t0 < 0.0 {
+		b0++
+		t0 = float64(b0)*m + c
+	}
+
+	offset := Seconds(t0)
+
+	return beats, bpm, offset
 }
 
 func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, uint, time.Duration) {
