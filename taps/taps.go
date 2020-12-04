@@ -322,50 +322,6 @@ func linearize(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Be
 	return beats, bpm, offset
 }
 
-func extrapolate(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, uint, time.Duration) {
-	beats := []Beat{}
-
-	if len(clusters) < 2 {
-		for _, cluster := range clusters {
-			beats = append(beats, makeBeat(cluster.Center, cluster))
-		}
-
-		return beats, 0, 0
-	}
-
-	x := []float64{}
-	t := []float64{}
-	for ix, c := range clusters {
-		x = append(x, float64(ix))
-		t = append(t, c.Center)
-	}
-
-	m, c := regression.OLS(x, t)
-
-	bmin := int(math.Floor((start.Seconds() - c) / m))
-	bmax := int(math.Ceil((end.Seconds() - c) / m))
-
-	for bb := bmin; bb <= bmax; bb++ {
-		tt := float64(bb)*m + c
-		if tt >= start.Seconds() && tt <= end.Seconds() {
-			beats = append(beats, makeBeat(tt, clusters[bb]))
-		}
-	}
-
-	bpm := uint(math.Round(60.0 / m))
-
-	b0 := int(math.Floor(-c / m))
-	t0 := float64(b0)*m + c
-	for t0 < 0.0 {
-		b0++
-		t0 = float64(b0)*m + c
-	}
-
-	offset := Seconds(t0)
-
-	return beats, bpm, offset
-}
-
 /* NOTE: assumes clusters are time sorted
  */
 func interpolate(clusters []ckmeans.Cluster) ([]int, error) {

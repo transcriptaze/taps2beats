@@ -184,3 +184,71 @@ func TestInterpolateWithMissingBeat(t *testing.T) {
 
 	compare(beats.Beats, expected.Beats, t)
 }
+
+// func TestInterpolateWithTwoClusters(t *testing.T) {
+// 	expected := []Beat{
+// 		Beat{
+// 			At:       Seconds(0.306),
+// 			Mean:     Seconds(0),
+// 			Variance: Seconds(0),
+// 			Taps:     seconds(),
+// 		},
+// 		Beat{
+// 			At:       Seconds(1.361),
+// 			Mean:     Seconds(0),
+// 			Variance: Seconds(0),
+// 			Taps:     seconds(),
+// 		},
+// 		Beat{
+// 			At:       Seconds(2.415),
+// 			Mean:     Seconds(0),
+// 			Variance: Seconds(0),
+// 			Taps:     seconds(),
+// 		},
+// 		Beat{
+// 			At:       Seconds(3.469),
+// 			Mean:     Seconds(0),
+// 			Variance: Seconds(0),
+// 			Taps:     seconds(),
+// 		},
+// 		Beat{
+// 			At:       Seconds(4.524),
+// 			Mean:     Seconds(4.524),
+// 			Variance: Seconds(0.003),
+// 			Taps:     seconds(4.570, 4.506, 4.530, 4.530, 4.518, 4.495, 4.529, 4.524, 4.518, 4.518),
+// 		},
+// 		Beat{
+// 			At:       Seconds(5.578),
+// 			Mean:     Seconds(5.578),
+// 			Variance: Seconds(0.004),
+// 			Taps:     seconds(5.604, 5.592, 5.592, 5.603, 5.580, 5.545, 5.563, 5.557, 5.586, 5.551, 5.586),
+// 		},
+// 		Beat{
+// 			At:       Seconds(6.632),
+// 			Mean:     Seconds(0),
+// 			Variance: Seconds(0),
+// 			Taps:     seconds(),
+// 		},
+// 		Beat{
+// 			At:       Seconds(7.687),
+// 			Mean:     Seconds(0),
+// 			Variance: Seconds(0),
+// 			Taps:     seconds(),
+// 		},
+// 	}
+//
+// 	beats, BPM, offset := extrapolate(map[int]ckmeans.Cluster{
+// 		1: clusters[0],
+// 		2: clusters[2],
+// 	}, Seconds(0), Seconds(8.5))
+//
+// 	if BPM != 57 {
+// 		t.Errorf("Incorrect BPM - expected:%v, got:%v", 57, BPM)
+// 	}
+//
+// 	if math.Abs(offset.Seconds()-0.306) > 0.0011 {
+// 		t.Errorf("Incorrect BPM - expected:%v, got:%v", 306*time.Millisecond, offset)
+// 	}
+//
+// 	compare(beats, expected, t)
+// }
