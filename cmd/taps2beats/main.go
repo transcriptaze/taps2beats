@@ -94,7 +94,7 @@ func main() {
 		fmt.Printf("  ... using forgetting factor %v latency\n", t2b.Forgetting)
 	}
 
-	beats := t2b.Taps2Beats(taps.Floats2Seconds(data), taps.Seconds(-0.5), taps.Seconds(13.5))
+	beats := t2b.Taps2Beats(taps.Floats2Seconds(data))
 
 	// ... quantize
 	if options.quantize {

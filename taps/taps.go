@@ -40,7 +40,7 @@ var Default = T2B{
 	Forgetting: 0.0,
 }
 
-func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Beats {
+func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
 	// ... cluster taps into beats
 	data := []float64{}
 	weights := []float64{}
@@ -56,34 +56,16 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 
 	clusters := ckmeans.CKMeans1dDp(data, weights)
 
-	sort.SliceStable(clusters, func(i, j int) bool { return clusters[i].Center < clusters[j].Center })
-
-	// ... estimate beats
-	var beats = []Beat{}
-	var BPM uint
-	var offset time.Duration
-
-	if b, err := interpolate(clusters); err != nil {
-		for _, cluster := range clusters {
-			beats = append(beats, makeBeat(cluster.Center, cluster))
-		}
-	} else {
-		m := map[int]ckmeans.Cluster{}
-		for i, c := range clusters {
-			m[b[i]] = c
-		}
-
-		beats, BPM, offset = linearize(m, start, end)
-	}
+	// ... estimate BPM and offset
+	beats, BPM, offset := bpm(clusters)
 
 	// ... compensate for latency
-	offset = offset - t2b.Latency
-
+	offset -= t2b.Latency
 	for i, b := range beats {
 		beats[i].At = (b.At - t2b.Latency)
-
-		if len(b.Taps) > 0 {
-			beats[i].Mean = (b.Mean - t2b.Latency)
+		beats[i].Mean = (b.Mean - t2b.Latency)
+		for j, t := range b.Taps {
+			beats[i].Taps[j] = t - t2b.Latency
 		}
 	}
 
@@ -98,14 +80,6 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration, start, end time.Duration) Bea
 
 		for j, t := range b.Taps {
 			beats[i].Taps[j] = t.Round(t2b.Precision)
-		}
-	}
-
-	// ... remove quantization
-	// FIXME - shouldn't be necessary after interpolate is factored out
-	for i, b := range beats {
-		if len(beats[i].Taps) > 0 {
-			beats[i].At = b.Mean
 		}
 	}
 
@@ -289,21 +263,31 @@ func (t2b *T2B) Shift(beats Beats) Beats {
 	return shifted
 }
 
-func linearize(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Beat, uint, time.Duration) {
+func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
 	beats := []Beat{}
 
 	for _, cluster := range clusters {
 		beats = append(beats, makeBeat(cluster.Center, cluster))
 	}
 
-	if len(clusters) < 2 {
+	if len(beats) < 2 {
 		return beats, 0, 0
+	}
+
+	interpolated, err := interpolate(clusters)
+	if err != nil {
+		return beats, 0, 0
+	}
+
+	index := map[int]ckmeans.Cluster{}
+	for i, c := range clusters {
+		index[interpolated[i]] = c
 	}
 
 	x := []float64{}
 	t := []float64{}
-	for ix, c := range clusters {
-		x = append(x, float64(ix))
+	for i, c := range index {
+		x = append(x, float64(i))
 		t = append(t, c.Center)
 	}
 
@@ -325,9 +309,10 @@ func linearize(clusters map[int]ckmeans.Cluster, start, end time.Duration) ([]Be
 /* NOTE: assumes clusters are time sorted
  */
 func interpolate(clusters []ckmeans.Cluster) ([]int, error) {
+	sort.SliceStable(clusters, func(i, j int) bool { return clusters[i].Center < clusters[j].Center })
+
 	N := len(clusters)
 	beats := make([]int, N)
-
 	for i := range clusters {
 		beats[i] = i + 1
 	}
