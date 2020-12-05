@@ -1,6 +1,6 @@
 ## IN PROGRESS
 
-- [ ] split interpolate out as callable functions and let taps2beats just do clustering
+- [ ] commonalize taps.interpolate and taps.remap
 - [ ] test Quantize with missing beat (shouldn't interpolate!)
 - [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] --help
@@ -13,6 +13,7 @@
 - [ ] Read from stdin
 - [ ] godoc
 
+- [x] split interpolate out as callable functions and let taps2beats just do clustering
 - [x] split quantize out as callable functions and let taps2beats just do clustering
 - [x] make BPM and Offset not pointers
 - [x] --shift to adjust so that first beat is 0.0

@@ -17,30 +17,29 @@ import (
 
 const VERSION = "v0.0.0"
 
-type region struct {
+type interval struct {
+	set   bool
 	start *time.Duration
 	end   *time.Duration
 }
 
 var options = struct {
-	precision   time.Duration
-	latency     time.Duration
-	forgetting  float64
-	quantize    bool
-	interpolate bool
-	region      region
-	shift       bool
-	outfile     string
-	debug       bool
+	precision  time.Duration
+	latency    time.Duration
+	forgetting float64
+	quantize   bool
+	interval   interval
+	shift      bool
+	outfile    string
+	debug      bool
 }{
-	precision:   taps.Default.Precision,
-	latency:     taps.Default.Latency,
-	forgetting:  taps.Default.Forgetting,
-	quantize:    false,
-	interpolate: false,
-	region:      region{},
-	outfile:     "",
-	debug:       false,
+	precision:  taps.Default.Precision,
+	latency:    taps.Default.Latency,
+	forgetting: taps.Default.Forgetting,
+	quantize:   false,
+	interval:   interval{},
+	outfile:    "",
+	debug:      false,
 }
 
 func main() {
@@ -48,8 +47,7 @@ func main() {
 	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate")
 	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
-	flag.BoolVar(&options.interpolate, "interpolate", options.interpolate, "adds beats in gaps between tapped beats")
-	flag.Var(&options.region, "range", "start and end times (in seconds) for which to return beats e.g. 0.8:10.0")
+	flag.Var(&options.interval, "interval", "start and end times (in seconds) for which to return beats e.g. 0.8:10.0")
 	flag.BoolVar(&options.shift, "shift", options.shift, "shifts all times so that the first beat is on 0")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
@@ -112,40 +110,35 @@ func main() {
 	}
 
 	// ... interpolate
-	if options.interpolate {
-		if options.debug {
-			fmt.Printf("  ... interpolating missing beats\n")
+	if options.interval.set && len(beats.Beats) > 0 {
+		var start time.Duration
+		var end time.Duration
+
+		if options.interval.start == nil {
+			start = choose(beats.Beats, func(p, q time.Duration) bool { return p < q })
+		} else {
+			start = *options.interval.start
 		}
 
-		beats, err = t2b.Interpolate(beats, taps.Seconds(-0.5), taps.Seconds(13.5)) // FIXME - rework interpolate as a range
+		if options.interval.end == nil {
+			end = choose(beats.Beats, func(p, q time.Duration) bool { return p > q })
+		} else {
+			end = *options.interval.end
+		}
+
+		if options.debug {
+			fmt.Printf("  ... interpolating missing beats over interval %v..%v \n", start, end)
+		}
+
+		beats, err = t2b.Interpolate(beats, start, end)
 		if err != nil {
 			fmt.Printf("\n  ** ERROR: unable to interpolate beats (%v)\n\n", err)
 			os.Exit(1)
 		}
-	} else if options.debug {
+
+	} else if options.debug && len(beats.Beats) > 0 {
 		fmt.Printf("  ... ignoring missing beats\n")
 	}
-
-	ix := 0
-	for i, b := range beats.Beats {
-		ix = i
-		if options.region.start == nil && len(b.Taps) > 0 {
-			break
-		} else if options.region.start != nil && *options.region.start <= b.At {
-			break
-		}
-	}
-
-	jx := ix
-	for i, b := range beats.Beats {
-		if options.region.end == nil && len(b.Taps) > 0 {
-			jx = i + 1
-		} else if options.region.end != nil && *options.region.end >= b.At {
-			jx = i + 1
-		}
-	}
-
-	beats.Beats = beats.Beats[ix:jx]
 
 	if options.debug {
 		fmt.Printf("  ... %v beats\n", len(beats.Beats))
@@ -275,21 +268,43 @@ func usage() {
 	fmt.Println()
 }
 
-func (r *region) String() string {
-	if r.start != nil && r.end != nil {
-		return fmt.Sprintf("%.1f:%.1f", r.start.Seconds(), r.end.Seconds())
-	} else if r.start != nil {
-		return fmt.Sprintf("%.1f", r.start.Seconds())
-	} else if r.end != nil {
-		return fmt.Sprintf(":%.1f", r.end.Seconds())
+func choose(beats []taps.Beat, f func(p, q time.Duration) bool) time.Duration {
+	if len(beats) < 1 {
+		panic("Insufficient data")
 	}
 
-	return ""
+	v := beats[0].At
+	for _, b := range beats {
+		if f(b.At, v) {
+			v = b.At
+		}
+
+		for _, t := range b.Taps {
+			if f(t, v) {
+				v = t
+			}
+		}
+	}
+	return v
 }
 
-func (r *region) Set(s string) error {
+func (v *interval) String() string {
+	if v.start != nil && v.end != nil {
+		return fmt.Sprintf("%v:%v", v.start, v.end)
+	} else if v.start != nil {
+		return fmt.Sprintf("%v", v.start)
+	} else if v.end != nil {
+		return fmt.Sprintf(":%v", v.end)
+	}
+
+	return "*"
+}
+
+func (v *interval) Set(s string) error {
 	re := regexp.MustCompile(`[0-9]+(\.[0-9]*)?`)
 	tokens := strings.Split(s, ":")
+
+	v.set = true
 
 	if len(tokens) > 1 {
 		if re.MatchString(tokens[0]) {
@@ -298,7 +313,7 @@ func (r *region) Set(s string) error {
 				return err
 			}
 
-			r.start = &start
+			v.start = &start
 		}
 
 		if re.MatchString(tokens[1]) {
@@ -307,8 +322,8 @@ func (r *region) Set(s string) error {
 				return err
 			}
 
-			if r.start == nil || end > *r.start {
-				r.end = &end
+			if v.start == nil || end > *v.start {
+				v.end = &end
 			}
 		}
 
@@ -322,7 +337,7 @@ func (r *region) Set(s string) error {
 				return err
 			}
 
-			r.start = &start
+			v.start = &start
 
 			return nil
 		}
