@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestTaps2BeatsX
+	go test ./... -run TestTaps2BeatsWithForgetting
 
 debugx: build
 	go test ./... -run TestInterpolate

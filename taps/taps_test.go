@@ -350,16 +350,16 @@ func TestTaps2BeatsWithLatency(t *testing.T) {
 func TestTaps2BeatsWithForgetting(t *testing.T) {
 	expected := Beats{
 		BPM:    114,
-		Offset: 323 * time.Millisecond,
+		Offset: 309 * time.Millisecond,
 		Beats: []Beat{
-			{At: 4528 * time.Millisecond, Mean: 4527 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
+			{At: 4521 * time.Millisecond, Mean: 4521 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[0]},
 			{At: 5057 * time.Millisecond, Mean: 5057 * time.Millisecond, Variance: 5 * time.Millisecond, Taps: Floats2Seconds(bins)[1]},
-			{At: 5582 * time.Millisecond, Mean: 5582 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
-			{At: 6103 * time.Millisecond, Mean: 6103 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[3]},
-			{At: 6622 * time.Millisecond, Mean: 6622 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[4]},
+			{At: 5575 * time.Millisecond, Mean: 5575 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[2]},
+			{At: 6099 * time.Millisecond, Mean: 6099 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[3]},
+			{At: 6614 * time.Millisecond, Mean: 6614 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[4]},
 			{At: 7153 * time.Millisecond, Mean: 7153 * time.Millisecond, Variance: 4 * time.Millisecond, Taps: Floats2Seconds(bins)[5]},
-			{At: 7689 * time.Millisecond, Mean: 7689 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
-			{At: 8207 * time.Millisecond, Mean: 8207 * time.Millisecond, Variance: 6 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
+			{At: 7683 * time.Millisecond, Mean: 7683 * time.Millisecond, Variance: 3 * time.Millisecond, Taps: Floats2Seconds(bins)[6]},
+			{At: 8215 * time.Millisecond, Mean: 8215 * time.Millisecond, Variance: 9 * time.Millisecond, Taps: Floats2Seconds(bins)[7]},
 		},
 	}
 

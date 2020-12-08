@@ -43,15 +43,44 @@ var Default = T2B{
 func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
 	// ... cluster taps into beats
 	data := []float64{}
-	weights := []float64{}
-	w := 1.0
 	for _, row := range taps {
 		for _, t := range row {
 			data = append(data, t.Seconds())
-			weights = append(weights, w)
+		}
+	}
+
+	weights := make([]float64, len(data))
+	switch {
+	case t2b.Forgetting == 0.0:
+		for i := range weights {
+			weights[i] = 1.0
 		}
 
-		w = w * (1.0 - t2b.Forgetting)
+	case t2b.Forgetting > 0.0:
+		ix := len(weights) - 1
+		w := 1.0
+		f := 1.0 - t2b.Forgetting
+		for _, row := range taps {
+			for range row {
+				weights[ix] = w
+				ix--
+			}
+
+			w = w * f
+		}
+
+	case t2b.Forgetting < 0.0:
+		ix := 0
+		w := 1.0
+		f := 1.0 + t2b.Forgetting
+		for _, row := range taps {
+			for range row {
+				weights[ix] = w
+				ix++
+			}
+
+			w = w * f
+		}
 	}
 
 	clusters := ckmeans.CKMeans1dDp(data, weights)
