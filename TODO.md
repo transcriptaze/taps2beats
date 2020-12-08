@@ -1,7 +1,6 @@
 ## IN PROGRESS
 
 - [ ] commonalize taps.interpolate and taps.remap
-- [ ] test Quantize with missing beat (shouldn't interpolate!)
 - [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] Format output nicely
 - [ ] JSON output
@@ -11,6 +10,7 @@
 - [ ] Read from stdin
 - [ ] godoc
 
+- [x] test Quantize with missing beat (shouldn't interpolate!)
 - [x] usage()
 - [x] --help
 - [x] split interpolate out as callable functions and let taps2beats just do clustering
