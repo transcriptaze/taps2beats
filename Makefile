@@ -21,10 +21,6 @@ build: format
 test: build
 	go test ./...
 
-run: build
-	./bin/taps2beats --debug --precision 1ms --latency 7ms --quantize --interval '*' --shift ./runtime/taps.txt
-	./bin/taps2beats --debug --precision 1ms --latency 7ms --quantize --interval 1s:12s  ./runtime/taps.txt
-
 vet: build
 	go vet ./...
 
@@ -37,4 +33,11 @@ benchmark: build
 coverage: build
 	go test -cover ./...
 
+run: build
+	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift ./runtime/taps.txt
+	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  ./runtime/taps.txt
+
+help: build
+	./bin/taps2beats 
+	./bin/taps2beats --help
 

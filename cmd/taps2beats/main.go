@@ -15,7 +15,7 @@ import (
 	"github.com/twystd/taps2beats/taps"
 )
 
-const VERSION = "v0.0.0"
+const VERSION = "v0.1.0"
 
 type interval struct {
 	set   bool
@@ -31,7 +31,8 @@ var options = struct {
 	interval   interval
 	shift      bool
 	outfile    string
-	debug      bool
+	verbose    bool
+	help       bool
 }{
 	precision:  taps.Default.Precision,
 	latency:    taps.Default.Latency,
@@ -39,31 +40,38 @@ var options = struct {
 	quantize:   false,
 	interval:   interval{},
 	outfile:    "",
-	debug:      false,
+	verbose:    false,
+	help:       false,
 }
 
 func main() {
-	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats'")
-	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate")
+	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
+	flag.DurationVar(&options.latency, "latency", options.latency, "delayi for which to compensate, in Go 'time' format (e.g. 70ms)")
 	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
-	flag.Var(&options.interval, "interval", "start and end times (in seconds) for which to return beats e.g. 0.8:10.0")
+	flag.Var(&options.interval, "interval", "start and end times (in seconds) for which to return beats (e.g. 0.8s:10.0s)")
 	flag.BoolVar(&options.shift, "shift", options.shift, "shifts all times so that the first beat is on 0")
 	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
-	flag.BoolVar(&options.debug, "debug", options.debug, "enables debugging")
+	flag.BoolVar(&options.verbose, "verbose", options.verbose, "enables verbose progress messages")
+	flag.BoolVar(&options.help, "help", options.help, "displays the 'help' information")
 	flag.Parse()
 
-	if options.debug {
+	if options.help {
+		help()
+		os.Exit(0)
+	}
+
+	if options.verbose {
 		fmt.Printf("\n  taps2beats %s\n\n", VERSION)
 	}
 
 	if len(flag.Args()) == 0 {
 		usage()
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	file := flag.Args()[0]
-	if options.debug {
+	if options.verbose {
 		fmt.Printf("  ... reading data from %s\n", file)
 	}
 
@@ -76,7 +84,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if options.debug {
+	if options.verbose {
 		fmt.Printf("  ... %v values read from %s\n", len(data), file)
 	}
 
@@ -86,7 +94,7 @@ func main() {
 		Forgetting: options.forgetting,
 	}
 
-	if options.debug {
+	if options.verbose {
 		fmt.Printf("  ... rounding to %v precision\n", t2b.Precision)
 		fmt.Printf("  ... compensating for %v latency\n", t2b.Latency)
 		fmt.Printf("  ... using forgetting factor %v latency\n", t2b.Forgetting)
@@ -96,7 +104,7 @@ func main() {
 
 	// ... quantize
 	if options.quantize {
-		if options.debug {
+		if options.verbose {
 			fmt.Printf("  ... quantizing tapped beats to match estimated BPM\n")
 		}
 
@@ -105,7 +113,7 @@ func main() {
 			fmt.Printf("\n  ** ERROR: unable to quantize beats (%v)\n\n", err)
 			os.Exit(1)
 		}
-	} else if options.debug {
+	} else if options.verbose {
 		fmt.Printf("  ... tapped beats are not quantized to match estimated BPM\n")
 	}
 
@@ -126,7 +134,7 @@ func main() {
 			end = *options.interval.end
 		}
 
-		if options.debug {
+		if options.verbose {
 			fmt.Printf("  ... interpolating missing beats over interval %v..%v \n", start, end)
 		}
 
@@ -136,16 +144,16 @@ func main() {
 			os.Exit(1)
 		}
 
-	} else if options.debug && len(beats.Beats) > 0 {
+	} else if options.verbose && len(beats.Beats) > 0 {
 		fmt.Printf("  ... ignoring missing beats\n")
 	}
 
-	if options.debug {
+	if options.verbose {
 		fmt.Printf("  ... %v beats\n", len(beats.Beats))
 	}
 
 	if options.shift {
-		if options.debug {
+		if options.verbose {
 			fmt.Printf("  ... shifting beats to start at 0\n")
 		}
 
@@ -264,7 +272,68 @@ func usage() {
 	fmt.Println()
 	fmt.Println("  Options:")
 	fmt.Println()
-	fmt.Println("    --debug     Displays internal information for diagnosing errors")
+
+	flag.VisitAll(func(f *flag.Flag) {
+		fmt.Printf("    --%-13s %s\n", f.Name, f.Usage)
+	})
+
+	fmt.Println()
+}
+
+func help() {
+	fmt.Println()
+	fmt.Printf("  taps2beats %s\n", VERSION)
+	fmt.Println()
+	fmt.Println("  taps2beats is a utility to estimate the beats of a song from a file containing a list of")
+	fmt.Println("  the times at which person (or other musical entity of whatever sort) 'taps' to the beat.")
+	fmt.Println()
+	fmt.Println("  The 'taps' in the input file are expected to be in seconds, and arranged as lines where each")
+	fmt.Println("  line is a single loop of the song being 'tapped' e.g.:")
+	fmt.Println()
+	fmt.Println("     4.570 5.0635 5.603 6.102 6.642 7.141 7.7106 8.192")
+	fmt.Println("     5.045 5.5917 6.114 6.619 7.135 7.693 8.2038")
+	fmt.Println("     4.529 5.0576 5.591 6.137 6.630 7.176 7.6989 8.227 9.87353")
+	fmt.Println("     ....")
+	fmt.Println()
+	fmt.Println("  The only requirement is that the taps are separated by whitespace - the lines do not have to")
+	fmt.Println("  contain the same number of values, the values do not have to be in time order, nor are they")
+	fmt.Println("  required to have the same precision.")
+	fmt.Println()
+	fmt.Println("  Usage: taps2beats [--interval <interval>] [--quantize] [--forgetting <factor>] [--latency <delay>] [--precision <time>] [--shift] [--out <file>] [--verbose] <file>")
+	fmt.Println()
+	fmt.Println("  Arguments:")
+	fmt.Println()
+	fmt.Println("    file  Path to file containing the whitespace delimited taps to be clustered into beats")
+	fmt.Println()
+	fmt.Println("  Options:")
+	fmt.Println()
+	fmt.Println("    --interval <interval>  start and end times (in seconds) for which to return beats (e.g. 0.8s:10.0s)")
+	fmt.Println("                           If an interval is specified, taps2beats will attempt to interpolate missing")
+	fmt.Println("                           beats using a least squares fit which assumes the BPM is more or less constant.")
+	fmt.Println("                           (this may not be true unless it was played to a click track). If no interval is")
+	fmt.Println("                           specified, taps2beats returns only the beats for which a taps was detected i.e.")
+	fmt.Println("                           there is no interpolation for missing beats")
+	fmt.Println()
+	fmt.Println("    --quantize             linearizes the estimated beats to a least squares fitted BPM")
+	fmt.Println("                           Without the 'quantize' option, the beats are estimated to be the mean of the")
+	fmt.Println("                           clustered taps for that beat. --quantize adjusts the estimated beats so that")
+	fmt.Println("                           they fit a straight line i.e. constant BPM")
+	fmt.Println()
+	fmt.Println("    --forgetting <factor>  'forgetting factor' for discounting older taps, on the basis that the later")
+	fmt.Println("                           taps are probably more accurate since the person is more familiar with the song.")
+	fmt.Println("                           The factor is applied on a per-line basis i.e. all the taps in a line are")
+	fmt.Println("                           discounted by the same amount. The default factor of 0 weights all taps the same,")
+	fmt.Println("                           while a factor of 0.1 cumulatively discounts each subsequent line by 10% (a factor")
+	fmt.Println("                           of -0.1 inverts that and discounts later taps rather than earlier taps")
+	fmt.Println()
+	fmt.Println("    --latency <delay>      delay for which to compensate, in Go 'time' format (e.g. 70ms)")
+	fmt.Println()
+	fmt.Println("    --precision <time>    time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
+	fmt.Println("    --out                 output file path")
+	fmt.Println("    --shift               shifts all times so that the first beat is on 0 and the offset is 0")
+	fmt.Println("    --verbose             enables verbose progress messages")
+	fmt.Println("    --help                displays the this information")
+
 	fmt.Println()
 }
 
