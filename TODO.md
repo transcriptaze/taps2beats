@@ -1,14 +1,14 @@
 ## IN PROGRESS
 
 - [ ] commonalize taps.interpolate and taps.remap
-- [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] Format output nicely
 - [ ] JSON output
 - [ ] JSON input
-- [ ] Web page
+- [ ] (TEMPORARILY) copy ckmeans implementation into this project
 - [ ] README
 - [ ] Read from stdin
 - [ ] godoc
+- [ ] Web page
 
 - [x] test Quantize with missing beat (shouldn't interpolate!)
 - [x] usage()

@@ -49,41 +49,7 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
 		}
 	}
 
-	weights := make([]float64, len(data))
-	switch {
-	case t2b.Forgetting == 0.0:
-		for i := range weights {
-			weights[i] = 1.0
-		}
-
-	case t2b.Forgetting > 0.0:
-		ix := len(weights) - 1
-		w := 1.0
-		f := 1.0 - t2b.Forgetting
-		for _, row := range taps {
-			for range row {
-				weights[ix] = w
-				ix--
-			}
-
-			w = w * f
-		}
-
-	case t2b.Forgetting < 0.0:
-		ix := 0
-		w := 1.0
-		f := 1.0 + t2b.Forgetting
-		for _, row := range taps {
-			for range row {
-				weights[ix] = w
-				ix++
-			}
-
-			w = w * f
-		}
-	}
-
-	clusters := ckmeans.CKMeans1dDp(data, weights)
+	clusters := ckmeans.CKMeans1dDp(data, weights(taps, t2b.Forgetting))
 
 	// ... estimate BPM and offset
 	beats, BPM, offset := bpm(clusters)
@@ -119,6 +85,49 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
 		Offset: offset,
 		Beats:  beats,
 	}
+}
+
+func weights(taps [][]time.Duration, forgetting float64) []float64 {
+	N := 0
+	for _, row := range taps {
+		N += len(row)
+	}
+
+	array := make([]float64, N)
+	switch {
+	case forgetting == 0.0:
+		for i := range array {
+			array[i] = 1.0
+		}
+
+	case forgetting > 0.0:
+		ix := len(array) - 1
+		w := 1.0
+		f := 1.0 - forgetting
+		for _, row := range taps {
+			for range row {
+				array[ix] = w
+				ix--
+			}
+
+			w = w * f
+		}
+
+	case forgetting < 0.0:
+		ix := 0
+		w := 1.0
+		f := 1.0 + forgetting
+		for _, row := range taps {
+			for range row {
+				array[ix] = w
+				ix++
+			}
+
+			w = w * f
+		}
+	}
+
+	return array
 }
 
 func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
