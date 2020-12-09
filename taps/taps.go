@@ -147,7 +147,7 @@ func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
 		return quantized, nil
 	}
 
-	index, err := remap(beats)
+	index, err := reindex(beats.Beats)
 	if err != nil {
 		return beats, err
 	}
@@ -228,7 +228,7 @@ func (t2b *T2B) Interpolate(beats Beats, start, end time.Duration) (Beats, error
 		}, nil
 	}
 
-	index, err := remap(beats)
+	index, err := reindex(beats.Beats)
 	if err != nil {
 		return beats, err
 	}
@@ -302,31 +302,27 @@ func (t2b *T2B) Shift(beats Beats) Beats {
 }
 
 func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
-	beats := []Beat{}
+	sort.SliceStable(clusters, func(i, j int) bool { return clusters[i].Center < clusters[j].Center })
 
-	for _, cluster := range clusters {
-		beats = append(beats, makeBeat(cluster.Center, cluster))
+	beats := make([]Beat, len(clusters))
+	for i, cluster := range clusters {
+		beats[i] = makeBeat(cluster.Center, cluster)
 	}
 
 	if len(beats) < 2 {
 		return beats, 0, 0
 	}
 
-	interpolated, err := interpolate(clusters)
+	index, err := reindex(beats)
 	if err != nil {
 		return beats, 0, 0
-	}
-
-	index := map[int]ckmeans.Cluster{}
-	for i, c := range clusters {
-		index[interpolated[i]] = c
 	}
 
 	x := []float64{}
 	t := []float64{}
 	for i, c := range index {
 		x = append(x, float64(i))
-		t = append(t, c.Center)
+		t = append(t, c.At.Seconds())
 	}
 
 	m, c := regression.OLS(x, t)
@@ -344,71 +340,11 @@ func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
 	return beats, bpm, offset
 }
 
-/* NOTE: assumes clusters are time sorted
- */
-func interpolate(clusters []ckmeans.Cluster) ([]int, error) {
-	sort.SliceStable(clusters, func(i, j int) bool { return clusters[i].Center < clusters[j].Center })
+func reindex(beats []Beat) (map[int]Beat, error) {
+	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
 
-	N := len(clusters)
-	beats := make([]int, N)
-	for i := range clusters {
-		beats[i] = i + 1
-	}
-
-	// ... trivial cases
-	if N <= 2 {
-		return beats, nil
-	}
-
-	// ... 3+ intervals
-
-	x0 := clusters[0].Center
-	xn := clusters[N-1].Center
-	y0 := 1.0
-
-	dt := Seconds(xn - x0).Minutes()
-	bmax := int(math.Ceil(dt * float64(MaxBPM*MinSubdivision/4)))
-
-loop:
-	for i := N; i <= bmax; i++ {
-		yn := float64(i)
-		m := (yn - y0) / (xn - x0)
-		c := yn - m*xn
-
-		x := clusters[0].Center
-		y := m*x + c
-		b0 := math.Round(y)
-		beats[0] = int(b0)
-		sumsq := y*y - 2*y*b0 + b0*b0
-
-		for j := 1; j < N; j++ {
-			x := clusters[j].Center
-			y := m*x + c
-			bn := math.Round(y)
-
-			beats[j] = int(bn)
-			if beats[j] <= beats[j-1] {
-				continue loop
-			}
-
-			sumsq += y*y - 2*y*bn + bn*bn
-		}
-
-		variance := sumsq / float64(N-1)
-
-		if variance < 0.001 {
-			return beats, nil
-		}
-	}
-
-	return nil, fmt.Errorf("Error interpolating beats: %v", beats)
-}
-
-func remap(beats Beats) (map[int]Beat, error) {
-	sort.SliceStable(beats.Beats, func(i, j int) bool { return beats.Beats[i].At < beats.Beats[j].At })
-
-	at := make([]float64, len(beats.Beats))
-	for i, b := range beats.Beats {
+	at := make([]float64, len(beats))
+	for i, b := range beats {
 		at[i] = b.At.Seconds()
 	}
 
@@ -424,7 +360,7 @@ func remap(beats Beats) (map[int]Beat, error) {
 		m := map[int]Beat{}
 
 		for i, ix := range index {
-			m[ix] = beats.Beats[i]
+			m[ix] = beats[i]
 		}
 
 		return m, nil
@@ -470,7 +406,7 @@ loop:
 			m := map[int]Beat{}
 
 			for i, ix := range index {
-				m[ix] = beats.Beats[i]
+				m[ix] = beats[i]
 			}
 
 			return m, nil

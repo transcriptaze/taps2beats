@@ -1,6 +1,5 @@
 ## IN PROGRESS
 
-- [ ] commonalize taps.interpolate and taps.remap
 - [ ] Format output nicely
 - [ ] JSON output
 - [ ] JSON input
@@ -10,6 +9,7 @@
 - [ ] godoc
 - [ ] Web page
 
+- [x] commonalize taps.interpolate and taps.remap
 - [x] test Quantize with missing beat (shouldn't interpolate!)
 - [x] usage()
 - [x] --help

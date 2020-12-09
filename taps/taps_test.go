@@ -382,21 +382,21 @@ func TestTaps2BeatsWithForgetting(t *testing.T) {
 	compare(beats.Beats, expected.Beats, t)
 }
 
-func TestInterpolateForDegenerateCases(t *testing.T) {
-	tests := [][]ckmeans.Cluster{
+func TestReindexForDegenerateCases(t *testing.T) {
+	tests := [][]Beat{
 		{},
-		{clusters[0]},
-		{clusters[0], clusters[7]},
+		{beats[8]},
+		{beats[8], beats[15]},
 	}
 
-	expected := [][]int{
+	expected := []map[int]Beat{
 		{},
-		{1},
-		{1, 2},
+		{1: beats[8]},
+		{1: beats[8], 2: beats[15]},
 	}
 
 	for i, v := range tests {
-		beats, err := interpolate(v)
+		beats, err := reindex(v)
 		if err != nil {
 			t.Fatalf("[%d] unexpected error (%v)", i+1, err)
 		}
@@ -407,7 +407,7 @@ func TestInterpolateForDegenerateCases(t *testing.T) {
 	}
 }
 
-func TestInterpolateForThreeBeats(t *testing.T) {
+func TestReindexForThreeBeats(t *testing.T) {
 	samples := [][]int{
 		{1, 2, 3},
 		{1, 2, 4}, {1, 3, 4},
@@ -417,36 +417,36 @@ func TestInterpolateForThreeBeats(t *testing.T) {
 		{1, 2, 8}, {1, 3, 8}, {1, 4, 8}, {1, 5, 8}, {1, 6, 8}, {1, 7, 8},
 	}
 
-	expected := [][]int{
-		{1, 2, 3},
-		{1, 2, 4},
-		{1, 3, 4},
-		{1, 2, 5},
-		{1, 2, 3}, // {1, 3, 5}
-		{1, 4, 5},
-		{1, 2, 6},
-		{1, 3, 6},
-		{1, 4, 6},
-		{1, 5, 6},
-		{1, 2, 7},
-		{1, 2, 4}, // {1, 3, 7},
-		{1, 2, 3}, // {1, 4, 7},
-		{1, 3, 4}, // {1, 5, 7},
-		{1, 6, 7},
-		{1, 2, 8},
-		{1, 3, 8},
-		{1, 4, 8},
-		{1, 5, 8},
-		{1, 6, 8},
-		{1, 7, 8},
+	expected := []map[int]Beat{
+		{1: beats[8], 2: beats[9], 3: beats[10]},
+		{1: beats[8], 2: beats[9], 4: beats[11]},
+		{1: beats[8], 3: beats[10], 4: beats[11]},
+		{1: beats[8], 2: beats[9], 5: beats[12]},
+		{1: beats[8], 2: beats[10], 3: beats[12]}, // {1, 3, 5}
+		{1: beats[8], 4: beats[11], 5: beats[12]},
+		{1: beats[8], 2: beats[9], 6: beats[13]},
+		{1: beats[8], 3: beats[10], 6: beats[13]},
+		{1: beats[8], 4: beats[11], 6: beats[13]},
+		{1: beats[8], 5: beats[12], 6: beats[13]},
+		{1: beats[8], 2: beats[9], 7: beats[14]},
+		{1: beats[8], 2: beats[10], 4: beats[14]}, // {1, 3, 7},
+		{1: beats[8], 2: beats[11], 3: beats[14]}, // {1, 4, 7},
+		{1: beats[8], 3: beats[12], 4: beats[14]}, // {1, 5, 7},
+		{1: beats[8], 6: beats[13], 7: beats[14]},
+		{1: beats[8], 2: beats[9], 8: beats[15]},
+		{1: beats[8], 3: beats[10], 8: beats[15]},
+		{1: beats[8], 4: beats[11], 8: beats[15]},
+		{1: beats[8], 5: beats[12], 8: beats[15]},
+		{1: beats[8], 6: beats[13], 8: beats[15]},
+		{1: beats[8], 7: beats[14], 8: beats[15]},
 	}
 	for i, v := range samples {
-		c := []ckmeans.Cluster{}
+		c := []Beat{}
 		for _, ix := range v {
-			c = append(c, clusters[ix-1])
+			c = append(c, beats[8+ix-1])
 		}
 
-		beats, err := interpolate(c)
+		beats, err := reindex(c)
 		if err != nil {
 			t.Fatalf("[%d] unexpected error (%v)", i+1, err)
 		}
@@ -476,31 +476,65 @@ func TestInterpolateForFourBeats(t *testing.T) {
 		{1, 6, 7, 8},
 	}
 
-	expected := [][]int{
-		{1, 2, 3, 4}, {1, 2, 3, 5}, {1, 2, 3, 6}, {1, 2, 3, 7}, {1, 2, 3, 8},
-		{1, 2, 4, 5}, {1, 2, 4, 6}, {1, 2, 4, 7}, {1, 2, 4, 8},
-		{1, 2, 5, 6}, {1, 2, 5, 7}, {1, 2, 5, 8},
-		{1, 2, 6, 7}, {1, 2, 6, 8},
-		{1, 2, 7, 8},
-		{1, 3, 4, 5}, {1, 3, 4, 6}, {1, 3, 4, 7}, {1, 3, 4, 8},
-		{1, 3, 5, 6} /* {1, 3, 5, 7}, */, {1, 2, 3, 4}, {1, 3, 5, 8},
-		{1, 3, 6, 7}, {1, 3, 6, 8},
-		{1, 3, 7, 8},
-		{1, 4, 5, 6}, {1, 4, 5, 7}, {1, 4, 5, 8},
-		{1, 4, 6, 7}, {1, 4, 6, 8},
-		{1, 4, 7, 8},
-		{1, 5, 6, 7}, {1, 5, 6, 8},
-		{1, 5, 7, 8},
-		{1, 6, 7, 8},
+	expected := []map[int]Beat{
+		{1: beats[8], 2: beats[9], 3: beats[10], 4: beats[11]},
+		{1: beats[8], 2: beats[9], 3: beats[10], 5: beats[12]},
+		{1: beats[8], 2: beats[9], 3: beats[10], 6: beats[13]},
+		{1: beats[8], 2: beats[9], 3: beats[10], 7: beats[14]},
+		{1: beats[8], 2: beats[9], 3: beats[10], 8: beats[15]},
+
+		{1: beats[8], 2: beats[9], 4: beats[11], 5: beats[12]},
+		{1: beats[8], 2: beats[9], 4: beats[11], 6: beats[13]},
+		{1: beats[8], 2: beats[9], 4: beats[11], 7: beats[14]},
+		{1: beats[8], 2: beats[9], 4: beats[11], 8: beats[15]},
+
+		{1: beats[8], 2: beats[9], 5: beats[12], 6: beats[13]},
+		{1: beats[8], 2: beats[9], 5: beats[12], 7: beats[14]},
+		{1: beats[8], 2: beats[9], 5: beats[12], 8: beats[15]},
+
+		{1: beats[8], 2: beats[9], 6: beats[13], 7: beats[14]},
+		{1: beats[8], 2: beats[9], 6: beats[13], 8: beats[15]},
+
+		{1: beats[8], 2: beats[9], 7: beats[14], 8: beats[15]},
+
+		{1: beats[8], 3: beats[10], 4: beats[11], 5: beats[12]},
+		{1: beats[8], 3: beats[10], 4: beats[11], 6: beats[13]},
+		{1: beats[8], 3: beats[10], 4: beats[11], 7: beats[14]},
+		{1: beats[8], 3: beats[10], 4: beats[11], 8: beats[15]},
+
+		{1: beats[8], 3: beats[10], 5: beats[12], 6: beats[13]}, /* {1, 3, 5, 7}, */
+		{1: beats[8], 2: beats[10], 3: beats[12], 4: beats[14]},
+		{1: beats[8], 3: beats[10], 5: beats[12], 8: beats[15]},
+
+		{1: beats[8], 3: beats[10], 6: beats[13], 7: beats[14]},
+		{1: beats[8], 3: beats[10], 6: beats[13], 8: beats[15]},
+
+		{1: beats[8], 3: beats[10], 7: beats[14], 8: beats[15]},
+
+		{1: beats[8], 4: beats[11], 5: beats[12], 6: beats[13]},
+		{1: beats[8], 4: beats[11], 5: beats[12], 7: beats[14]},
+		{1: beats[8], 4: beats[11], 5: beats[12], 8: beats[15]},
+
+		{1: beats[8], 4: beats[11], 6: beats[13], 7: beats[14]},
+		{1: beats[8], 4: beats[11], 6: beats[13], 8: beats[15]},
+
+		{1: beats[8], 4: beats[11], 7: beats[14], 8: beats[15]},
+
+		{1: beats[8], 5: beats[12], 6: beats[13], 7: beats[14]},
+		{1: beats[8], 5: beats[12], 6: beats[13], 8: beats[15]},
+
+		{1: beats[8], 5: beats[12], 7: beats[14], 8: beats[15]},
+
+		{1: beats[8], 6: beats[13], 7: beats[14], 8: beats[15]},
 	}
 
 	for i, v := range samples {
-		c := []ckmeans.Cluster{}
+		c := []Beat{}
 		for _, ix := range v {
-			c = append(c, clusters[ix-1])
+			c = append(c, beats[8+ix-1])
 		}
 
-		beats, err := interpolate(c)
+		beats, err := reindex(c)
 		if err != nil {
 			t.Fatalf("[%d] unexpected error (%v)", i+1, err)
 		}
@@ -521,26 +555,32 @@ func TestTapCombinations(t *testing.T) {
 	}
 
 	test := func(v []int) {
-		c := make([]ckmeans.Cluster, len(v))
+		c := make([]Beat, len(v))
 		for i, ix := range v {
-			c[i] = clusters[ix-1]
+			c[i] = beats[8+ix-1]
 		}
 
-		beats, err := interpolate(c)
+		expected := map[int]Beat{}
+		for _, ix := range v {
+			expected[ix] = beats[8+ix-1]
+		}
+
+		index, err := reindex(c)
 		if err != nil {
 			t.Fatalf("[%v] unexpected error (%v)", v, err)
 		}
 
-		expected := v
 		for _, x := range exceptions {
 			if reflect.DeepEqual(v, x[0]) {
-				expected = x[1]
+				expected = map[int]Beat{}
+				for i := range x[0] {
+					expected[x[1][i]] = beats[8+x[0][i]-1]
+				}
 			}
 		}
 
-		if !reflect.DeepEqual(beats, expected) {
+		if !reflect.DeepEqual(index, expected) {
 			t.Errorf("[%v] invalid interpolation - expected:%v, got:%v", v, expected, beats)
-
 		}
 	}
 
@@ -565,13 +605,13 @@ func combinations(k int, head, tail []int, f func([]int)) {
 }
 
 func TestInterpolateWithPathologicalData(t *testing.T) {
-	clusters := []ckmeans.Cluster{
-		{Center: 1.0, Variance: 0.001, Values: []float64{}},
-		{Center: 1.1, Variance: 0.001, Values: []float64{}},
-		{Center: 11.0, Variance: 0.001, Values: []float64{}},
+	clusters := []Beat{
+		Beat{At: Seconds(1.0)},
+		Beat{At: Seconds(1.1)},
+		Beat{At: Seconds(11.0)},
 	}
 
-	_, err := interpolate(clusters)
+	_, err := reindex(clusters)
 	if err == nil {
 		t.Fatalf("Expected error, got %v", err)
 	}
