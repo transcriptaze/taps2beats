@@ -24,7 +24,7 @@ type Beat struct {
 }
 
 type T2B struct {
-	Precision  time.Duration
+	//	Precision  time.Duration
 	Latency    time.Duration
 	Forgetting float64
 }
@@ -35,7 +35,7 @@ const (
 )
 
 var Default = T2B{
-	Precision:  1 * time.Millisecond,
+	//	Precision:  1 * time.Millisecond,
 	Latency:    0 * time.Millisecond,
 	Forgetting: 0.0,
 }
@@ -64,26 +64,27 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
 		}
 	}
 
-	// ... round to precision
-
-	offset = offset.Round(t2b.Precision)
-
-	for i, b := range beats {
-		beats[i].At = b.At.Round(t2b.Precision)
-		beats[i].Mean = b.Mean.Round(t2b.Precision)
-		beats[i].Variance = b.Variance.Round(t2b.Precision)
-
-		for j, t := range b.Taps {
-			beats[i].Taps[j] = t.Round(t2b.Precision)
-		}
-	}
-
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
 
 	return Beats{
 		BPM:    BPM,
 		Offset: offset,
 		Beats:  beats,
+	}
+}
+
+func (beats *Beats) Round(precision time.Duration) {
+	if beats != nil {
+		beats.Offset = beats.Offset.Round(precision)
+
+		for i, b := range beats.Beats {
+			beats.Beats[i].At = b.At.Round(precision)
+			beats.Beats[i].Mean = b.Mean.Round(precision)
+			beats.Beats[i].Variance = b.Variance.Round(precision)
+			for j, tap := range b.Taps {
+				beats.Beats[i].Taps[j] = tap.Round(precision)
+			}
+		}
 	}
 }
 

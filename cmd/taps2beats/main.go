@@ -24,17 +24,17 @@ type interval struct {
 }
 
 var options = struct {
+	outfile    string
+	interval   interval
+	quantize   bool
+	forgetting float64
 	precision  time.Duration
 	latency    time.Duration
-	forgetting float64
-	quantize   bool
-	interval   interval
 	shift      bool
-	outfile    string
 	verbose    bool
 	help       bool
 }{
-	precision:  taps.Default.Precision,
+	precision:  1 * time.Millisecond,
 	latency:    taps.Default.Latency,
 	forgetting: taps.Default.Forgetting,
 	quantize:   false,
@@ -45,13 +45,13 @@ var options = struct {
 }
 
 func main() {
+	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
+	flag.Var(&options.interval, "interval", "start and end times (in seconds) for which to return beats (e.g. 0.8s:10.0s)")
+	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
+	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
 	flag.DurationVar(&options.latency, "latency", options.latency, "delayi for which to compensate, in Go 'time' format (e.g. 70ms)")
-	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
-	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
-	flag.Var(&options.interval, "interval", "start and end times (in seconds) for which to return beats (e.g. 0.8s:10.0s)")
 	flag.BoolVar(&options.shift, "shift", options.shift, "shifts all times so that the first beat is on 0")
-	flag.StringVar(&options.outfile, "out", options.outfile, "output file path")
 	flag.BoolVar(&options.verbose, "verbose", options.verbose, "enables verbose progress messages")
 	flag.BoolVar(&options.help, "help", options.help, "displays the 'help' information")
 	flag.Parse()
@@ -89,13 +89,11 @@ func main() {
 	}
 
 	t2b := taps.T2B{
-		Precision:  options.precision,
 		Latency:    options.latency,
 		Forgetting: options.forgetting,
 	}
 
 	if options.verbose {
-		fmt.Printf("  ... rounding to %v precision\n", t2b.Precision)
 		fmt.Printf("  ... compensating for %v latency\n", t2b.Latency)
 		fmt.Printf("  ... using forgetting factor %v latency\n", t2b.Forgetting)
 	}
@@ -143,7 +141,6 @@ func main() {
 			fmt.Printf("\n  ** ERROR: unable to interpolate beats (%v)\n\n", err)
 			os.Exit(1)
 		}
-
 	} else if options.verbose && len(beats.Beats) > 0 {
 		fmt.Printf("  ... ignoring missing beats\n")
 	}
@@ -160,6 +157,14 @@ func main() {
 		beats = t2b.Shift(beats)
 	}
 
+	// ... round
+	if options.verbose {
+		fmt.Printf("  ... rounding to %v\n", options.precision)
+	}
+
+	beats.Round(options.precision)
+
+	// ... format and print
 	var b bytes.Buffer
 
 	print(&b, beats)

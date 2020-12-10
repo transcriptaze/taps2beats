@@ -62,7 +62,6 @@ func TestShift(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:  Default.Precision,
 		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
@@ -94,7 +93,6 @@ func TestShiftWithNoData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:  Default.Precision,
 		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
@@ -175,7 +173,6 @@ func TestShiftWithExtrapolatedData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Precision:  Default.Precision,
 		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
