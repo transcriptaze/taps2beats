@@ -1,6 +1,7 @@
 ## IN PROGRESS
 
-- [ ] Format output nicely
+- [ ] Factor latency out as callable function Sub
+- [ ] --format option
 - [ ] JSON output
 - [ ] JSON input
 - [ ] (TEMPORARILY) copy ckmeans implementation into this project
@@ -9,6 +10,7 @@
 - [ ] godoc
 - [ ] Web page
 
+- [x] Format output nicely
 - [x] commonalize taps.interpolate and taps.remap
 - [x] test Quantize with missing beat (shouldn't interpolate!)
 - [x] usage()

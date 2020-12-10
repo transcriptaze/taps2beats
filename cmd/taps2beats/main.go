@@ -208,63 +208,49 @@ func read(f string) (int, [][]float64, error) {
 }
 
 func print(f io.Writer, beats taps.Beats) {
+	grid := [][]string{}
+	for i, b := range beats.Beats {
+		row := []string{
+			fmt.Sprintf("%d", i+1),
+			fmt.Sprintf("%v", b.At),
+		}
+
+		if len(b.Taps) > 0 {
+			row = append(row, fmt.Sprintf("%v", b.Mean))
+			row = append(row, fmt.Sprintf("%v", b.Variance))
+			for _, t := range b.Taps {
+				row = append(row, fmt.Sprintf("%v", t))
+			}
+		}
+
+		grid = append(grid, row)
+	}
+
+	columns := 0
+	for _, row := range grid {
+		if len(row) > columns {
+			columns = len(row)
+		}
+	}
+
+	cols := make([]int, columns)
+	for _, row := range grid {
+		for i, v := range row {
+			if len(v) > cols[i] {
+				cols[i] = len(v)
+			}
+		}
+	}
+
 	fmt.Fprintf(f, "BPM:    %v\n", beats.BPM)
 	fmt.Fprintf(f, "Offset: %v\n\n", beats.Offset)
-
-	for i, b := range beats.Beats {
-		fmt.Fprintf(f, "%d %v %v %v %v\n", i+1, b.At, b.Mean, b.Variance, b.Taps)
+	for _, row := range grid {
+		fmt.Fprintf(f, "%-*s", cols[0], row[0])
+		for i, v := range row[1:] {
+			fmt.Fprintf(f, " %-*s", cols[i+1], v)
+		}
+		fmt.Fprintln(f)
 	}
-	//	columns := 0
-	//	for _, b := range beats {
-	//		if len(b.Values) > columns {
-	//			columns = len(c.Values)
-	//		}
-	//	}
-	//	columns += 3
-	//
-	//	table := make([][]string, len(clusters))
-	//	for i := range table {
-	//		table[i] = make([]string, columns)
-	//	}
-	//
-	//	for i, c := range clusters {
-	//		table[i][0] = fmt.Sprintf("%d", i+1)
-	//		table[i][1] = fmt.Sprintf("%v", c.Center)
-	//		table[i][2] = fmt.Sprintf("%v", c.Variance)
-	//		for j, v := range c.Values {
-	//			table[i][j+3] = fmt.Sprintf("%v", v)
-	//		}
-	//	}
-	//
-	//	widths := make([]int, columns)
-	//	for _, row := range table {
-	//		for i, s := range row {
-	//			if len(s) > widths[i] {
-	//				widths[i] = len(s)
-	//			}
-	//		}
-	//	}
-	//
-	//	formats := make([]string, columns)
-	//	for i, w := range widths {
-	//		formats[i] = fmt.Sprintf("%%-%dv", w)
-	//	}
-	//
-	//	for i, c := range clusters {
-	//		line := ""
-	//		line += fmt.Sprintf(formats[0], i+1)
-	//		line += "  "
-	//		line += fmt.Sprintf(formats[1], c.Center)
-	//		line += "  "
-	//		line += fmt.Sprintf(formats[2], c.Variance)
-	//		line += "  "
-	//		for j, v := range c.Values {
-	//			line += " "
-	//			line += fmt.Sprintf(formats[j+3], v)
-	//		}
-	//
-	//		fmt.Fprintf(f, "%s\n", line)
-	//	}
 }
 
 func usage() {
