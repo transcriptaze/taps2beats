@@ -13,13 +13,13 @@ func TestQuantize(t *testing.T) {
 		Beats:  []Beat{quantized[8], quantized[9], quantized[10], quantized[11], quantized[12], quantized[13], quantized[14], quantized[15]},
 	}
 
-	data := Beats{
+	beats := Beats{
 		BPM:    123,
 		Offset: 117 * time.Millisecond,
 		Beats:  []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]},
 	}
 
-	beats, err := Quantize(data)
+	err := beats.Quantize()
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -42,13 +42,13 @@ func TestQuantizeWithNoData(t *testing.T) {
 		Beats:  []Beat{},
 	}
 
-	data := Beats{
+	beats := Beats{
 		BPM:    123,
 		Offset: 117 * time.Millisecond,
 		Beats:  []Beat{},
 	}
 
-	beats, err := Quantize(data)
+	err := beats.Quantize()
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -71,13 +71,13 @@ func TestQuantizeWithOneDataPoint(t *testing.T) {
 		Beats:  []Beat{beats[8]},
 	}
 
-	data := Beats{
+	beats := Beats{
 		BPM:    123,
 		Offset: 117 * time.Millisecond,
 		Beats:  []Beat{beats[8]},
 	}
 
-	beats, err := Quantize(data)
+	err := beats.Quantize()
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -100,13 +100,13 @@ func TestQuantizeWithMissingBeat(t *testing.T) {
 		Beats:  []Beat{quantized[8], quantized[9], quantized[11], quantized[12], quantized[13], quantized[14], quantized[15]},
 	}
 
-	data := Beats{
+	beats := Beats{
 		BPM:    123,
 		Offset: 117 * time.Millisecond,
 		Beats:  []Beat{beats[8], beats[9], beats[11], beats[12], beats[13], beats[14], beats[15]},
 	}
 
-	beats, err := Quantize(data)
+	err := beats.Quantize()
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}

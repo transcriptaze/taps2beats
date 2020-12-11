@@ -100,13 +100,10 @@ func main() {
 			fmt.Printf("  ... quantizing tapped beats to match estimated BPM\n")
 		}
 
-		beats, err = taps.Quantize(beats)
-		if err != nil {
+		if err := beats.Quantize(); err != nil {
 			fmt.Printf("\n  ** ERROR: unable to quantize beats (%v)\n\n", err)
 			os.Exit(1)
 		}
-	} else if options.verbose {
-		fmt.Printf("  ... tapped beats are not quantized to match estimated BPM\n")
 	}
 
 	// ... interpolate
@@ -135,8 +132,6 @@ func main() {
 			fmt.Printf("\n  ** ERROR: unable to interpolate beats (%v)\n\n", err)
 			os.Exit(1)
 		}
-	} else if options.verbose && len(beats.Beats) > 0 {
-		fmt.Printf("  ... ignoring missing beats\n")
 	}
 
 	if options.verbose {

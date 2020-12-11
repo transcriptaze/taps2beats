@@ -49,6 +49,63 @@ func Taps2Beats(taps [][]time.Duration, forgetting float64) Beats {
 	}
 }
 
+func (beats *Beats) Quantize() error {
+	if beats != nil {
+		if len(beats.Beats) < 1 {
+			beats.BPM = 0
+			beats.Offset = 0 * time.Millisecond
+
+			return nil
+		}
+
+		if len(beats.Beats) < 2 {
+			beats.BPM = 0
+			beats.Offset = beats.Beats[0].At
+
+			return nil
+		}
+
+		index, err := reindex(beats.Beats)
+		if err != nil {
+			return err
+		}
+
+		x := []float64{}
+		t := []float64{}
+		for ix, b := range index {
+			x = append(x, float64(ix))
+			t = append(t, b.At.Seconds())
+		}
+
+		m, c := regression.OLS(x, t)
+
+		quantized := []Beat{}
+		for ix, b := range index {
+			quantized = append(quantized, Beat{
+				At:       Seconds(float64(ix)*m + c),
+				Mean:     b.Mean,
+				Variance: b.Variance,
+				Taps:     b.Taps,
+			})
+		}
+
+		sort.SliceStable(quantized, func(i, j int) bool { return quantized[i].At < quantized[j].At })
+
+		b0 := int(math.Floor(-c / m))
+		t0 := float64(b0)*m + c
+		for t0 < 0.0 {
+			b0++
+			t0 = float64(b0)*m + c
+		}
+
+		beats.BPM = uint(math.Round(60.0 / m))
+		beats.Offset = Seconds(t0)
+		beats.Beats = quantized
+	}
+
+	return nil
+}
+
 func (beats *Beats) Round(precision time.Duration) {
 	if beats != nil {
 		beats.Offset = beats.Offset.Round(precision)
@@ -121,63 +178,6 @@ func weights(taps [][]time.Duration, forgetting float64) []float64 {
 	}
 
 	return array
-}
-
-func Quantize(beats Beats) (Beats, error) {
-	if len(beats.Beats) < 2 {
-		quantized := Beats{
-			BPM:    0,
-			Offset: 0 * time.Millisecond,
-			Beats:  make([]Beat, len(beats.Beats)),
-		}
-
-		copy(quantized.Beats, beats.Beats)
-
-		if len(quantized.Beats) > 0 {
-			quantized.Offset = quantized.Beats[0].At
-		}
-
-		return quantized, nil
-	}
-
-	index, err := reindex(beats.Beats)
-	if err != nil {
-		return beats, err
-	}
-
-	x := []float64{}
-	t := []float64{}
-	for ix, b := range index {
-		x = append(x, float64(ix))
-		t = append(t, b.At.Seconds())
-	}
-
-	m, c := regression.OLS(x, t)
-
-	quantized := []Beat{}
-	for ix, b := range index {
-		quantized = append(quantized, Beat{
-			At:       Seconds(float64(ix)*m + c),
-			Mean:     b.Mean,
-			Variance: b.Variance,
-			Taps:     b.Taps,
-		})
-	}
-
-	sort.SliceStable(quantized, func(i, j int) bool { return quantized[i].At < quantized[j].At })
-
-	b0 := int(math.Floor(-c / m))
-	t0 := float64(b0)*m + c
-	for t0 < 0.0 {
-		b0++
-		t0 = float64(b0)*m + c
-	}
-
-	return Beats{
-		BPM:    uint(math.Round(60.0 / m)),
-		Offset: Seconds(t0),
-		Beats:  quantized,
-	}, nil
 }
 
 func Interpolate(beats Beats, start, end time.Duration) (Beats, error) {
