@@ -17,14 +17,13 @@ func TestInterpolate(t *testing.T) {
 		},
 	}
 
-	data := Beats{
+	beats := Beats{
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
 		Beats:  []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]},
 	}
 
-	beats, err := Interpolate(data, Seconds(0), Seconds(10.5))
-	if err != nil {
+	if err := beats.Interpolate(Seconds(0), Seconds(10.5)); err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
 
@@ -40,27 +39,25 @@ func TestInterpolate(t *testing.T) {
 }
 
 func TestInterpolateWithNoData(t *testing.T) {
-	data := Beats{
+	beats := Beats{
 		BPM:    0,
 		Offset: 0 * time.Millisecond,
 		Beats:  []Beat{},
 	}
 
-	_, err := Interpolate(data, Seconds(0), Seconds(10.5))
-	if err == nil {
+	if err := beats.Interpolate(Seconds(0), Seconds(10.5)); err == nil {
 		t.Fatalf("Expected error, got (%v)", err)
 	}
 }
 
 func TestInterpolateWithInsufficientData(t *testing.T) {
-	data := Beats{
+	beats := Beats{
 		BPM:    0,
 		Offset: 0 * time.Millisecond,
 		Beats:  []Beat{beats[8]},
 	}
 
-	_, err := Interpolate(data, Seconds(0), Seconds(10.5))
-	if err == nil {
+	if err := beats.Interpolate(Seconds(0), Seconds(10.5)); err == nil {
 		t.Fatalf("Expected error, got (%v)", err)
 	}
 }
@@ -93,14 +90,13 @@ func TestInterpolateWithMinimalInformation(t *testing.T) {
 		},
 	}
 
-	data := Beats{
+	beats := Beats{
 		BPM:    114,
 		Offset: 0 * time.Millisecond,
 		Beats:  []Beat{beats[8]},
 	}
 
-	beats, err := Interpolate(data, Seconds(0), Seconds(10.5))
-	if err != nil {
+	if err := beats.Interpolate(Seconds(0), Seconds(10.5)); err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
 
@@ -133,14 +129,13 @@ func TestInterpolateWithMissingBeat(t *testing.T) {
 		},
 	}
 
-	data := Beats{
+	beats := Beats{
 		BPM:    114,
 		Offset: 316 * time.Millisecond,
 		Beats:  []Beat{beats[8], beats[9], beats[11], beats[12], beats[13], beats[14], beats[15]},
 	}
 
-	beats, err := Interpolate(data, Seconds(0), Seconds(10.5))
-	if err != nil {
+	if err := beats.Interpolate(Seconds(0), Seconds(10.5)); err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
 

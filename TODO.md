@@ -1,13 +1,13 @@
 ## IN PROGRESS
 
 - [ ] --format option
+- [ ] Copy ckmeans implementation into this project
+- [ ] README
 - [ ] JSON output
 - [ ] JSON input
-- [ ] (TEMPORARILY) copy ckmeans implementation into this project
-- [ ] README
 - [ ] Read from stdin
-- [ ] godoc
 - [ ] Web page
+- [ ] godoc
 
 - [x] Factor latency out as callable function Sub
 - [x] Format output nicely

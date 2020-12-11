@@ -127,8 +127,7 @@ func main() {
 			fmt.Printf("  ... interpolating missing beats over interval %v..%v \n", start, end)
 		}
 
-		beats, err = taps.Interpolate(beats, start, end)
-		if err != nil {
+		if err := beats.Interpolate(start, end); err != nil {
 			fmt.Printf("\n  ** ERROR: unable to interpolate beats (%v)\n\n", err)
 			os.Exit(1)
 		}

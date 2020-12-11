@@ -106,6 +106,94 @@ func (beats *Beats) Quantize() error {
 	return nil
 }
 
+func (beats *Beats) Interpolate(start, end time.Duration) error {
+	if beats != nil {
+		if len(beats.Beats) == 0 {
+			return fmt.Errorf("Insufficient data")
+		}
+
+		if len(beats.Beats) == 1 && beats.BPM == 0 {
+			return fmt.Errorf("Insufficient data")
+		}
+
+		// TODO simplify
+		if len(beats.Beats) == 1 {
+			m := 60.0 / float64(beats.BPM)
+			c := beats.Beats[0].At.Seconds() - m
+			bmin := int(math.Floor((start.Seconds() - c) / m))
+			bmax := int(math.Ceil((end.Seconds() - c) / m))
+
+			interpolated := []Beat{}
+			for b := bmin; b <= bmax; b++ {
+				tt := float64(b)*m + c
+				if tt >= start.Seconds() && tt <= end.Seconds() {
+					if b == 1 {
+						interpolated = append(interpolated, beats.Beats[0])
+					} else {
+						interpolated = append(interpolated, Beat{At: Seconds(tt)})
+					}
+				}
+			}
+
+			b0 := int(math.Floor(-c / m))
+			t0 := float64(b0)*m + c
+			for t0 < 0.0 {
+				b0++
+				t0 = float64(b0)*m + c
+			}
+
+			beats.BPM = uint(math.Round(60.0 / m))
+			beats.Offset = Seconds(t0)
+			beats.Beats = interpolated
+
+			return nil
+		}
+
+		index, err := reindex(beats.Beats)
+		if err != nil {
+			return err
+		}
+
+		x := []float64{}
+		t := []float64{}
+		for ix, b := range index {
+			x = append(x, float64(ix))
+			t = append(t, b.At.Seconds())
+		}
+
+		m, c := regression.OLS(x, t)
+		bmin := int(math.Floor((start.Seconds() - c) / m))
+		bmax := int(math.Ceil((end.Seconds() - c) / m))
+
+		interpolated := []Beat{}
+		for b := bmin; b <= bmax; b++ {
+			tt := float64(b)*m + c
+			if tt >= start.Seconds() && tt <= end.Seconds() {
+				if beat, ok := index[b]; ok {
+					interpolated = append(interpolated, beat)
+				} else {
+					interpolated = append(interpolated, Beat{At: Seconds(tt)})
+				}
+			}
+		}
+
+		b0 := int(math.Floor(-c / m))
+		t0 := float64(b0)*m + c
+		for t0 < 0.0 {
+			b0++
+			t0 = float64(b0)*m + c
+		}
+
+		beats.BPM = uint(math.Round(60.0 / m))
+		beats.Offset = Seconds(t0)
+		beats.Beats = interpolated
+
+		return nil
+	}
+
+	return nil
+}
+
 func (beats *Beats) Round(precision time.Duration) {
 	if beats != nil {
 		beats.Offset = beats.Offset.Round(precision)
@@ -178,89 +266,6 @@ func weights(taps [][]time.Duration, forgetting float64) []float64 {
 	}
 
 	return array
-}
-
-func Interpolate(beats Beats, start, end time.Duration) (Beats, error) {
-	if len(beats.Beats) == 0 {
-		return beats, fmt.Errorf("Insufficient data")
-	}
-
-	if len(beats.Beats) == 1 {
-		if beats.BPM == 0 {
-			return beats, fmt.Errorf("Insufficient data")
-		}
-
-		m := 60.0 / float64(beats.BPM)
-		c := beats.Beats[0].At.Seconds() - m
-		bmin := int(math.Floor((start.Seconds() - c) / m))
-		bmax := int(math.Ceil((end.Seconds() - c) / m))
-
-		interpolated := []Beat{}
-		for b := bmin; b <= bmax; b++ {
-			tt := float64(b)*m + c
-			if tt >= start.Seconds() && tt <= end.Seconds() {
-				if b == 1 {
-					interpolated = append(interpolated, beats.Beats[0])
-				} else {
-					interpolated = append(interpolated, Beat{At: Seconds(tt)})
-				}
-			}
-		}
-
-		b0 := int(math.Floor(-c / m))
-		t0 := float64(b0)*m + c
-		for t0 < 0.0 {
-			b0++
-			t0 = float64(b0)*m + c
-		}
-
-		return Beats{
-			BPM:    uint(math.Round(60.0 / m)),
-			Offset: Seconds(t0),
-			Beats:  interpolated,
-		}, nil
-	}
-
-	index, err := reindex(beats.Beats)
-	if err != nil {
-		return beats, err
-	}
-
-	x := []float64{}
-	t := []float64{}
-	for ix, b := range index {
-		x = append(x, float64(ix))
-		t = append(t, b.At.Seconds())
-	}
-
-	m, c := regression.OLS(x, t)
-	bmin := int(math.Floor((start.Seconds() - c) / m))
-	bmax := int(math.Ceil((end.Seconds() - c) / m))
-
-	interpolated := []Beat{}
-	for b := bmin; b <= bmax; b++ {
-		tt := float64(b)*m + c
-		if tt >= start.Seconds() && tt <= end.Seconds() {
-			if beat, ok := index[b]; ok {
-				interpolated = append(interpolated, beat)
-			} else {
-				interpolated = append(interpolated, Beat{At: Seconds(tt)})
-			}
-		}
-	}
-
-	b0 := int(math.Floor(-c / m))
-	t0 := float64(b0)*m + c
-	for t0 < 0.0 {
-		b0++
-		t0 = float64(b0)*m + c
-	}
-
-	return Beats{
-		BPM:    uint(math.Round(60.0 / m)),
-		Offset: Seconds(t0),
-		Beats:  interpolated,
-	}, nil
 }
 
 func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
