@@ -23,21 +23,12 @@ type Beat struct {
 	Taps     []time.Duration
 }
 
-type T2B struct {
-	//Latency    time.Duration
-	Forgetting float64
-}
-
 const (
 	MaxBPM         int = 200
 	MinSubdivision int = 8
 )
 
-var Default = T2B{
-	Forgetting: 0.0,
-}
-
-func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
+func Taps2Beats(taps [][]time.Duration, forgetting float64) Beats {
 	data := []float64{}
 	for _, row := range taps {
 		for _, t := range row {
@@ -45,7 +36,8 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
 		}
 	}
 
-	clusters := ckmeans.CKMeans1dDp(data, weights(taps, t2b.Forgetting))
+	w := weights(taps, forgetting)
+	clusters := ckmeans.CKMeans1dDp(data, w)
 	beats, BPM, offset := bpm(clusters)
 
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
@@ -131,7 +123,7 @@ func weights(taps [][]time.Duration, forgetting float64) []float64 {
 	return array
 }
 
-func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
+func Quantize(beats Beats) (Beats, error) {
 	if len(beats.Beats) < 2 {
 		quantized := Beats{
 			BPM:    0,
@@ -188,7 +180,7 @@ func (t2b *T2B) Quantize(beats Beats) (Beats, error) {
 	}, nil
 }
 
-func (t2b *T2B) Interpolate(beats Beats, start, end time.Duration) (Beats, error) {
+func Interpolate(beats Beats, start, end time.Duration) (Beats, error) {
 	if len(beats.Beats) == 0 {
 		return beats, fmt.Errorf("Insufficient data")
 	}

@@ -98,11 +98,7 @@ func TestTaps2Beats(t *testing.T) {
 		Beats:  []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	beats := t2b.Taps2Beats(Floats2Seconds(taps))
+	beats := Taps2Beats(Floats2Seconds(taps), 0.0)
 
 	if beats.BPM != expected.BPM {
 		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.BPM, beats.BPM)
@@ -136,11 +132,7 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 		{4.517911093, 5.069403016, 5.586174007, 6.108568986, 6.578649068, 7.681606914, 8.26211078},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	beats := t2b.Taps2Beats(Floats2Seconds(taps))
+	beats := Taps2Beats(Floats2Seconds(taps), 0.0)
 
 	if beats.BPM != expected.BPM {
 		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.BPM, beats.BPM)
@@ -170,11 +162,7 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 		{50.0, 50.1, 50.2, 49.9, 49.8},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	beats := t2b.Taps2Beats(Floats2Seconds(taps))
+	beats := Taps2Beats(Floats2Seconds(taps), 0.0)
 
 	if beats.BPM != expected.BPM {
 		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.BPM, beats.BPM)
@@ -203,11 +191,7 @@ func TestTaps2BeatsWithForgetting(t *testing.T) {
 		},
 	}
 
-	t2b := T2B{
-		Forgetting: 0.1,
-	}
-
-	beats := t2b.Taps2Beats(Floats2Seconds(taps))
+	beats := Taps2Beats(Floats2Seconds(taps), 0.1)
 
 	if beats.BPM != expected.BPM {
 		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.BPM, beats.BPM)

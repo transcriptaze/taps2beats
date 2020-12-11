@@ -23,11 +23,7 @@ func TestInterpolate(t *testing.T) {
 		Beats:  []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	beats, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
+	beats, err := Interpolate(data, Seconds(0), Seconds(10.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -50,11 +46,7 @@ func TestInterpolateWithNoData(t *testing.T) {
 		Beats:  []Beat{},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	_, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
+	_, err := Interpolate(data, Seconds(0), Seconds(10.5))
 	if err == nil {
 		t.Fatalf("Expected error, got (%v)", err)
 	}
@@ -67,11 +59,7 @@ func TestInterpolateWithInsufficientData(t *testing.T) {
 		Beats:  []Beat{beats[8]},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	_, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
+	_, err := Interpolate(data, Seconds(0), Seconds(10.5))
 	if err == nil {
 		t.Fatalf("Expected error, got (%v)", err)
 	}
@@ -111,11 +99,7 @@ func TestInterpolateWithMinimalInformation(t *testing.T) {
 		Beats:  []Beat{beats[8]},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	beats, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
+	beats, err := Interpolate(data, Seconds(0), Seconds(10.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}
@@ -155,11 +139,7 @@ func TestInterpolateWithMissingBeat(t *testing.T) {
 		Beats:  []Beat{beats[8], beats[9], beats[11], beats[12], beats[13], beats[14], beats[15]},
 	}
 
-	t2b := T2B{
-		Forgetting: Default.Forgetting,
-	}
-
-	beats, err := t2b.Interpolate(data, Seconds(0), Seconds(10.5))
+	beats, err := Interpolate(data, Seconds(0), Seconds(10.5))
 	if err != nil {
 		t.Fatalf("Unexpected error (%v)", err)
 	}

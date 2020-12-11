@@ -36,7 +36,7 @@ var options = struct {
 }{
 	precision:  1 * time.Millisecond,
 	latency:    0 * time.Millisecond,
-	forgetting: taps.Default.Forgetting,
+	forgetting: 0.0,
 	quantize:   false,
 	interval:   interval{},
 	outfile:    "",
@@ -88,15 +88,11 @@ func main() {
 		fmt.Printf("  ... %v values read from %s\n", len(data), file)
 	}
 
-	t2b := taps.T2B{
-		Forgetting: options.forgetting,
-	}
-
 	if options.verbose {
-		fmt.Printf("  ... using forgetting factor %v\n", t2b.Forgetting)
+		fmt.Printf("  ... using forgetting factor %v\n", options.forgetting)
 	}
 
-	beats := t2b.Taps2Beats(taps.Floats2Seconds(data))
+	beats := taps.Taps2Beats(taps.Floats2Seconds(data), options.forgetting)
 
 	// ... quantize
 	if options.quantize {
@@ -104,7 +100,7 @@ func main() {
 			fmt.Printf("  ... quantizing tapped beats to match estimated BPM\n")
 		}
 
-		beats, err = t2b.Quantize(beats)
+		beats, err = taps.Quantize(beats)
 		if err != nil {
 			fmt.Printf("\n  ** ERROR: unable to quantize beats (%v)\n\n", err)
 			os.Exit(1)
@@ -134,7 +130,7 @@ func main() {
 			fmt.Printf("  ... interpolating missing beats over interval %v..%v \n", start, end)
 		}
 
-		beats, err = t2b.Interpolate(beats, start, end)
+		beats, err = taps.Interpolate(beats, start, end)
 		if err != nil {
 			fmt.Printf("\n  ** ERROR: unable to interpolate beats (%v)\n\n", err)
 			os.Exit(1)
