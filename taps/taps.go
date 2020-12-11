@@ -24,8 +24,7 @@ type Beat struct {
 }
 
 type T2B struct {
-	//	Precision  time.Duration
-	Latency    time.Duration
+	//Latency    time.Duration
 	Forgetting float64
 }
 
@@ -35,13 +34,10 @@ const (
 )
 
 var Default = T2B{
-	//	Precision:  1 * time.Millisecond,
-	Latency:    0 * time.Millisecond,
 	Forgetting: 0.0,
 }
 
 func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
-	// ... cluster taps into beats
 	data := []float64{}
 	for _, row := range taps {
 		for _, t := range row {
@@ -50,19 +46,7 @@ func (t2b *T2B) Taps2Beats(taps [][]time.Duration) Beats {
 	}
 
 	clusters := ckmeans.CKMeans1dDp(data, weights(taps, t2b.Forgetting))
-
-	// ... estimate BPM and offset
 	beats, BPM, offset := bpm(clusters)
-
-	// ... compensate for latency
-	offset -= t2b.Latency
-	for i, b := range beats {
-		beats[i].At = (b.At - t2b.Latency)
-		beats[i].Mean = (b.Mean - t2b.Latency)
-		for j, t := range b.Taps {
-			beats[i].Taps[j] = t - t2b.Latency
-		}
-	}
 
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
 
@@ -83,6 +67,22 @@ func (beats *Beats) Round(precision time.Duration) {
 			beats.Beats[i].Variance = b.Variance.Round(precision)
 			for j, tap := range b.Taps {
 				beats.Beats[i].Taps[j] = tap.Round(precision)
+			}
+		}
+	}
+}
+
+func (beats *Beats) Sub(dt time.Duration) {
+	if beats != nil {
+		beats.Offset -= dt
+		for i, b := range beats.Beats {
+			beats.Beats[i].At = b.At - dt
+
+			if len(b.Taps) > 0 {
+				beats.Beats[i].Mean = b.Mean - dt
+				for j, t := range b.Taps {
+					beats.Beats[i].Taps[j] = t - dt
+				}
 			}
 		}
 	}
@@ -269,37 +269,6 @@ func (t2b *T2B) Interpolate(beats Beats, start, end time.Duration) (Beats, error
 		Offset: Seconds(t0),
 		Beats:  interpolated,
 	}, nil
-}
-
-func (t2b *T2B) Shift(beats Beats) Beats {
-	shifted := Beats{
-		BPM:    beats.BPM,
-		Offset: 0,
-		Beats:  make([]Beat, len(beats.Beats)),
-	}
-
-	if len(beats.Beats) > 0 {
-		sort.SliceStable(beats.Beats, func(i, j int) bool { return beats.Beats[i].At < beats.Beats[j].At })
-
-		shift := beats.Beats[0].At
-		for i, b := range beats.Beats {
-			shifted.Beats[i] = Beat{
-				At:       b.At - shift,
-				Mean:     b.Mean,
-				Variance: b.Variance,
-				Taps:     make([]time.Duration, len(b.Taps)),
-			}
-
-			if len(b.Taps) > 0 {
-				shifted.Beats[i].Mean = b.Mean - shift
-				for j, t := range b.Taps {
-					shifted.Beats[i].Taps[j] = t - shift
-				}
-			}
-		}
-	}
-
-	return shifted
 }
 
 func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {

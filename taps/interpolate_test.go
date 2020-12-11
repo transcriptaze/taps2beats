@@ -24,7 +24,6 @@ func TestInterpolate(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -52,7 +51,6 @@ func TestInterpolateWithNoData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -70,7 +68,6 @@ func TestInterpolateWithInsufficientData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -115,7 +112,6 @@ func TestInterpolateWithMinimalInformation(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -160,7 +156,6 @@ func TestInterpolateWithMissingBeat(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 

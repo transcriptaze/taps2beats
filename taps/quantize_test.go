@@ -20,7 +20,6 @@ func TestQuantize(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -54,7 +53,6 @@ func TestQuantizeWithNoData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -88,7 +86,6 @@ func TestQuantizeWithOneDataPoint(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -122,7 +119,6 @@ func TestQuantizeWithMissingBeat(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 

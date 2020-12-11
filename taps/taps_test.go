@@ -99,7 +99,6 @@ func TestTaps2Beats(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -138,7 +137,6 @@ func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -173,7 +171,6 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: Default.Forgetting,
 	}
 
@@ -185,159 +182,6 @@ func TestTaps2BeatsWithWeirdData(t *testing.T) {
 
 	if math.Abs(beats.Offset.Seconds()-expected.Offset.Seconds()) > 0.0011 {
 		t.Errorf("Incorrect offset - expected:%v, got:%v", expected.Offset, beats.Offset)
-	}
-
-	compare(beats.Beats, expected.Beats, t)
-}
-
-func TestTaps2BeatsWithLatency(t *testing.T) {
-	expected := Beats{
-		BPM:    114,
-		Offset: 279 * time.Millisecond,
-		Beats: []Beat{
-			{
-				At:       4487 * time.Millisecond,
-				Mean:     4487 * time.Millisecond,
-				Variance: 3 * time.Millisecond,
-				Taps: seconds(
-					4.57027199-0.037,
-					4.50617612-0.037,
-					4.52956007-0.037,
-					4.52956007-0.037,
-					4.51786509-0.037,
-					4.49458114-0.037,
-					4.52940807-0.037,
-					4.52363108-0.037,
-					4.51797909-0.037,
-					4.51791109-0.037)},
-			{
-				At:       5020 * time.Millisecond,
-				Mean:     5020 * time.Millisecond,
-				Variance: 8 * time.Millisecond,
-				Taps: seconds(
-					5.06359402-0.037,
-					5.04597106-0.037,
-					5.05767004-0.037,
-					5.06928402-0.037,
-					5.02278211-0.037,
-					5.13309289-0.037,
-					5.04023407-0.037,
-					5.04029507-0.037,
-					5.04607106-0.037,
-					5.04616506-0.037,
-					5.06940302-0.037)},
-			{
-				At:       5541 * time.Millisecond,
-				Mean:     5541 * time.Millisecond,
-				Variance: 4 * time.Millisecond,
-				Taps: seconds(
-					5.603539973-0.037,
-					5.591722996-0.037,
-					5.591721996-0.037,
-					5.603428973-0.037,
-					5.580101018-0.037,
-					5.545395086-0.037,
-					5.562732052-0.037,
-					5.556940064-0.037,
-					5.586102007-0.037,
-					5.551068075-0.037,
-					5.586174007-0.037)},
-			{
-				At:       6064 * time.Millisecond,
-				Mean:     6064 * time.Millisecond,
-				Variance: 4 * time.Millisecond,
-				Taps: seconds(
-					6.102690998-0.037,
-					6.114172975-0.037,
-					6.13742393-0.037,
-					6.102591998-0.037,
-					6.096715009-0.037,
-					6.067721066-0.037,
-					6.079333043-0.037,
-					6.131584941-0.037,
-					6.09099502-0.037,
-					6.073547054-0.037,
-					6.108568986-0.037)},
-			{
-				At:       6581 * time.Millisecond,
-				Mean:     6581 * time.Millisecond,
-				Variance: 7 * time.Millisecond,
-				Taps: seconds(
-					6.642708943-0.037,
-					6.619153989-0.037,
-					6.630941966-0.037,
-					6.613455-0.037,
-					6.654118921-0.037,
-					6.578564068-0.037,
-					6.624973977-0.037,
-					6.654145921-0.037,
-					6.596029034-0.037,
-					6.607636011-0.037,
-					6.578649068-0.037)},
-			{
-				At:       7116 * time.Millisecond,
-				Mean:     7116 * time.Millisecond,
-				Variance: 4 * time.Millisecond,
-				Taps: seconds(
-					7.14179697-0.037,
-					7.13578898-0.037,
-					7.17668390-0.037,
-					7.14764496-0.037,
-					7.17637190-0.037,
-					7.13009699-0.037,
-					7.14165097-0.037,
-					7.19387687-0.037,
-					7.13022499-0.037,
-					7.16501892-0.037,
-					7.14752397-0.037)},
-			{
-				At:       7648 * time.Millisecond,
-				Mean:     7648 * time.Millisecond,
-				Variance: 5 * time.Millisecond,
-				Taps: seconds(
-					7.710649857-0.037,
-					7.693071891-0.037,
-					7.69897488-0.037,
-					7.69912088-0.037,
-					7.681405914-0.037,
-					7.652464971-0.037,
-					7.664070948-0.037,
-					7.722112835-0.037,
-					7.652501970-0.037,
-					7.687334903-0.037,
-					7.681606914-0.037)},
-			{
-				At:       8173 * time.Millisecond,
-				Mean:     8173 * time.Millisecond,
-				Variance: 12 * time.Millisecond,
-				Taps: seconds(
-					8.192470916-0.037,
-					8.203885893-0.037,
-					8.227207848-0.037,
-					8.215609871-0.037,
-					8.215537871-0.037,
-					8.13427303-0.037,
-					8.198270905-0.037,
-					8.244539814-0.037,
-					8.180805939-0.037,
-					8.238953824-0.037,
-					8.26211078-0.037)},
-		},
-	}
-
-	t2b := T2B{
-		Latency:    37 * time.Millisecond,
-		Forgetting: Default.Forgetting,
-	}
-
-	beats := t2b.Taps2Beats(Floats2Seconds(taps))
-
-	if beats.BPM != expected.BPM {
-		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.BPM, beats.BPM)
-	}
-
-	if math.Abs(beats.Offset.Seconds()-expected.Offset.Seconds()) > 0.0011 {
-		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.Offset, beats.Offset)
 	}
 
 	compare(beats.Beats, expected.Beats, t)
@@ -360,7 +204,6 @@ func TestTaps2BeatsWithForgetting(t *testing.T) {
 	}
 
 	t2b := T2B{
-		Latency:    Default.Latency,
 		Forgetting: 0.1,
 	}
 

@@ -1,6 +1,5 @@
 ## IN PROGRESS
 
-- [ ] Factor latency out as callable function Sub
 - [ ] --format option
 - [ ] JSON output
 - [ ] JSON input
@@ -10,6 +9,7 @@
 - [ ] godoc
 - [ ] Web page
 
+- [x] Factor latency out as callable function Sub
 - [x] Format output nicely
 - [x] commonalize taps.interpolate and taps.remap
 - [x] test Quantize with missing beat (shouldn't interpolate!)

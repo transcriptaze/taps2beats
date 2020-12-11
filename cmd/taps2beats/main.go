@@ -35,7 +35,7 @@ var options = struct {
 	help       bool
 }{
 	precision:  1 * time.Millisecond,
-	latency:    taps.Default.Latency,
+	latency:    0 * time.Millisecond,
 	forgetting: taps.Default.Forgetting,
 	quantize:   false,
 	interval:   interval{},
@@ -89,13 +89,11 @@ func main() {
 	}
 
 	t2b := taps.T2B{
-		Latency:    options.latency,
 		Forgetting: options.forgetting,
 	}
 
 	if options.verbose {
-		fmt.Printf("  ... compensating for %v latency\n", t2b.Latency)
-		fmt.Printf("  ... using forgetting factor %v latency\n", t2b.Forgetting)
+		fmt.Printf("  ... using forgetting factor %v\n", t2b.Forgetting)
 	}
 
 	beats := t2b.Taps2Beats(taps.Floats2Seconds(data))
@@ -149,12 +147,20 @@ func main() {
 		fmt.Printf("  ... %v beats\n", len(beats.Beats))
 	}
 
+	if options.latency != 0 {
+		if options.verbose {
+			fmt.Printf("  ... compensating for %v latency\n", options.latency)
+		}
+
+		beats.Sub(options.latency)
+	}
+
 	if options.shift {
 		if options.verbose {
 			fmt.Printf("  ... shifting beats to start at 0\n")
 		}
 
-		beats = t2b.Shift(beats)
+		beats.Sub(beats.Offset)
 	}
 
 	// ... round
