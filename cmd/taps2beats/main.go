@@ -50,7 +50,7 @@ func main() {
 	flag.BoolVar(&options.quantize, "quantize", options.quantize, "adjusts the tapped beats to fit a least squares fitted BPM")
 	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
-	flag.DurationVar(&options.latency, "latency", options.latency, "delayi for which to compensate, in Go 'time' format (e.g. 70ms)")
+	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate, in Go 'time' format (e.g. 70ms)")
 	flag.BoolVar(&options.shift, "shift", options.shift, "shifts all times so that the first beat is on 0")
 	flag.BoolVar(&options.verbose, "verbose", options.verbose, "enables verbose progress messages")
 	flag.BoolVar(&options.help, "help", options.help, "displays the 'help' information")

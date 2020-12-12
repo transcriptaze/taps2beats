@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	"github.com/twystd/ckmeans.1d.dp/go/ckmeans"
+	"github.com/twystd/taps2beats/ckmeans"
 	"github.com/twystd/taps2beats/regression"
 )
 

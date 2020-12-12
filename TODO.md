@@ -1,14 +1,15 @@
 ## IN PROGRESS
 
+- [ ] Commonalise regression
 - [ ] --format option
-- [ ] Copy ckmeans implementation into this project
-- [ ] README
 - [ ] JSON output
 - [ ] JSON input
 - [ ] Read from stdin
 - [ ] Web page
 - [ ] godoc
 
+- [x] README
+- [x] Copy ckmeans implementation into this project
 - [x] Factor latency out as callable function Sub
 - [x] Format output nicely
 - [x] commonalize taps.interpolate and taps.remap
@@ -34,6 +35,7 @@
 
 ## TODO
 
-1. Look at beat detection algorithms
-2. Gradient descent for interpolation (?)
+1. Look into beat detection algorithms
+2. Look into gradient descent for interpolation
+3. Look into constrained Deming regression for interpolation
 3. https://moultano.wordpress.com/2018/11/08/minhashing-3kbzhsxyg4467-6
