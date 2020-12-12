@@ -1,10 +1,11 @@
 ### taps2beats
 
-`taps2beats` is a somewhat (?) off the wall command-line utility and Go module that estimates the beats of a piece of music from a file of the beats as tapped by a person (or musical entity of whatever sort). 
+`taps2beats` is a somewhat _(?)_ off the wall command-line utility and Go module that estimates the beats of a piece
+of music from a file of the beats as _tapped_ by a person (or musical entity of whatever sort). 
 
-The internal algorithm uses an implementation of _Ckmeans.1d.dp_ to cluster the supplied 
-'taps' into the optimal equivalent beats, followed by least squares regression to estimate the BPM and offset and (optionally) quantize and interpolate the beats over
-the interval.
+The internal algorithm uses an implementation of _Ckmeans.1d.dp_ to cluster the supplied _'taps'_ into the optimal 
+equivalent beats, followed by least squares regression to estimate the BPM and offset and (optionally) quantize 
+and interpolate the beats over the interval.
 
 #### Requirements
 
@@ -12,7 +13,8 @@ the interval.
 
 #### Installation
 
-To install the stable version, download the `tar.gz` or `zip` release for your platform from the [Releases](https://github.com/twystd/taps2beats/releases) page, and unpack into the directory of your choice.  
+To install the stable version, download the `tar.gz` or `zip` release for your platform from the [Releases](https://github.com/twystd/taps2beats/releases) 
+page, and unpack into the directory of your choice.  
 
 The build the development version, clone the [taps2beats](https://github.com/twystd/taps2beats) _github_ repository:
 
@@ -49,8 +51,8 @@ The output format is a fixed column width list of beats, with each beat represen
 | Beat | At | Mean | Variance | Taps |
 |------|----|------|----------|------|
 | ...  |
-| 6    | 7.153s | 7.153s | 1.3ms | 7.142s 7.136s 7.177s 7.148s 7.176s 7.13s 7.142s 7.194s 7.13s  7.165s 7.148s |
-| 7    | 7.686s | 7.686s | 2.1ms | 7.711s 7.693s 7.699s 7.699s 7.681s 7.652s 7.664s 7.722s 7.653s 7.687s 7.682s |
+| 6    | 7.153s | 7.153s | 1.3ms | 7.142s 7.136s 7.177s 7.148s 7.176s 7.13s 7.13s  7.165s 7.148s |
+| 7    | 7.686s | 7.686s | 2.1ms | 7.711s 7.693s 7.699s 7.681s 7.652s 7.722s 7.653s 7.687s 7.682s |
 | ...  |
 
 Options:
