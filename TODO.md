@@ -2,12 +2,12 @@
 
 - [ ] Commonalise regression
 - [ ] --format option
-- [ ] JSON output
 - [ ] JSON input
 - [ ] Read from stdin
 - [ ] Web page
 - [ ] godoc
 
+- [x] JSON output
 - [x] README
 - [x] Copy ckmeans implementation into this project
 - [x] Factor latency out as callable function Sub

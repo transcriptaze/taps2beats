@@ -11,16 +11,16 @@ import (
 )
 
 type Beats struct {
-	BPM    uint
-	Offset time.Duration
-	Beats  []Beat
+	BPM    uint          `json:"BPM"`
+	Offset time.Duration `json:"offset"`
+	Beats  []Beat        `json:"beats"`
 }
 
 type Beat struct {
-	At       time.Duration
-	Mean     time.Duration
-	Variance time.Duration
-	Taps     []time.Duration
+	At       time.Duration   `json:"at"`
+	Mean     time.Duration   `json:"mean"`
+	Variance time.Duration   `json:"variance"`
+	Taps     []time.Duration `json:"taps"`
 }
 
 const (

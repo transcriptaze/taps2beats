@@ -36,6 +36,7 @@ coverage: build
 run: build
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift ./runtime/taps.txt
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  ./runtime/taps.txt
+	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  --json ./runtime/taps.txt
 
 help: build
 	./bin/taps2beats 

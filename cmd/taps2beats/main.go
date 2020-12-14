@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -31,15 +32,18 @@ var options = struct {
 	precision  time.Duration
 	latency    time.Duration
 	shift      bool
+	json       bool
 	verbose    bool
 	help       bool
 }{
+	outfile:    "",
+	interval:   interval{},
+	quantize:   false,
+	forgetting: 0.0,
 	precision:  1 * time.Millisecond,
 	latency:    0 * time.Millisecond,
-	forgetting: 0.0,
-	quantize:   false,
-	interval:   interval{},
-	outfile:    "",
+	shift:      false,
+	json:       false,
 	verbose:    false,
 	help:       false,
 }
@@ -52,6 +56,7 @@ func main() {
 	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
 	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate, in Go 'time' format (e.g. 70ms)")
 	flag.BoolVar(&options.shift, "shift", options.shift, "shifts all times so that the first beat is on 0")
+	flag.BoolVar(&options.json, "json", options.json, "Sets the output format to prettified JSON")
 	flag.BoolVar(&options.verbose, "verbose", options.verbose, "enables verbose progress messages")
 	flag.BoolVar(&options.help, "help", options.help, "displays the 'help' information")
 	flag.Parse()
@@ -163,7 +168,18 @@ func main() {
 	// ... format and print
 	var b bytes.Buffer
 
-	print(&b, beats)
+	if options.json {
+		json, err := json.MarshalIndent(beats, "", " ")
+		if err != nil {
+			fmt.Printf("\n  ** ERROR: unable to format output as JSON (%v)\n\n", err)
+			os.Exit(1)
+		}
+
+		b.Write(json)
+
+	} else {
+		print(&b, beats)
+	}
 
 	if options.outfile == "" {
 		fmt.Println()
@@ -286,7 +302,7 @@ func help() {
 	fmt.Println("  contain the same number of values, the values do not have to be in time order, nor are they")
 	fmt.Println("  required to have the same precision.")
 	fmt.Println()
-	fmt.Println("  Usage: taps2beats [--interval <interval>] [--quantize] [--forgetting <factor>] [--latency <delay>] [--precision <time>] [--shift] [--out <file>] [--verbose] <file>")
+	fmt.Println("  Usage: taps2beats [--interval <interval>] [--quantize] [--forgetting <factor>] [--latency <delay>] [--precision <time>] [--shift] [--out <file>] [--json] [--verbose] <file>")
 	fmt.Println()
 	fmt.Println("  Arguments:")
 	fmt.Println()
@@ -318,6 +334,7 @@ func help() {
 	fmt.Println("    --precision <time>    time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
 	fmt.Println("    --out                 output file path")
 	fmt.Println("    --shift               shifts all times so that the first beat is on 0 and the offset is 0")
+	fmt.Println("    --json                formats the output as prettified JSON")
 	fmt.Println("    --verbose             enables verbose progress messages")
 	fmt.Println("    --help                displays the this information")
 
