@@ -1,12 +1,14 @@
 ## IN PROGRESS
 
 - [ ] Commonalise regression
+- [ ] Implement Beats.MarshalJSON/UnmarshalJSON
+- [ ] Implement Beats.MarshalText/UnmarshalText
 - [ ] --format option
-- [ ] JSON input
 - [ ] Read from stdin
 - [ ] Web page
 - [ ] godoc
 
+- [x] JSON input
 - [x] JSON output
 - [x] README
 - [x] Copy ckmeans implementation into this project

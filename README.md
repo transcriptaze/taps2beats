@@ -37,8 +37,17 @@ The `file` is a list of lines of the 'taps' (in seconds), separated by whitespac
 4.511093 5.069403016 5.586174007 6.108568986 6.57864 7.147523 7.681614 8.262078
 ```
 
-There is no requirement that the number of taps on each line be the same or that the taps are specified to the same precision. Ideally, each line represents a _loop_ of the music being tapped, but this is only significant if a _forgetting_ factor (described below)
-is used to weight later 'taps' as being more accurate than e.g. the first few attempts.
+There is no requirement that the number of taps on each line be the same or that the taps are specified to the
+same precision. Ideally, each line represents a _loop_ of the music being tapped, but this is only significant
+if a _forgetting_ factor (described below) is used to weight later 'taps' as being more accurate than e.g. the
+first few attempts.
+
+If the input filename ends with '.json', the file is parsed as a JSON object that is expected to contain:
+```
+{ 
+  "taps": [][]float 
+}
+```
 
 The output format is a fixed column width list of beats, with each beat represented by a line that contains
 
@@ -89,7 +98,8 @@ Options:
 --shift                Adjusts all beats (and times) so that the first beat in the 
                        interval falls on 0s.
                        
---json                 Formats the output as prettified JSON.
+--json                 Formats the output as prettified JSON, with all the times converted
+                       to seconds (to a precision of 1ms)
 ```
 
 #### Examples

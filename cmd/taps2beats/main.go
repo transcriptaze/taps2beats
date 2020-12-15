@@ -2,14 +2,11 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -168,17 +165,16 @@ func main() {
 	// ... format and print
 	var b bytes.Buffer
 
-	if options.json {
-		json, err := json.MarshalIndent(beats, "", " ")
-		if err != nil {
+	if options.json || strings.HasSuffix(strings.ToLower(options.outfile), ".json") {
+		if err := formatJSON(beats, &b); err != nil {
 			fmt.Printf("\n  ** ERROR: unable to format output as JSON (%v)\n\n", err)
 			os.Exit(1)
 		}
-
-		b.Write(json)
-
 	} else {
-		print(&b, beats)
+		if err := formatTXT(beats, &b); err != nil {
+			fmt.Printf("\n  ** ERROR: unable to format output (%v)\n\n", err)
+			os.Exit(1)
+		}
 	}
 
 	if options.outfile == "" {
@@ -187,81 +183,6 @@ func main() {
 		fmt.Println()
 	} else {
 		ioutil.WriteFile(options.outfile, b.Bytes(), 0644)
-	}
-}
-
-func read(f string) (int, [][]float64, error) {
-	bytes, err := ioutil.ReadFile(f)
-	if err != nil {
-		return 0, nil, err
-	}
-
-	count := 0
-	data := [][]float64{}
-	re := regexp.MustCompile(`\s+`)
-	for _, line := range strings.Split(string(bytes), "\n") {
-		tokens := re.Split(line, -1)
-		row := []float64{}
-		for _, t := range tokens {
-			if t != "" {
-				if v, err := strconv.ParseFloat(t, 64); err != nil {
-					fmt.Printf("  ** WARN: invalid value (%s)\n", t)
-				} else {
-					row = append(row, v)
-					count++
-				}
-			}
-		}
-
-		data = append(data, row)
-	}
-
-	return count, data, nil
-}
-
-func print(f io.Writer, beats taps.Beats) {
-	grid := [][]string{}
-	for i, b := range beats.Beats {
-		row := []string{
-			fmt.Sprintf("%d", i+1),
-			fmt.Sprintf("%v", b.At),
-		}
-
-		if len(b.Taps) > 0 {
-			row = append(row, fmt.Sprintf("%v", b.Mean))
-			row = append(row, fmt.Sprintf("%v", b.Variance))
-			for _, t := range b.Taps {
-				row = append(row, fmt.Sprintf("%v", t))
-			}
-		}
-
-		grid = append(grid, row)
-	}
-
-	columns := 0
-	for _, row := range grid {
-		if len(row) > columns {
-			columns = len(row)
-		}
-	}
-
-	cols := make([]int, columns)
-	for _, row := range grid {
-		for i, v := range row {
-			if len(v) > cols[i] {
-				cols[i] = len(v)
-			}
-		}
-	}
-
-	fmt.Fprintf(f, "BPM:    %v\n", beats.BPM)
-	fmt.Fprintf(f, "Offset: %v\n\n", beats.Offset)
-	for _, row := range grid {
-		fmt.Fprintf(f, "%-*s", cols[0], row[0])
-		for i, v := range row[1:] {
-			fmt.Fprintf(f, " %-*s", cols[i+1], v)
-		}
-		fmt.Fprintln(f)
 	}
 }
 

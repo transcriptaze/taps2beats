@@ -34,9 +34,11 @@ coverage: build
 	go test -cover ./...
 
 run: build
-	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift ./runtime/taps.txt
-	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  ./runtime/taps.txt
-	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  --json ./runtime/taps.txt
+	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift ./examples/taps.txt
+	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  ./examples/taps.txt
+
+json: build
+	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  --json ./examples/taps.json
 
 help: build
 	./bin/taps2beats 
