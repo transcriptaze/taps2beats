@@ -1,13 +1,14 @@
 ## IN PROGRESS
 
-- [ ] Commonalise regression
+- [ ] Read from stdin
+- [ ] Commonalize BPM + offset
 - [ ] Implement Beats.MarshalJSON/UnmarshalJSON
 - [ ] Implement Beats.MarshalText/UnmarshalText
 - [ ] --format option
-- [ ] Read from stdin
 - [ ] Web page
 - [ ] godoc
 
+- [x] Commonalise regression
 - [x] JSON input
 - [x] JSON output
 - [x] README

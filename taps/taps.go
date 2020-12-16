@@ -17,6 +17,7 @@ type Beats struct {
 }
 
 type Beat struct {
+	beat     int             `json:"-"`
 	At       time.Duration   `json:"at"`
 	Mean     time.Duration   `json:"mean"`
 	Variance time.Duration   `json:"variance"`
@@ -54,35 +55,24 @@ func (beats *Beats) Quantize() error {
 		if len(beats.Beats) < 1 {
 			beats.BPM = 0
 			beats.Offset = 0 * time.Millisecond
-
 			return nil
 		}
 
 		if len(beats.Beats) < 2 {
 			beats.BPM = 0
 			beats.Offset = beats.Beats[0].At
-
 			return nil
 		}
 
-		index, err := reindex(beats.Beats)
+		m, c, err := fit(beats.Beats)
 		if err != nil {
 			return err
 		}
 
-		x := []float64{}
-		t := []float64{}
-		for ix, b := range index {
-			x = append(x, float64(ix))
-			t = append(t, b.At.Seconds())
-		}
-
-		m, c := regression.OLS(x, t)
-
 		quantized := []Beat{}
-		for ix, b := range index {
+		for _, b := range beats.Beats {
 			quantized = append(quantized, Beat{
-				At:       Seconds(float64(ix)*m + c),
+				At:       Seconds(float64(b.beat)*m + c),
 				Mean:     b.Mean,
 				Variance: b.Variance,
 				Taps:     b.Taps,
@@ -149,19 +139,16 @@ func (beats *Beats) Interpolate(start, end time.Duration) error {
 			return nil
 		}
 
-		index, err := reindex(beats.Beats)
+		m, c, err := fit(beats.Beats)
 		if err != nil {
 			return err
 		}
 
-		x := []float64{}
-		t := []float64{}
-		for ix, b := range index {
-			x = append(x, float64(ix))
-			t = append(t, b.At.Seconds())
+		index := map[int]Beat{}
+		for _, b := range beats.Beats {
+			index[b.beat] = b
 		}
 
-		m, c := regression.OLS(x, t)
 		bmin := int(math.Floor((start.Seconds() - c) / m))
 		bmax := int(math.Ceil((end.Seconds() - c) / m))
 
@@ -280,19 +267,11 @@ func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
 		return beats, 0, 0
 	}
 
-	index, err := reindex(beats)
+	m, c, err := fit(beats)
 	if err != nil {
 		return beats, 0, 0
 	}
 
-	x := []float64{}
-	t := []float64{}
-	for i, c := range index {
-		x = append(x, float64(i))
-		t = append(t, c.At.Seconds())
-	}
-
-	m, c := regression.OLS(x, t)
 	bpm := uint(math.Round(60.0 / m))
 
 	b0 := int(math.Floor(-c / m))
@@ -307,7 +286,29 @@ func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
 	return beats, bpm, offset
 }
 
-func reindex(beats []Beat) (map[int]Beat, error) {
+func fit(beats []Beat) (float64, float64, error) {
+	if len(beats) < 2 {
+		panic("Insufficient data")
+	}
+
+	err := reindex(beats)
+	if err != nil {
+		return 0, 0, err
+	}
+
+	x := []float64{}
+	t := []float64{}
+	for _, b := range beats {
+		x = append(x, float64(b.beat))
+		t = append(t, b.At.Seconds())
+	}
+
+	m, c := regression.OLS(x, t)
+
+	return m, c, nil
+}
+
+func reindex(beats []Beat) error {
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
 
 	at := make([]float64, len(beats))
@@ -324,13 +325,11 @@ func reindex(beats []Beat) (map[int]Beat, error) {
 
 	// ... trivial cases
 	if N <= 2 {
-		m := map[int]Beat{}
-
-		for i, ix := range index {
-			m[ix] = beats[i]
+		for i := range beats {
+			beats[i].beat = index[i]
 		}
 
-		return m, nil
+		return nil
 	}
 
 	// ... 3+ intervals
@@ -370,17 +369,15 @@ loop:
 		variance := sumsq / float64(N-1)
 
 		if variance < 0.001 {
-			m := map[int]Beat{}
-
-			for i, ix := range index {
-				m[ix] = beats[i]
+			for i := range beats {
+				beats[i].beat = index[i]
 			}
 
-			return m, nil
+			return nil
 		}
 	}
 
-	return nil, fmt.Errorf("Error mapping taps to beats: %v", beats)
+	return fmt.Errorf("Error mapping taps to beats: %v", beats)
 }
 
 func makeBeat(at float64, cluster ckmeans.Cluster) Beat {
