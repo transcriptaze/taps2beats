@@ -1,13 +1,13 @@
 ## IN PROGRESS
 
-- [ ] Read from stdin
+- [ ] Move to github/transcriptase
 - [ ] Commonalize BPM + offset
 - [ ] Implement Beats.MarshalJSON/UnmarshalJSON
 - [ ] Implement Beats.MarshalText/UnmarshalText
-- [ ] --format option
 - [ ] Web page
 - [ ] godoc
 
+- [x] Read from stdin
 - [x] Commonalise regression
 - [x] JSON input
 - [x] JSON output
@@ -42,3 +42,5 @@
 2. Look into gradient descent for interpolation
 3. Look into constrained Deming regression for interpolation
 3. https://moultano.wordpress.com/2018/11/08/minhashing-3kbzhsxyg4467-6
+4. --format option to set the output value format (?)
+5. --interactive, to record the 'taps' directly (?)

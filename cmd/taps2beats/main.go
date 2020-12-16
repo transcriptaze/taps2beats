@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -67,22 +68,37 @@ func main() {
 		fmt.Printf("\n  taps2beats %s\n\n", VERSION)
 	}
 
+	//	if len(flag.Args()) == 0 {
+	//		usage()
+	//		os.Exit(0)
+	//	}
+
+	var file string
+	var f io.Reader
 	if len(flag.Args()) == 0 {
-		usage()
-		os.Exit(0)
+		file = "<stdin>"
+		f = os.Stdin
+	} else {
+		file := flag.Args()[0]
+		f, err := os.Open(file)
+		if err != nil {
+			fmt.Printf("\n  ** ERROR: unable to open file %s (%v)\n\n", file, err)
+			os.Exit(1)
+		}
+
+		defer f.Close()
 	}
 
-	file := flag.Args()[0]
 	if options.verbose {
 		fmt.Printf("  ... reading data from %s\n", file)
 	}
 
-	N, data, err := read(file)
+	N, data, err := read(f, false)
 	if err != nil {
-		fmt.Printf("\n  ** ERROR: unable to read data from file %s (%v)\n\n", file, err)
+		fmt.Printf("\n  ** ERROR: unable to read data from %s (%v)\n\n", file, err)
 		os.Exit(1)
 	} else if N == 0 {
-		fmt.Printf("\n  ** ERROR: no data in file %s (%v)\n\n", file, err)
+		fmt.Printf("\n  ** ERROR: no data \n\n")
 		os.Exit(1)
 	}
 
@@ -91,7 +107,7 @@ func main() {
 	}
 
 	if options.verbose {
-		fmt.Printf("  ... using forgetting factor %v\n", options.forgetting)
+		fmt.Printf("  ... using forgetting factor %0.1f\n", options.forgetting)
 	}
 
 	beats := taps.Taps2Beats(taps.Floats2Seconds(data), options.forgetting)
@@ -109,7 +125,7 @@ func main() {
 	}
 
 	// ... interpolate
-	if options.interval.set && len(beats.Beats) > 0 {
+	if options.interval.set && len(beats.Beats) > 1 {
 		var start time.Duration
 		var end time.Duration
 
@@ -186,24 +202,6 @@ func main() {
 	}
 }
 
-func usage() {
-	fmt.Println()
-	fmt.Println("  Usage: taps2beats [options] <file>")
-	fmt.Println()
-	fmt.Println("  Arguments:")
-	fmt.Println()
-	fmt.Println("    file  Path to file containing the whitespace delimited taps to be clustered into beats")
-	fmt.Println()
-	fmt.Println("  Options:")
-	fmt.Println()
-
-	flag.VisitAll(func(f *flag.Flag) {
-		fmt.Printf("    --%-13s %s\n", f.Name, f.Usage)
-	})
-
-	fmt.Println()
-}
-
 func help() {
 	fmt.Println()
 	fmt.Printf("  taps2beats %s\n", VERSION)
@@ -227,7 +225,8 @@ func help() {
 	fmt.Println()
 	fmt.Println("  Arguments:")
 	fmt.Println()
-	fmt.Println("    file  Path to file containing the whitespace delimited taps to be clustered into beats")
+	fmt.Println("    file  Path to file containing the whitespace delimited taps to be clustered into beats. Reads")
+	fmt.Println("          from <stdin> if the file is not specified.")
 	fmt.Println()
 	fmt.Println("  Options:")
 	fmt.Println()

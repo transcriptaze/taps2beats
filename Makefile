@@ -40,7 +40,12 @@ run: build
 json: build
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  --json ./examples/taps.json
 
+pipe: build
+	cat examples/taps.txt | ./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift
+
+stdin: build
+	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*'
+
 help: build
-	./bin/taps2beats 
 	./bin/taps2beats --help
 

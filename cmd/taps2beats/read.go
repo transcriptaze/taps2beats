@@ -3,20 +3,21 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-func read(f string) (int, [][]float64, error) {
-	bytes, err := ioutil.ReadFile(f)
+func read(r io.Reader, isJSON bool) (int, [][]float64, error) {
+	bytes, err := ioutil.ReadAll(r)
 	if err != nil {
 		return 0, nil, err
 	}
 
 	var data [][]float64
-	if strings.HasSuffix(strings.ToLower(f), ".json") {
+	if isJSON {
 		data, err = parseJSON(bytes)
 	} else {
 		data, err = parseTXT(bytes)
@@ -62,7 +63,9 @@ func parseTXT(bytes []byte) ([][]float64, error) {
 			}
 		}
 
-		data = append(data, row)
+		if len(row) > 0 {
+			data = append(data, row)
+		}
 	}
 
 	return data, nil
