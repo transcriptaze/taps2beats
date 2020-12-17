@@ -1,12 +1,13 @@
 ## IN PROGRESS
 
-- [ ] Move to github/transcriptase
-- [ ] Commonalize BPM + offset
 - [ ] Implement Beats.MarshalJSON/UnmarshalJSON
 - [ ] Implement Beats.MarshalText/UnmarshalText
-- [ ] Web page
 - [ ] godoc
+- [ ] Initial version release
+- [ ] Web page
 
+- [x] Commonalize BPM + offset
+- [x] Make github repo public
 - [x] Read from stdin
 - [x] Commonalise regression
 - [x] JSON input

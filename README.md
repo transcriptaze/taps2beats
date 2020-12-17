@@ -1,11 +1,11 @@
 ### taps2beats
 
-`taps2beats` is a somewhat _(?)_ off the wall command-line utility and Go module that estimates the beats of a piece
-of music from a file of the beats as _tapped_ by a person (or musical entity of whatever sort). 
+`taps2beats` is a somewhat _(?)_ oddball command-line utility and Go module that estimates the beats of a piece
+of music from a file of the beats as _tapped_ by a person (or other musical entity of whatever sort). 
 
 The internal algorithm uses an implementation of _Ckmeans.1d.dp_ to cluster the supplied _'taps'_ into the optimal 
 equivalent beats, followed by least squares regression to estimate the BPM and offset and (optionally) quantize 
-and interpolate the beats over the interval.
+and (optionally) interpolate the beats over the interval.
 
 #### Requirements
 
@@ -18,7 +18,7 @@ page, and unpack into the directory of your choice.
 
 The build the development version, clone the [taps2beats](https://github.com/twystd/taps2beats) _github_ repository:
 
-    git clone https://github.com/uhppoted/node-red-contrib-uhppoted.git
+    git clone https://github.com/twystd/taps2beats.git
     cd taps2beats
     make build
 
@@ -48,6 +48,8 @@ If the input filename ends with '.json', the file is parsed as a JSON object tha
   "taps": [][]float 
 }
 ```
+
+Invoking `taps2beats` without an input file reads the _taps_ from stdin.
 
 The output format is a fixed column width list of beats, with each beat represented by a line that contains
 

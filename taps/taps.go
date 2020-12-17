@@ -37,9 +37,14 @@ func Taps2Beats(taps [][]time.Duration, forgetting float64) Beats {
 		}
 	}
 
-	w := weights(taps, forgetting)
-	clusters := ckmeans.CKMeans1dDp(data, w)
-	beats, BPM, offset := bpm(clusters)
+	clusters := ckmeans.CKMeans1dDp(data, weights(taps, forgetting))
+
+	beats := make([]Beat, len(clusters))
+	for i, cluster := range clusters {
+		beats[i] = makeBeat(cluster.Center, cluster)
+	}
+
+	BPM, offset := bpm(beats)
 
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
 
@@ -51,19 +56,21 @@ func Taps2Beats(taps [][]time.Duration, forgetting float64) Beats {
 }
 
 func (beats *Beats) Quantize() error {
-	if beats != nil {
-		if len(beats.Beats) < 1 {
-			beats.BPM = 0
-			beats.Offset = 0 * time.Millisecond
-			return nil
-		}
+	switch {
+	case beats == nil:
+		return nil
 
-		if len(beats.Beats) < 2 {
-			beats.BPM = 0
-			beats.Offset = beats.Beats[0].At
-			return nil
-		}
+	case len(beats.Beats) < 1:
+		beats.BPM = 0
+		beats.Offset = 0 * time.Millisecond
+		return nil
 
+	case len(beats.Beats) < 2:
+		beats.BPM = 0
+		beats.Offset = beats.Beats[0].At
+		return nil
+
+	default:
 		m, c, err := fit(beats.Beats)
 		if err != nil {
 			return err
@@ -79,66 +86,48 @@ func (beats *Beats) Quantize() error {
 			})
 		}
 
-		sort.SliceStable(quantized, func(i, j int) bool { return quantized[i].At < quantized[j].At })
-
-		b0 := int(math.Floor(-c / m))
-		t0 := float64(b0)*m + c
-		for t0 < 0.0 {
-			b0++
-			t0 = float64(b0)*m + c
-		}
-
-		beats.BPM = uint(math.Round(60.0 / m))
-		beats.Offset = Seconds(t0)
+		beats.BPM, beats.Offset = bpm(quantized)
 		beats.Beats = quantized
-	}
 
-	return nil
+		return nil
+	}
 }
 
 func (beats *Beats) Interpolate(start, end time.Duration) error {
-	if beats != nil {
-		if len(beats.Beats) == 0 {
-			return fmt.Errorf("Insufficient data")
-		}
+	switch {
+	case beats == nil:
+		return nil
 
-		if len(beats.Beats) == 1 && beats.BPM == 0 {
-			return fmt.Errorf("Insufficient data")
-		}
+	case len(beats.Beats) == 0:
+		return fmt.Errorf("Insufficient data")
 
-		// TODO simplify
-		if len(beats.Beats) == 1 {
-			m := 60.0 / float64(beats.BPM)
-			c := beats.Beats[0].At.Seconds() - m
-			bmin := int(math.Floor((start.Seconds() - c) / m))
-			bmax := int(math.Ceil((end.Seconds() - c) / m))
+	case len(beats.Beats) == 1 && beats.BPM == 0:
+		return fmt.Errorf("Insufficient data")
 
-			interpolated := []Beat{}
-			for b := bmin; b <= bmax; b++ {
-				tt := float64(b)*m + c
-				if tt >= start.Seconds() && tt <= end.Seconds() {
-					if b == 1 {
-						interpolated = append(interpolated, beats.Beats[0])
-					} else {
-						interpolated = append(interpolated, Beat{At: Seconds(tt)})
-					}
+	case len(beats.Beats) == 1:
+		m := 60.0 / float64(beats.BPM)
+		c := beats.Beats[0].At.Seconds() - m
+		bmin := int(math.Floor((start.Seconds() - c) / m))
+		bmax := int(math.Ceil((end.Seconds() - c) / m))
+
+		interpolated := []Beat{}
+		for b := bmin; b <= bmax; b++ {
+			tt := float64(b)*m + c
+			if tt >= start.Seconds() && tt <= end.Seconds() {
+				if b == 1 {
+					interpolated = append(interpolated, beats.Beats[0])
+				} else {
+					interpolated = append(interpolated, Beat{At: Seconds(tt)})
 				}
 			}
-
-			b0 := int(math.Floor(-c / m))
-			t0 := float64(b0)*m + c
-			for t0 < 0.0 {
-				b0++
-				t0 = float64(b0)*m + c
-			}
-
-			beats.BPM = uint(math.Round(60.0 / m))
-			beats.Offset = Seconds(t0)
-			beats.Beats = interpolated
-
-			return nil
 		}
 
+		beats.BPM, beats.Offset = bpm(interpolated)
+		beats.Beats = interpolated
+
+		return nil
+
+	default:
 		m, c, err := fit(beats.Beats)
 		if err != nil {
 			return err
@@ -164,21 +153,11 @@ func (beats *Beats) Interpolate(start, end time.Duration) error {
 			}
 		}
 
-		b0 := int(math.Floor(-c / m))
-		t0 := float64(b0)*m + c
-		for t0 < 0.0 {
-			b0++
-			t0 = float64(b0)*m + c
-		}
-
-		beats.BPM = uint(math.Round(60.0 / m))
-		beats.Offset = Seconds(t0)
+		beats.BPM, beats.Offset = bpm(interpolated)
 		beats.Beats = interpolated
 
 		return nil
 	}
-
-	return nil
 }
 
 func (beats *Beats) Round(precision time.Duration) {
@@ -255,21 +234,14 @@ func weights(taps [][]time.Duration, forgetting float64) []float64 {
 	return array
 }
 
-func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
-	sort.SliceStable(clusters, func(i, j int) bool { return clusters[i].Center < clusters[j].Center })
-
-	beats := make([]Beat, len(clusters))
-	for i, cluster := range clusters {
-		beats[i] = makeBeat(cluster.Center, cluster)
-	}
-
+func bpm(beats []Beat) (uint, time.Duration) {
 	if len(beats) < 2 {
-		return beats, 0, 0
+		return 0, 0
 	}
 
 	m, c, err := fit(beats)
 	if err != nil {
-		return beats, 0, 0
+		return 0, 0
 	}
 
 	bpm := uint(math.Round(60.0 / m))
@@ -283,7 +255,7 @@ func bpm(clusters []ckmeans.Cluster) ([]Beat, uint, time.Duration) {
 
 	offset := Seconds(t0)
 
-	return beats, bpm, offset
+	return bpm, offset
 }
 
 func fit(beats []Beat) (float64, float64, error) {
@@ -386,6 +358,8 @@ func makeBeat(at float64, cluster ckmeans.Cluster) Beat {
 	for i, v := range cluster.Values {
 		taps[i] = Seconds(v)
 	}
+
+	//	sort.SliceStable(taps, func(i, j int) bool { return taps[i] < taps[j] })
 
 	return Beat{
 		At:       Seconds(at),
