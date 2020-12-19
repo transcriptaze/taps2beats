@@ -33,6 +33,21 @@ func (t instant) MarshalText() ([]byte, error) {
 	return []byte(s), nil
 }
 
+func (t *instant) UnmarshalText(s []byte) error {
+	if t != nil {
+		var v float64
+
+		_, err := fmt.Sscanf(string(s), "%f", &v)
+		if err != nil {
+			return err
+		}
+
+		*t = instant(v * float64(time.Second))
+	}
+
+	return nil
+}
+
 const (
 	MaxBPM         int = 200
 	MinSubdivision int = 8
@@ -222,7 +237,7 @@ func (beats Beats) MarshalJSON() ([]byte, error) {
 		b.Beats[i] = beat{
 			At:       instant(bb.At),
 			Mean:     instant(bb.Mean),
-			Variance: instant(bb.Mean),
+			Variance: instant(bb.Variance),
 			Taps:     make([]instant, len(bb.Taps)),
 		}
 
@@ -232,6 +247,46 @@ func (beats Beats) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(b)
+}
+
+func (beats *Beats) UnmarshalJSON(bytes []byte) error {
+	if beats != nil {
+		type beat struct {
+			At       instant   `json:"at"`
+			Mean     instant   `json:"mean"`
+			Variance instant   `json:"variance"`
+			Taps     []instant `json:"taps"`
+		}
+
+		b := struct {
+			BPM    uint    `json:"BPM"`
+			Offset instant `json:"offset"`
+			Beats  []beat  `json:"beats"`
+		}{}
+
+		if err := json.Unmarshal(bytes, &b); err != nil {
+			return err
+		}
+
+		beats.BPM = b.BPM
+		beats.Offset = time.Duration(b.Offset)
+		beats.Beats = make([]Beat, len(b.Beats))
+
+		for i, bb := range b.Beats {
+			beats.Beats[i] = Beat{
+				At:       time.Duration(bb.At),
+				Mean:     time.Duration(bb.Mean),
+				Variance: time.Duration(bb.Variance),
+				Taps:     make([]time.Duration, len(bb.Taps)),
+			}
+
+			for j, tap := range bb.Taps {
+				beats.Beats[i].Taps[j] = time.Duration(tap)
+			}
+		}
+	}
+
+	return nil
 }
 
 func weights(taps [][]time.Duration, forgetting float64) []float64 {
