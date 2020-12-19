@@ -10,19 +10,13 @@ import (
 	"strings"
 )
 
-func read(r io.Reader, isJSON bool) (int, [][]float64, error) {
+func read(r io.Reader, parse func([]byte) ([][]float64, error)) (int, [][]float64, error) {
 	bytes, err := ioutil.ReadAll(r)
 	if err != nil {
 		return 0, nil, err
 	}
 
-	var data [][]float64
-	if isJSON {
-		data, err = parseJSON(bytes)
-	} else {
-		data, err = parseTXT(bytes)
-	}
-
+	data, err := parse(bytes)
 	if err != nil {
 		return 0, nil, err
 	}

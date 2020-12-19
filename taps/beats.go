@@ -1,6 +1,7 @@
 package taps
 
 import (
+	"encoding/json"
 	"fmt"
 	"math"
 	"sort"
@@ -22,6 +23,14 @@ type Beat struct {
 	Mean     time.Duration   `json:"mean"`
 	Variance time.Duration   `json:"variance"`
 	Taps     []time.Duration `json:"taps"`
+}
+
+type instant time.Duration
+
+func (t instant) MarshalText() ([]byte, error) {
+	s := fmt.Sprintf("%.3f", time.Duration(t).Seconds())
+
+	return []byte(s), nil
 }
 
 const (
@@ -189,6 +198,40 @@ func (beats *Beats) Sub(dt time.Duration) {
 			}
 		}
 	}
+}
+
+func (beats Beats) MarshalJSON() ([]byte, error) {
+	type beat struct {
+		At       instant   `json:"at"`
+		Mean     instant   `json:"mean"`
+		Variance instant   `json:"variance"`
+		Taps     []instant `json:"taps"`
+	}
+
+	b := struct {
+		BPM    uint    `json:"BPM"`
+		Offset instant `json:"offset"`
+		Beats  []beat  `json:"beats"`
+	}{
+		BPM:    beats.BPM,
+		Offset: instant(beats.Offset),
+		Beats:  make([]beat, len(beats.Beats)),
+	}
+
+	for i, bb := range beats.Beats {
+		b.Beats[i] = beat{
+			At:       instant(bb.At),
+			Mean:     instant(bb.Mean),
+			Variance: instant(bb.Mean),
+			Taps:     make([]instant, len(bb.Taps)),
+		}
+
+		for j, t := range bb.Taps {
+			b.Beats[i].Taps[j] = instant(t)
+		}
+	}
+
+	return json.Marshal(b)
 }
 
 func weights(taps [][]time.Duration, forgetting float64) []float64 {

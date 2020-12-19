@@ -4,50 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"time"
 
 	"github.com/twystd/taps2beats/taps"
 )
 
-type instant time.Duration
-
-func (t instant) MarshalText() ([]byte, error) {
-	s := fmt.Sprintf("%.3f", time.Duration(t).Seconds())
-
-	return []byte(s), nil
-}
-
 func formatJSON(beats taps.Beats, f io.Writer) error {
-	type beat struct {
-		At       instant   `json:"at"`
-		Mean     instant   `json:"mean"`
-		Variance instant   `json:"variance"`
-		Taps     []instant `json:"taps"`
-	}
-
-	b := struct {
-		BPM    uint    `json:"BPM"`
-		Offset instant `json:"offset"`
-		Beats  []beat  `json:"beats"`
-	}{
-		BPM:    beats.BPM,
-		Offset: instant(beats.Offset),
-		Beats:  make([]beat, len(beats.Beats)),
-	}
-
-	for i, bb := range beats.Beats {
-		b.Beats[i] = beat{
-			At:       instant(bb.At),
-			Mean:     instant(bb.Mean),
-			Variance: instant(bb.Mean),
-			Taps:     make([]instant, len(bb.Taps)),
-		}
-
-		for j, t := range bb.Taps {
-			b.Beats[i].Taps[j] = instant(t)
-		}
-	}
-
 	bytes, err := json.MarshalIndent(beats, "", " ")
 	if err != nil {
 		return err

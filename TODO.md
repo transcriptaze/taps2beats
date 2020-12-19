@@ -1,11 +1,12 @@
 ## IN PROGRESS
 
-- [ ] Implement Beats.MarshalJSON/UnmarshalJSON
+- [ ] Implement Beats.UnmarshalJSON
 - [ ] Implement Beats.MarshalText/UnmarshalText
 - [ ] godoc
 - [ ] Initial version release
 - [ ] Web page
 
+- [x] Implement Beats.MarshalJSON
 - [x] Commonalize BPM + offset
 - [x] Make github repo public
 - [x] Read from stdin

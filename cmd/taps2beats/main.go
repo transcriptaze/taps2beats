@@ -68,18 +68,14 @@ func main() {
 		fmt.Printf("\n  taps2beats %s\n\n", VERSION)
 	}
 
-	//	if len(flag.Args()) == 0 {
-	//		usage()
-	//		os.Exit(0)
-	//	}
-
 	var file string
-	var f io.Reader
+	var r io.Reader
+	var parser = parseTXT
 	if len(flag.Args()) == 0 {
 		file = "<stdin>"
-		f = os.Stdin
+		r = os.Stdin
 	} else {
-		file := flag.Args()[0]
+		file = flag.Args()[0]
 		f, err := os.Open(file)
 		if err != nil {
 			fmt.Printf("\n  ** ERROR: unable to open file %s (%v)\n\n", file, err)
@@ -87,13 +83,19 @@ func main() {
 		}
 
 		defer f.Close()
+
+		r = f
+
+		if strings.HasSuffix(strings.ToLower(file), ".json") {
+			parser = parseJSON
+		}
 	}
 
 	if options.verbose {
 		fmt.Printf("  ... reading data from %s\n", file)
 	}
 
-	N, data, err := read(f, false)
+	N, data, err := read(r, parser)
 	if err != nil {
 		fmt.Printf("\n  ** ERROR: unable to read data from %s (%v)\n\n", file, err)
 		os.Exit(1)
