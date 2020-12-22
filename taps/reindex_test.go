@@ -1,4 +1,4 @@
-package taps
+package taps2beats
 
 import (
 	"reflect"

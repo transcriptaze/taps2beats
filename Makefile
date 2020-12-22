@@ -30,6 +30,9 @@ benchmark: build
 coverage: build
 	go test -cover ./...
 
+godoc: build
+	godoc -http=:80     
+
 run: build
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift ./examples/taps.txt
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  ./examples/taps.txt

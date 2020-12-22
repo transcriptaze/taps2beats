@@ -1,4 +1,6 @@
-package taps
+// Package sort provides primitives for sorting slices and user-defined
+// collections.
+package taps2beats
 
 import (
 	"encoding/json"

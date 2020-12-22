@@ -1,3 +1,11 @@
+/*
+Godoc extracts and generates documentation for Go programs.
+It runs as a web server and presents the documentation as a
+web page.
+	godoc -http=:6060
+Usage:
+*/
+
 package main
 
 import (
@@ -11,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/twystd/taps2beats/taps"
+	"github.com/twystd/taps2beats/taps2beats"
 )
 
 const VERSION = "v0.1.0"

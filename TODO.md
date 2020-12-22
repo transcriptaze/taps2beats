@@ -1,11 +1,10 @@
 ## IN PROGRESS
 
-- [ ] Implement Beats.UnmarshalJSON
-- [ ] Implement Beats.MarshalText/UnmarshalText
 - [ ] godoc
 - [ ] Initial version release
 - [ ] Web page
 
+- [x] Implement Beats.UnmarshalJSON
 - [x] Implement Beats.MarshalJSON
 - [x] Commonalize BPM + offset
 - [x] Make github repo public
@@ -46,3 +45,5 @@
 3. https://moultano.wordpress.com/2018/11/08/minhashing-3kbzhsxyg4467-6
 4. --format option to set the output value format (?)
 5. --interactive, to record the 'taps' directly (?)
+6. https://gitlab.com/agrahn/ABLoopPlayer
+7. https://agrahn.gitlab.io/ABLoopPlayer
