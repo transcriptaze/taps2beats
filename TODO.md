@@ -1,9 +1,9 @@
 ## IN PROGRESS
 
-- [ ] Examples (https://godoc.org/github.com/fluhus/godoc-tricks)
 - [ ] Web page
 - [ ] Initial version release
 
+- [x] godoc examples
 - [x] godoc
 - [x] Implement Beats.UnmarshalJSON
 - [x] Implement Beats.MarshalJSON

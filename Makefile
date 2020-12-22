@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestMarshallJSON
+	go test ./... -run ExampleBeats_Interpolate
 
 build: format
 	mkdir -p bin

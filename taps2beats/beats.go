@@ -10,10 +10,12 @@
 package taps2beats
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"math"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/twystd/taps2beats/taps2beats/ckmeans"
@@ -321,6 +323,54 @@ func (beats *Beats) UnmarshalJSON(bytes []byte) error {
 	}
 
 	return nil
+}
+
+// Implementation of the Stringer interface.
+func (beats Beats) String() string {
+	var width = 0
+
+	for _, beat := range beats.Beats {
+		if s := fmt.Sprintf("%v", beat.At); len(s) > width {
+			width = len(s)
+		}
+
+		if s := fmt.Sprintf("%v", beat.Mean); len(s) > width {
+			width = len(s)
+		}
+
+		if s := fmt.Sprintf("%v", beat.Variance); len(s) > width {
+			width = len(s)
+		}
+
+		for _, t := range beat.Taps {
+			if s := fmt.Sprintf("%v", t); len(s) > width {
+				width = len(s)
+			}
+		}
+	}
+
+	var b bytes.Buffer
+
+	fmt.Fprintf(&b, "BPM:    %d\n", beats.BPM)
+	fmt.Fprintf(&b, "Offset: %v\n", beats.Offset)
+	fmt.Fprintln(&b)
+	for i, beat := range beats.Beats {
+		s := ""
+		s += fmt.Sprintf("%-3d", i+1)
+		s += fmt.Sprintf(" %-[1]*s", width, beat.At)
+
+		if len(beat.Taps) > 0 {
+			s += fmt.Sprintf(" %-[1]*s", width, beat.Mean)
+			s += fmt.Sprintf(" %-[1]*s", width, beat.Variance)
+			for _, t := range beat.Taps {
+				s += fmt.Sprintf(" %-[1]*s", width, t)
+			}
+		}
+
+		fmt.Fprintf(&b, "%s\n", strings.TrimSpace(s))
+	}
+
+	return string(b.Bytes())
 }
 
 // Generates the weights array for a set of taps. The returned weights use 1.0 as a base value,
