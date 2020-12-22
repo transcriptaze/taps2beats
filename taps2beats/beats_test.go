@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/twystd/ckmeans.1d.dp/go/ckmeans"
+	"github.com/twystd/taps2beats/taps2beats/ckmeans"
 )
 
 var taps = [][]float64{

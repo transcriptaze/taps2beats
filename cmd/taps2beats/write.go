@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/twystd/taps2beats/taps"
+	"github.com/twystd/taps2beats/taps2beats"
 )
 
-func formatJSON(beats taps.Beats, f io.Writer) error {
+func formatJSON(beats taps2beats.Beats, f io.Writer) error {
 	bytes, err := json.MarshalIndent(beats, "", " ")
 	if err != nil {
 		return err
@@ -19,7 +19,7 @@ func formatJSON(beats taps.Beats, f io.Writer) error {
 	return nil
 }
 
-func formatTXT(beats taps.Beats, f io.Writer) error {
+func formatTXT(beats taps2beats.Beats, f io.Writer) error {
 	grid := [][]string{}
 	for i, b := range beats.Beats {
 		row := []string{

@@ -4,10 +4,12 @@ import (
 	"math"
 )
 
+// Deming regression for least squares fitting of 2-d data where both axes are uncertain.
+//
 // Ref. https://davegiles.blogspot.com/2014/11/orthogonal-regression-first-steps.html
 // Ref. https://docs.scipy.org/doc/scipy-0.14.0/reference/odr.html
 // Ref. https://en.wikipedia.org/wiki/Deming_regression#Orthogonal_regression
-func Orthogonal(x, y []float64) (float64, float64) {
+func orthogonal(x, y []float64) (float64, float64) {
 	if len(x) < 2 {
 		panic("Insufficient data for an orthogonal least squares fit")
 	}

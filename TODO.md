@@ -1,9 +1,10 @@
 ## IN PROGRESS
 
-- [ ] godoc
-- [ ] Initial version release
+- [ ] Examples (https://godoc.org/github.com/fluhus/godoc-tricks)
 - [ ] Web page
+- [ ] Initial version release
 
+- [x] godoc
 - [x] Implement Beats.UnmarshalJSON
 - [x] Implement Beats.MarshalJSON
 - [x] Commonalize BPM + offset

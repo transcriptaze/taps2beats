@@ -1,17 +1,24 @@
+// Basic and uninformed port of the R Ckmeans.1d.dp_v4.3.3 implementation for the optimal
+// clustering of 1-dimensional data.
+//
+// This implemenation is simplified specifically for use in this applications and only
+// implements L2 dissimilarity and linear clustering. It also assumes the inputs are
+// always weighted.
 package ckmeans
 
 import (
 	"sort"
 )
 
+// A cluster resulting from the clustering algorithm.
 type Cluster struct {
-	Center   float64
-	Variance float64
-	Values   []float64
+	Center   float64   // mean of the values assigned to this cluster from the data set
+	Variance float64   // variance of the values assigned to this cluster from the data set
+	Values   []float64 // the values from the data set that are assigned to this cluster
 }
 
-// Nasty, scrappy, line-by-line port of the 'R' 4.3.3 implementation of Ckmeans.1d.dp, i
-// borrowed from https://github.com/twystd/ckmeans.1d.dp
+// ckmeans.1d.dp implementation using L2 dissimilarity and linear clustering. Panics
+// if the weights array does not match the supplied data array.
 func CKMeans1dDp(data, weights []float64) []Cluster {
 	// validate inputs
 	if data == nil || len(data) == 0 {

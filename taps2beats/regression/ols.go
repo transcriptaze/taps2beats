@@ -1,7 +1,14 @@
+// Statistical regression functions for fitting beats to an idealized function.
 package regression
 
 // Ref. https://stackoverflow.com/questions/16422287/linear-regression-library-for-go-language
-func OLS(x, y []float64) (float64, float64) {
+
+// Implementation of ordinary least squares to fit a 2-d set of data to a straight line.
+// Returns the gradient and offset of the line.
+//
+// Panics if the x and y arrays do not contain at least 2 data points or if the
+// x and y arrays are different lengths.
+func OrdinaryLeastSquares(x, y []float64) (float64, float64) {
 	if len(x) < 2 {
 		panic("Insufficient data for a least squares fit")
 	}

@@ -33,7 +33,7 @@ func TestOrthogonalRegression(t *testing.T) {
 	x := []float64{9.8, 9.7, 10.7, 10.9, 12.4, 12.5, 12.8, 12.8, 12.9, 13.3, 13.4, 13.5, 13.7, 14.9, 15.2, 15.5}
 	y := []float64{10.1, 11.4, 10.8, 11.3, 11.8, 12.1, 12.3, 13.6, 14.2, 14.4, 14.6, 15.3, 15.5, 15.8, 16.2, 16.5}
 
-	m, c := Orthogonal(x, y)
+	m, c := orthogonal(x, y)
 
 	if math.Abs(m-1.2080) > 0.0001 || math.Abs(c - -1.9088) > 0.0001 {
 		t.Errorf("Incorrect orthogonal regression - expected: %.4f,%.4f, got:%.4f,%.4f", 1.2080, -1.9088, m, c)

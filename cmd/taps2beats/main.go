@@ -1,11 +1,41 @@
-/*
-Godoc extracts and generates documentation for Go programs.
-It runs as a web server and presents the documentation as a
-web page.
-	godoc -http=:6060
-Usage:
-*/
-
+// Command line utility for the taps2beats module.
+//
+//   Usage:
+//
+//   taps2beats [--verbose] [--out <file>] [--interval <interval>] [--quantize] [--forgetting <factor>] [--precision <time>] [--latency <time>] [--shift] <file>
+//
+//
+//   --verbose              Displays operational information
+//
+//   --out <file>           Writes the estimated beats to the supplied file
+//
+//   --interval <interval>  Extrapolates (and interpolates) the beats to extend over
+//                          the supplied interval. The interval should be specified as
+//                          <start>:<end> where <start> and <end> are in Go time format
+//                          e.g. --interval 0.3s:1m10.3s.
+//                          A '*' interval (--interval '*') will interpolate the beats
+//                          over the interval from the earliest to the latest 'tap'.
+//
+//   --quantize             Adjusts the estimated beats so that they fit to the estimated BPM
+//
+//   --forgetting <factor>  Discounts earlier taps from earlier loops as being less accurate
+//                          than later loops due to the listener learning the music. e.g. a
+//                          factor of 0.1 discounts each loop by 10% over the subsequent one.
+//                          A negative factor inverts the weighting i.e. earlier loops are
+//                          weighted as more accurate than later loops.
+//
+//   --precision <time>     Rounds the beats and all times to the specified precision (in Go
+//                          time format) e.g. --precision 1ms will round all times to the
+//                          nearest millisecond. The default precision is 1ms.
+//
+//   --latency <time>       Adjusts all times to compensate for the latency between the
+//                          actual beat and the detected 'tap' e.g. --latency 73ms
+//
+//   --shift                Adjusts all beats (and times) so that the first beat in the
+//                          interval falls on 0s.
+//
+//   --json                 Formats the output as prettified JSON, with all the times converted
+//                          to seconds (to a precision of 1ms)
 package main
 
 import (
@@ -120,7 +150,7 @@ func main() {
 		fmt.Printf("  ... using forgetting factor %0.1f\n", options.forgetting)
 	}
 
-	beats := taps.Taps2Beats(taps.Floats2Seconds(data), options.forgetting)
+	beats := taps2beats.Taps2Beats(taps2beats.Floats2Seconds(data), options.forgetting)
 
 	// ... quantize
 	if options.quantize {
@@ -271,7 +301,7 @@ func help() {
 	fmt.Println()
 }
 
-func choose(beats []taps.Beat, f func(p, q time.Duration) bool) time.Duration {
+func choose(beats []taps2beats.Beat, f func(p, q time.Duration) bool) time.Duration {
 	if len(beats) < 1 {
 		panic("Insufficient data")
 	}
