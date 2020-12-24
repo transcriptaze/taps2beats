@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>taps2beats</title>
+    <link rel="icon"       href="images/favicon.png">
+    <link rel="stylesheet" href="css/taps2beats.css" type="text/css">
+  </head>
+
+  <body> 
+    <div id="content">
+
+      <!-- HEADER -->
+      <header>
+        <img id="logo" src="images/logo.png"  />
+        <div id="banner" />
+      </header>
+
+      <!-- NAV -->
+
+      <nav>
+      </nav>
+
+      <!-- MAIN -->
+      <main>
+        <div style="width:100%;">
+          <div id="url" style="display: flex;">
+           <input id="inputYT" 
+                  list="YTids" 
+                  style="margin-left: 5px; margin-right: 1px; flex: 1 1 auto;" 
+                  autocomplete 
+                  disabled/>
+            <datalist id="YTids"></datalist>
+          </div>
+
+          <div style="background: #ddd;">
+            <iframe id="player"
+                    frameborder="0" 
+                    allowfullscreen="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    title="YouTube video player" 
+                    width="552" 
+                    height="311">
+            </iframe>
+          </div>
+
+          <div>
+           <input id="play" type="button" onclick="play(event)" value="PLAY" />
+          </div>
+        </div>
+      </main>
+
+
+      <!-- FOOTER -->
+      <footer>
+      </footer>
+    </div>
+  </body>
+
+  <!-- SCRIPTS -->
+ 
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script type="text/javascript">
+    function play(event) {
+      const v = document.getElementById("player")
+
+      v.src = "https://www.youtube.com/embed/CKI7MnfBYJA?autoplay=1&amp;fs=0&amp;modestbranding=1&amp;rel=0&amp;enablejsapi=1&amp;widgetid=2"
+    }
+  </script>
+
+</html>
