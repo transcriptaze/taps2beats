@@ -25,32 +25,13 @@
       <!-- MAIN -->
       <main>
         <div style="width:100%;">
-          <div id="url" style="display: flex;">
-           <input id="inputYT" 
-                  list="YTids" 
-                  style="margin-left: 5px; margin-right: 1px; flex: 1 1 auto;" 
-                  autocomplete 
-                  disabled/>
-            <datalist id="YTids"></datalist>
+          <div class="url">
+            <input id="url"  type="text"   value="CKI7MnfBYJA" />
+            <input id="load" type="button" value="Load" onclick="load(event)" />
           </div>
-
-          <div style="background: #ddd;">
-            <iframe id="player"
-                    frameborder="0" 
-                    allowfullscreen="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    title="YouTube video player" 
-                    width="552" 
-                    height="311">
-            </iframe>
-          </div>
-
-          <div>
-           <input id="play" type="button" onclick="play(event)" value="PLAY" />
-          </div>
+          <div id="player"></div>
         </div>
       </main>
-
 
       <!-- FOOTER -->
       <footer>
@@ -62,10 +43,46 @@
  
   <script src="https://www.youtube.com/iframe_api"></script>
   <script type="text/javascript">
-    function play(event) {
-      const v = document.getElementById("player")
+    var player
 
-      v.src = "https://www.youtube.com/embed/CKI7MnfBYJA?autoplay=1&amp;fs=0&amp;modestbranding=1&amp;rel=0&amp;enablejsapi=1&amp;widgetid=2"
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        playerVars: {
+          fs: 0,
+          controls: 1,
+          autoplay: 0,
+          loop: 0,
+          modestbranding: 1,
+          iv_load_policy: 3,
+          enablejsapi: 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      })
+    }
+
+    function load(event) {
+      const url = document.getElementById("url")    
+      const vid = { videoId: url.value,
+                    startSeconds: 10,
+                    endSeconds: 15
+                  }
+
+      player.cueVideoById(vid)
+    }
+
+    function onPlayerReady(event) {
+      console.log('onPlayerReady', event)
+    }
+
+    function onPlayerStateChange(event) {
+      console.log('onPlayerReady', event)
+    }
+
+    function stopVideo() {
+        player.stopVideo();
     }
   </script>
 

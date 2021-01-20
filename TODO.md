@@ -48,3 +48,5 @@
 5. --interactive, to record the 'taps' directly (?)
 6. https://gitlab.com/agrahn/ABLoopPlayer
 7. https://agrahn.gitlab.io/ABLoopPlayer
+8. https://towardsdatascience.com/deep-learning-in-geomtry-arclentgh-learning-119d347231ce
+
