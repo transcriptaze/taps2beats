@@ -29,7 +29,52 @@
             <input id="url"  type="text"   value="CKI7MnfBYJA" />
             <input id="load" type="button" value="Load" onclick="load(event)" />
           </div>
+
           <div id="player"></div>
+
+          <!-- https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html -->
+          <div class="aria-widget-slider">
+            <div class="rail" style="width: 638px;">
+              <img  id="start"
+                    src="images/min-arrow.png"
+                    role="slider"
+                    tabindex="0"
+                    class="min thumb"
+                    aria-valuemin="0"
+                    aria-valuenow="100"
+                    aria-valuetext="$100"
+                    aria-valuemax="400"
+                    aria-label="start">
+              <img id="end"
+                    src="images/max-arrow.png"
+                    role="slider"
+                    tabindex="0"
+                    class="max thumb"
+                    aria-valuemin="0"
+                    aria-valuenow="250"
+                    aria-valuetext="$250"
+                    aria-valuemax="400"
+                    aria-label="end">
+            </div>
+          </div>
+
+          <div style="clear: both; margin-top:12px">
+            <div class="rail-label min">0</div>
+            <div class="rail-label max">0</div>
+            <div style="clear: both;">
+              Start
+              <input type="text">
+            </div>
+            <div>
+              End
+              <input type="text">
+            </div>
+            <div>
+              Loop
+              <input type="checkbox">
+            </div>
+          </div>
+
         </div>
       </main>
 
@@ -42,6 +87,7 @@
   <!-- SCRIPTS -->
  
   <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="javascript/taps2beats.js"></script>
   <script type="text/javascript">
     var player
 

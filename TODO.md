@@ -1,6 +1,12 @@
 ## IN PROGRESS
 
 - [ ] Web page
+      - [ ] Start/end/loop controls
+      - [ ] Parse YouTube URL
+      - [ ] 'TAP' pad
+      - [ ] Show taps
+      - [ ] Load audio from file
+
 - [ ] Initial version release
 
 - [x] godoc examples
@@ -39,6 +45,9 @@
 - [x] Interpolate missing beats
 
 ## TODO
+
+- [ ] Better range slider
+      https://css-tricks.com/multi-thumb-sliders-general-case
 
 1. Look into beat detection algorithms
 2. Look into gradient descent for interpolation
