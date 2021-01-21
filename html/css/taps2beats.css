@@ -34,7 +34,7 @@ header {
 nav {
   grid-area: left;
   background: #e7dec3;
-  margin: 30px 8px 8px 8px;
+  margin: 0px 8px 8px 8px;
   border-top-left-radius: 4px;
   border-bottom-left-radius: 4px;
 }
@@ -96,7 +96,7 @@ div.url input#url {
   padding-left: 8px;
   padding-right: 8px;
   border: 1px solid red;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 div.url input#load {
@@ -106,9 +106,37 @@ div.url input#load {
   padding-left: 8px;
   padding-right: 8px;
   border: 1px solid red;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
+div.controls {
+  display: grid;
+  clear: both; 
+  margin-top:12px;
+  grid-template-columns: 4em 1fr 4em;
+  grid-template-areas: "from middle to";
+}
+
+input.time {
+  width: 4em;
+  padding: 2px 4px 2px 4px;
+  border: 1px solid red;
+  border-radius: 2px;
+  text-align: center;
+}
+
+input#from {
+  grid-area: from;
+}
+
+input#to {
+  grid-area: to;
+}
+
+div#other {
+  grid-area: middle;  
+  text-align: center;
+}
 
 footer {
   grid-area: footer;

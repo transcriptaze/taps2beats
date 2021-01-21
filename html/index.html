@@ -44,37 +44,27 @@
                     tabindex="0"
                     class="min thumb"
                     aria-valuemin="0"
-                    aria-valuenow="100"
-                    aria-valuetext="$100"
-                    aria-valuemax="400"
-                    aria-label="start">
+                    aria-valuenow="0"
+                    aria-valuemax="400">
               <img id="end"
                     src="images/max-arrow.png"
                     role="slider"
                     tabindex="0"
                     class="max thumb"
                     aria-valuemin="0"
-                    aria-valuenow="250"
-                    aria-valuetext="$250"
-                    aria-valuemax="400"
-                    aria-label="end">
+                    aria-valuenow="400"
+                    aria-valuemax="400">
             </div>
           </div>
 
-          <div style="clear: both; margin-top:12px">
-            <div class="rail-label min">0</div>
-            <div class="rail-label max">0</div>
-            <div style="clear: both;">
-              Start
-              <input type="text">
-            </div>
-            <div>
-              End
-              <input type="text">
-            </div>
-            <div>
-              Loop
-              <input type="checkbox">
+          <div class="controls">
+            <input id="from" type="text" class="time" readonly />
+            <input id="to"   type="text" class="time" readonly />
+            <div id="other">
+              <input id="loop" type="checkbox">
+              <label for="loop">Loop</label>
+              <input id="strech" type="checkbox">
+              <label for="stretch">Stretch</label>
             </div>
           </div>
 

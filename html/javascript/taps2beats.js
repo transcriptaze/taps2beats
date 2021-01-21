@@ -10,11 +10,11 @@
 'use strict';
 
 // Create Slider that contains value, valuemin, valuemax, and valuenow
-var Slider = function (domNode) {
+var Slider = function (domNode, labelNode) {
   this.domNode = domNode;
   this.railDomNode = domNode.parentNode;
+  this.labelDomNode = labelNode;
 
-  this.labelDomNode = false;
   this.minDomNode = false;
   this.maxDomNode = false;
 
@@ -60,14 +60,6 @@ Slider.prototype.init = function () {
 
   this.railWidth = parseInt(this.railDomNode.style.width.slice(0, -2));
 
-  if (this.domNode.classList.contains('min')) {
-    this.labelDomNode = this.domNode.parentElement.previousElementSibling;
-  }
-
-  if (this.domNode.classList.contains('max')) {
-    this.labelDomNode = this.domNode.parentElement.nextElementSibling;
-  }
-
   if (this.domNode.tabIndex != 0) {
     this.domNode.tabIndex = 0;
   }
@@ -93,10 +85,9 @@ Slider.prototype.moveSliderTo = function (value) {
   }
 
   this.valueNow = value;
-  this.dolValueNow = '$' + value;
+  this.dolValueNow = value;
 
   this.domNode.setAttribute('aria-valuenow', this.valueNow);
-  this.domNode.setAttribute('aria-valuetext', this.dolValueNow);
 
   if (this.minDomNode) {
     this.minDomNode.setAttribute('aria-valuemax', this.valueNow);
@@ -120,9 +111,9 @@ Slider.prototype.moveSliderTo = function (value) {
   }
 
   if (this.labelDomNode) {
-    this.labelDomNode.innerHTML = this.dolValueNow.toString();
+    this.labelDomNode.value = format(this.dolValueNow)
   }
-};
+}
 
 Slider.prototype.handleKeyDown = function (event) {
   var flag = false;
@@ -212,24 +203,26 @@ Slider.prototype.handleMouseDown = function (event) {
   this.domNode.focus();
 };
 
-// handleMouseMove has the same functionality as we need for handleMouseClick on the rail
-// Slider.prototype.handleClick = function (event) {
-
-//  var diffX = event.pageX - this.railDomNode.offsetLeft;
-//  this.valueNow = parseInt(((this.railMax - this.railMin) * diffX) / this.railWidth);
-//  this.moveSliderTo(this.valueNow);
-
-//  event.preventDefault();
-//  event.stopPropagation();
-
-// };
-
 // Initialize Sliders on the page
 window.addEventListener('load', function () {
-  var sliders = document.querySelectorAll('[role=slider]');
+  const start = new Slider(document.getElementById('start'), document.getElementById('from'))
+  const end = new Slider(document.getElementById('end'), document.getElementById('to'))
 
-  for (var i = 0; i < sliders.length; i++) {
-    var s = new Slider(sliders[i]);
-    s.init();
+  start.init()
+  end.init()
+})
+
+function format(t) {
+  let minutes = 0
+  let seconds = 0
+
+  if (t > 0) {
+    minutes = Math.floor(t/60)
+    seconds = t % 60
   }
-});
+
+  return String(minutes) + ':' + String(seconds).padStart(2,'0')
+  
+
+}
+
