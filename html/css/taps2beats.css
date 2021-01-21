@@ -71,12 +71,26 @@ main {
   overflow: hidden;
 }
 
+#container {
+  width: 100%;
+  text-align: center;
+  margin: auto;
+  padding: 0;
+}
+
+#player {
+  display: inline-block;
+}
+
 div.url {
+  display: flex;
+  flex-flow: row nowrap;
   margin-bottom: 8px;
 }
 
 div.url input#url {
-  width: 32em;
+  flex-grow: 1;
+  margin-right: 8px;
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 8px;
@@ -86,6 +100,7 @@ div.url input#url {
 }
 
 div.url input#load {
+  align-self: flex-end;
   padding-top: 2px;
   padding-bottom: 2px;
   padding-left: 8px;
@@ -93,6 +108,7 @@ div.url input#load {
   border: 1px solid red;
   border-radius: 4px;
 }
+
 
 footer {
   grid-area: footer;
