@@ -28,36 +28,38 @@
           
           <div id="container">
             <div class="url">
-              <input id="url"  type="text"   value="CKI7MnfBYJA" />
-              <input id="load" type="button" value="Load" onclick="load(event)" />
+              <input id="url"  type="text" placeholder="YouTube URL"  value="CKI7MnfBYJA" readonly />
+              <input id="load" type="button" value="Load" onclick="load(event)" disabled />
             </div>
 
-            <div id="player" class="player"></div>
-          </div>
-
-          <!-- https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html -->
-          <div class="aria-widget-slider">
-            <div class="rail" style="width: 638px;">
-              <img  id="start"
-                    src="images/min-arrow.png"
-                    role="slider"
-                    tabindex="0"
-                    class="min thumb"
-                    aria-valuemin="0"
-                    aria-valuenow="0"
-                    aria-valuemax="400">
-              <img id="end"
-                    src="images/max-arrow.png"
-                    role="slider"
-                    tabindex="0"
-                    class="max thumb"
-                    aria-valuemin="0"
-                    aria-valuenow="400"
-                    aria-valuemax="400">
+            <div style="position:relative;">
+              <div id="player" class="player"></div>
+              <div id="loading" class="overlay"</div>
             </div>
           </div>
 
-          <div class="controls">
+          <div id="controls" class="controls">
+            <!-- https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html -->
+            <div class="aria-widget-slider">
+              <div class="rail" style="width: 638px;">
+                <img id="start"
+                      src="images/min-arrow.png"
+                      role="slider"
+                      tabindex="0"
+                      class="min thumb"
+                      aria-valuemin="0"
+                      aria-valuenow="0"
+                      aria-valuemax="100">
+                <img id="end"
+                       src="images/max-arrow.png"
+                       role="slider"
+                       tabindex="0"
+                       class="max thumb"
+                       aria-valuemin="0"
+                       aria-valuenow="100"
+                       aria-valuemax="100">
+             </div>
+            </div>
             <input id="from" type="text" class="time" readonly />
             <input id="to"   type="text" class="time" readonly />
             <div id="other">
@@ -82,8 +84,6 @@
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="javascript/taps2beats.js"></script>
   <script type="text/javascript">
-    var player
-
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {
         playerVars: {
@@ -100,28 +100,6 @@
           'onStateChange': onPlayerStateChange
         }
       })
-    }
-
-    function load(event) {
-      const url = document.getElementById("url")    
-      const vid = { videoId: url.value,
-                    startSeconds: 10,
-                    endSeconds: 15
-                  }
-
-      player.cueVideoById(vid)
-    }
-
-    function onPlayerReady(event) {
-      console.log('onPlayerReady', event)
-    }
-
-    function onPlayerStateChange(event) {
-      console.log('onPlayerReady', event)
-    }
-
-    function stopVideo() {
-        player.stopVideo();
     }
   </script>
 

@@ -1,6 +1,8 @@
 ## IN PROGRESS
 
 - [ ] Web page
+      - [ ] 'Loading' windmill
+      - [ ] Fade out loading overlay
       - [ ] Start/end/loop controls
       - [ ] Parse YouTube URL
       - [ ] 'TAP' pad

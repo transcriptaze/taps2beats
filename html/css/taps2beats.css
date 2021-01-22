@@ -35,8 +35,7 @@ nav {
   grid-area: left;
   background: #e7dec3;
   margin: 0px 8px 8px 8px;
-  border-top-left-radius: 4px;
-  border-bottom-left-radius: 4px;
+  border-radius: 2px;
 }
 
 nav ul {
@@ -80,6 +79,19 @@ main {
 
 #player {
   display: inline-block;
+  width: 640px; 
+  height: 390px; 
+}
+
+.overlay {
+  background: black; 
+  width: 640px; 
+  height: 390px; 
+  position: absolute; 
+  left: 0px; 
+  top: 0px; 
+  z-index: 1;
+  visibility: visible;
 }
 
 div.url {
@@ -91,22 +103,39 @@ div.url {
 div.url input#url {
   flex-grow: 1;
   margin-right: 8px;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 3px;
+  padding-bottom: 3px;
   padding-left: 8px;
   padding-right: 8px;
   border: 1px solid red;
   border-radius: 2px;
+  outline: none;
+}
+
+div.url input#url::placeholder {
+  color: lightgray;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+div.url input#url[readonly] {
+  color: lightgray;
+  font-style: italic;
 }
 
 div.url input#load {
   align-self: flex-end;
-  padding-top: 2px;
-  padding-bottom: 2px;
+  padding-top: 3px;
+  padding-bottom: 3px;
   padding-left: 8px;
   padding-right: 8px;
   border: 1px solid red;
   border-radius: 2px;
+  outline: none;
+}
+
+#controls {
+  visibility: hidden;
 }
 
 div.controls {

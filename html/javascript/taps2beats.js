@@ -1,3 +1,70 @@
+var player
+var cued = false
+var start
+var end
+
+function onPlayerReady(event) {
+  document.getElementById('url').readOnly = false
+  document.getElementById('load').disabled = false
+
+  start = new Slider(document.getElementById('start'), document.getElementById('from'))
+  end = new Slider(document.getElementById('end'), document.getElementById('to'))
+}
+
+function onPlayerStateChange(event) {
+  console.log('onPlayerStateChange', event)
+
+  switch (event.data) {
+    case 0:
+      if (!cued) {
+        cued = true
+        duration = player.getDuration()
+
+        document.getElementById('start').setAttribute('aria-valuemin', 0)
+        document.getElementById('start').setAttribute('aria-valuemax', duration)
+        document.getElementById('start').setAttribute('aria-valuenow', 0)
+
+        document.getElementById('end').setAttribute('aria-valuemin', 0)
+        document.getElementById('end').setAttribute('aria-valuemax', duration)
+        document.getElementById('end').setAttribute('aria-valuenow', duration)
+
+        start.init()
+        end.init()
+        cue(event, duration)
+      }
+      break
+  
+    case 5:
+      document.getElementById('loading').style.visibility = 'hidden'
+      document.getElementById('controls').style.visibility = 'visible'      
+      break
+  }
+}
+
+function load(event) {
+  const url = document.getElementById('url')    
+  const vid = { 
+    videoId: url.value,
+    startSeconds: 0,
+    endSeconds: 0.1
+  }
+
+  cued = false
+  document.getElementById('loading').style.visibility = 'visible'
+  player.loadVideoById(vid)
+}
+
+function cue(event, duration) {
+  const url = document.getElementById('url')    
+  const vid = { 
+    videoId: url.value,
+    startSeconds: 0,
+    endSeconds: duration
+  }
+
+  player.cueVideoById(vid)
+}
+
 /*
  *   This content is licensed according to the W3C Software License at
  *   https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
@@ -104,8 +171,7 @@ Slider.prototype.moveSliderTo = function (value) {
   );
 
   if (this.minDomNode) {
-    this.domNode.style.left =
-      pos + this.thumbWidth - this.railBorderWidth + 'px';
+    this.domNode.style.left = pos + this.thumbWidth - this.railBorderWidth + 'px';
   } else {
     this.domNode.style.left = pos - this.railBorderWidth + 'px';
   }
@@ -202,15 +268,6 @@ Slider.prototype.handleMouseDown = function (event) {
   // Set focus to the clicked handle
   this.domNode.focus();
 };
-
-// Initialize Sliders on the page
-window.addEventListener('load', function () {
-  const start = new Slider(document.getElementById('start'), document.getElementById('from'))
-  const end = new Slider(document.getElementById('end'), document.getElementById('to'))
-
-  start.init()
-  end.init()
-})
 
 function format(t) {
   let minutes = 0
