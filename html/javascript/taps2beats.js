@@ -12,8 +12,6 @@ function onPlayerReady(event) {
 }
 
 function onPlayerStateChange(event) {
-  console.log('onPlayerStateChange', event)
-
   switch (event.data) {
     case 0:
       if (!cued) {

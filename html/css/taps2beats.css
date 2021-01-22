@@ -143,7 +143,7 @@ div.controls {
   clear: both; 
   margin-top:12px;
   grid-template-columns: 4em 1fr 4em;
-  grid-template-areas: "from middle to";
+  grid-template-areas: "slider slider slider" "from middle to";
 }
 
 input.time {
@@ -184,8 +184,9 @@ footer {
   padding: 12px;
 }
 
-div.aria-widget-slider {
-  clear: both;
+div.slider {
+  grid-area: slider;
+  clear: none;
   padding-top: 0.5em;
   padding-bottom: 1em;
 }
@@ -204,30 +205,31 @@ div.rail-label.max {
   text-align: left;
 }
 
-div.aria-widget-slider .rail {
+div.slider .rail {
   background-color: #eee;
   border: 1px solid #888;
   position: relative;
+  width: 640px;
   height: 4px;
   float: left;
 }
 
-div.aria-widget-slider img[role="slider"] {
+div.slider img[role="slider"] {
   position: absolute;
   padding: 0;
   margin: 0;
   top: -10px;
 }
 
-div.aria-widget-slider img[role="slider"].focus,
-div.aria-widget-slider img[role="slider"]:hover {
+div.slider img[role="slider"].focus,
+div.slider img[role="slider"]:hover {
   outline-color: rgb(140, 203, 242);
   outline-style: solid;
   outline-width: 2px;
   outline-offset: 2px;
 }
 
-div.aria-widget-slider .rail.focus {
+div.slider .rail.focus {
   background-color: #aaa;
 }
 

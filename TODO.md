@@ -1,9 +1,10 @@
 ## IN PROGRESS
 
 - [ ] Web page
+      - [ ] Start/end/loop controls
+      - [ ] Splashscreen
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
-      - [ ] Start/end/loop controls
       - [ ] Parse YouTube URL
       - [ ] 'TAP' pad
       - [ ] Show taps
@@ -60,4 +61,9 @@
 6. https://gitlab.com/agrahn/ABLoopPlayer
 7. https://agrahn.gitlab.io/ABLoopPlayer
 8. https://towardsdatascience.com/deep-learning-in-geomtry-arclentgh-learning-119d347231ce
+
+## NOTES
+
+1. https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html
+
 
