@@ -1,6 +1,7 @@
 'use strict';
 
 var player
+var loopTimer
 var cued = false
 var start
 var end
@@ -14,6 +15,8 @@ function onPlayerReady(event) {
 }
 
 function onPlayerStateChange(event) {
+  clearInterval(loopTimer)
+
   switch (event.data) {
     case YT.PlayerState.ENDED:
       if (!cued) {
@@ -27,6 +30,9 @@ function onPlayerStateChange(event) {
       break
 
     case YT.PlayerState.PLAYING:
+      if (cued) {
+        loopTimer = setInterval(tick, 100)        
+      }
       break
 
     case YT.PlayerState.PAUSED:
@@ -42,22 +48,35 @@ function onPlayerStateChange(event) {
   }
 }
 
+function tick() {
+  const end = document.getElementById('end').getAttribute('aria-valuenow')
+  const t = player.getCurrentTime()
+
+  if (t > end) {
+    cue()
+  }
+}
+
 function onSetStart(t, released) {
   document.getElementById('from').value = format(t)
 
-  if (released) {
-    switch (player.getPlayerState()) {
-      case YT.PlayerState.ENDED:
-      case YT.PlayerState.CUED:
+  switch (player.getPlayerState()) {
+    case YT.PlayerState.CUED:
+    case YT.PlayerState.ENDED:
+      if (released) {
         cue()
-        break
+      }
+      break
 
-      default:
-        if (player.getCurrentTime() < t) {
+    case YT.PlayerState.PAUSED:
+      player.seekTo(t, released)                              
+      break;
+
+    default:
+      if (released && player.getCurrentTime() < t) {
           player.seekTo(t, true)                              
-        }
-    }    
-  }
+      }
+    }
 }
 
 function onSetEnd(t, released) {
@@ -89,11 +108,9 @@ function load(event) {
 function cue() {
   const url = document.getElementById('url')    
   const start = document.getElementById('start').getAttribute('aria-valuenow')
-  const end = document.getElementById('end').getAttribute('aria-valuenow')
   const vid = { 
     videoId: url.value,
-    startSeconds: start,
-    endSeconds: end
+    startSeconds: start
   }
 
   player.cueVideoById(vid)
@@ -175,7 +192,9 @@ Slider.prototype.moveSliderTo = function (value, released) {
   this.valueNow = value;
   this.dolValueNow = value;
 
-  this.domNode.setAttribute('aria-valuenow', this.valueNow);
+  if (released) {
+    this.domNode.setAttribute('aria-valuenow', this.valueNow);    
+  }
 
   if (this.minDomNode) {
     this.minDomNode.setAttribute('aria-valuemax', this.valueNow);
