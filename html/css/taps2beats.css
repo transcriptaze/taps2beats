@@ -110,13 +110,14 @@ div.url {
 div.url input#url {
   flex-grow: 1;
   margin-right: 8px;
-  padding-top: 3px;
-  padding-bottom: 3px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 8px;
   padding-right: 8px;
   border: 1px solid red;
   border-radius: 2px;
   outline: none;
+  color: #444444;
 }
 
 div.url input#url::placeholder {
@@ -132,13 +133,20 @@ div.url input#url[readonly] {
 
 div.url input#load {
   align-self: flex-end;
-  padding-top: 3px;
-  padding-bottom: 3px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 8px;
   padding-right: 8px;
   border: 1px solid red;
   border-radius: 2px;
   outline: none;
+  color: #444444;
+  font-size: 0.9em;
+}
+
+div.url input#load[disabled] {
+  color: lightgray;
+  font-style: italic;
 }
 
 #controls {

@@ -94,26 +94,19 @@ function onSetEnd(t, released) {
 
 function load(event) {
   const url = document.getElementById('url')    
-  const vid = { 
-    videoId: url.value,
-    startSeconds: 0,
-    endSeconds: 0.1
-  }
+  const vid = getVideoID(url.value)
 
   cued = false
   document.getElementById('loading').style.visibility = 'visible'
-  player.loadVideoById(vid)
+  player.loadVideoById({ videoId: vid, startSeconds: 0, endSeconds: 0.1 })
 }
 
 function cue() {
   const url = document.getElementById('url')    
+  const vid = getVideoID(url.value)
   const start = document.getElementById('start').getAttribute('aria-valuenow')
-  const vid = { 
-    videoId: url.value,
-    startSeconds: start
-  }
 
-  player.cueVideoById(vid)
+  player.cueVideoById({ videoId: vid, startSeconds: start })
 }
 
 var Slider = function (node, handler) {
@@ -322,7 +315,17 @@ function format(t) {
   }
 
   return String(minutes) + ':' + String(seconds).padStart(2,'0')
-  
+}
 
+function getVideoID(url) {
+  let addr = new URL(url)
+
+  try {
+    return addr.searchParams.get("v")
+  } catch(err) {
+    console.log(err)
+  }
+
+  return ""
 }
 

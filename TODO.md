@@ -1,15 +1,16 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Start/end/loop controls
-      - [ ] Parse YouTube URL
-      - [ ] Splashscreen
+      - [ ] Loop controls
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
       - [ ] 'TAP' pad
       - [ ] Show taps
       - [ ] Load audio from file
-      - [ ] FontAwesome credit
+      - [x] FontAwesome credit in README
+      - [x] Start/end controls
+      - [x] Parse YouTube URL
+      - [x] Splashscreen
 
 - [ ] Initial version release
 
