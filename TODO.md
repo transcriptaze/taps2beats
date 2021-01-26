@@ -2,13 +2,14 @@
 
 - [ ] Web page
       - [ ] Start/end/loop controls
+      - [ ] Parse YouTube URL
       - [ ] Splashscreen
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
-      - [ ] Parse YouTube URL
       - [ ] 'TAP' pad
       - [ ] Show taps
       - [ ] Load audio from file
+      - [ ] FontAwesome credit
 
 - [ ] Initial version release
 

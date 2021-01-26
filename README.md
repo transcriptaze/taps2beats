@@ -237,3 +237,6 @@ The R Journal, 3(2), 29–33. doi: 10.32614/RJ-2011-015.
 
 [MIT](https://github.com/twystd/taps2beats/blob/master/LICENSE)
 
+Web page icons by FontAwesome:
+
+- [FontAwesome](https://fontawesome.com/license)

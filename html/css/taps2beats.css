@@ -84,7 +84,7 @@ main {
 }
 
 .overlay {
-  background: black; 
+  background: #222222; 
   width: 640px; 
   height: 390px; 
   position: absolute; 
@@ -92,6 +92,13 @@ main {
   top: 0px; 
   z-index: 1;
   visibility: visible;
+}
+
+.overlay img {
+  position: relative; 
+  top: 50%; 
+  transform: translateY(-50%);
+  width: 80px;
 }
 
 div.url {

@@ -1,3 +1,5 @@
+'use strict';
+
 var player
 var cued = false
 var start
@@ -7,35 +9,67 @@ function onPlayerReady(event) {
   document.getElementById('url').readOnly = false
   document.getElementById('load').disabled = false
 
-  start = new Slider(document.getElementById('start'), document.getElementById('from'))
-  end = new Slider(document.getElementById('end'), document.getElementById('to'))
+  start = new Slider('start', onSetStart)
+  end = new Slider('end', onSetEnd)
 }
 
 function onPlayerStateChange(event) {
   switch (event.data) {
-    case 0:
+    case YT.PlayerState.ENDED:
       if (!cued) {
         cued = true
-        duration = player.getDuration()
+        const duration = player.getDuration()
 
-        document.getElementById('start').setAttribute('aria-valuemin', 0)
-        document.getElementById('start').setAttribute('aria-valuemax', duration)
-        document.getElementById('start').setAttribute('aria-valuenow', 0)
-
-        document.getElementById('end').setAttribute('aria-valuemin', 0)
-        document.getElementById('end').setAttribute('aria-valuemax', duration)
-        document.getElementById('end').setAttribute('aria-valuenow', duration)
-
-        start.init()
-        end.init()
-        cue(event, duration)
+        start.init(0,duration,0)
+        end.init(0,duration,duration)
+        cue()
       }
       break
-  
-    case 5:
+
+    case YT.PlayerState.PLAYING:
+      break
+
+    case YT.PlayerState.PAUSED:
+      break
+
+    case YT.PlayerState.BUFFERING:
+      break
+
+    case YT.PlayerState.CUED:
       document.getElementById('loading').style.visibility = 'hidden'
       document.getElementById('controls').style.visibility = 'visible'      
       break
+  }
+}
+
+function onSetStart(t, released) {
+  document.getElementById('from').value = format(t)
+
+  if (released) {
+    switch (player.getPlayerState()) {
+      case YT.PlayerState.ENDED:
+      case YT.PlayerState.CUED:
+        cue()
+        break
+
+      default:
+        if (player.getCurrentTime() < t) {
+          player.seekTo(t, true)                              
+        }
+    }    
+  }
+}
+
+function onSetEnd(t, released) {
+  document.getElementById('to').value = format(t)
+
+  if (released) {
+    switch (player.getPlayerState()) {
+      case YT.PlayerState.ENDED:
+      case YT.PlayerState.CUED:
+        cue()
+        break
+    }    
   }
 }
 
@@ -52,46 +86,36 @@ function load(event) {
   player.loadVideoById(vid)
 }
 
-function cue(event, duration) {
+function cue() {
   const url = document.getElementById('url')    
+  const start = document.getElementById('start').getAttribute('aria-valuenow')
+  const end = document.getElementById('end').getAttribute('aria-valuenow')
   const vid = { 
     videoId: url.value,
-    startSeconds: 0,
-    endSeconds: duration
+    startSeconds: start,
+    endSeconds: end
   }
 
   player.cueVideoById(vid)
 }
 
-/*
- *   This content is licensed according to the W3C Software License at
- *   https://www.w3.org/Consortium/Legal/2015/copyright-software-and-document
- *
- *   File:   slider.js
- *
- *   Desc:   Slider widget that implements ARIA Authoring Practices
- */
+var Slider = function (node, handler) {
+  this.domNode = document.getElementById(node)
+  this.railDomNode = document.getElementById(node).parentNode
+  this.handler = handler
 
-'use strict';
+  this.minDomNode = false
+  this.maxDomNode = false
 
-// Create Slider that contains value, valuemin, valuemax, and valuenow
-var Slider = function (domNode, labelNode) {
-  this.domNode = domNode;
-  this.railDomNode = domNode.parentNode;
-  this.labelDomNode = labelNode;
+  this.valueNow = 50
 
-  this.minDomNode = false;
-  this.maxDomNode = false;
+  this.railMin = 0
+  this.railMax = 100
+  this.railWidth = 0
+  this.railBorderWidth = 1
 
-  this.valueNow = 50;
-
-  this.railMin = 0;
-  this.railMax = 100;
-  this.railWidth = 0;
-  this.railBorderWidth = 1;
-
-  this.thumbWidth = 20;
-  this.thumbHeight = 24;
+  this.thumbWidth = 20
+  this.thumbHeight = 24
 
   this.keyCode = Object.freeze({
     left: 37,
@@ -102,28 +126,27 @@ var Slider = function (domNode, labelNode) {
     pageDown: 34,
     end: 35,
     home: 36,
-  });
-};
+  })
+}
 
 // Initialize slider
-Slider.prototype.init = function () {
+Slider.prototype.init = function (min, max, t) {
+  this.valueNow = t
+  this.domNode.setAttribute('aria-valuenow', t)
+  this.domNode.setAttribute('aria-valuemin', min)
+  this.domNode.setAttribute('aria-valuemax', max)
+
+  this.railMin = min
+  this.railMax = max
+  this.railWidth = parseInt(this.railDomNode.style.width.slice(0, -2));
+
   if (this.domNode.previousElementSibling) {
     this.minDomNode = this.domNode.previousElementSibling;
-    this.railMin = parseInt(this.minDomNode.getAttribute('aria-valuemin'));
-  } else {
-    this.railMin = parseInt(this.domNode.getAttribute('aria-valuemin'));
   }
 
   if (this.domNode.nextElementSibling) {
     this.maxDomNode = this.domNode.nextElementSibling;
-    this.railMax = parseInt(this.maxDomNode.getAttribute('aria-valuemax'));
-  } else {
-    this.railMax = parseInt(this.domNode.getAttribute('aria-valuemax'));
   }
-
-  this.valueNow = parseInt(this.domNode.getAttribute('aria-valuenow'));
-
-  this.railWidth = parseInt(this.railDomNode.style.width.slice(0, -2));
 
   if (this.domNode.tabIndex != 0) {
     this.domNode.tabIndex = 0;
@@ -137,7 +160,7 @@ Slider.prototype.init = function () {
   this.moveSliderTo(this.valueNow);
 };
 
-Slider.prototype.moveSliderTo = function (value) {
+Slider.prototype.moveSliderTo = function (value, released) {
   var valueMax = parseInt(this.domNode.getAttribute('aria-valuemax'));
   var valueMin = parseInt(this.domNode.getAttribute('aria-valuemin'));
 
@@ -174,8 +197,8 @@ Slider.prototype.moveSliderTo = function (value) {
     this.domNode.style.left = pos - this.railBorderWidth + 'px';
   }
 
-  if (this.labelDomNode) {
-    this.labelDomNode.value = format(this.dolValueNow)
+  if (this.handler) {
+    this.handler(this.dolValueNow, released)
   }
 }
 
@@ -185,33 +208,33 @@ Slider.prototype.handleKeyDown = function (event) {
   switch (event.keyCode) {
     case this.keyCode.left:
     case this.keyCode.down:
-      this.moveSliderTo(this.valueNow - 1);
+      this.moveSliderTo(this.valueNow - 1, true)
       flag = true;
       break;
 
     case this.keyCode.right:
     case this.keyCode.up:
-      this.moveSliderTo(this.valueNow + 1);
+      this.moveSliderTo(this.valueNow + 1, true)
       flag = true;
       break;
 
     case this.keyCode.pageDown:
-      this.moveSliderTo(this.valueNow - 10);
+      this.moveSliderTo(this.valueNow - 10, true)
       flag = true;
       break;
 
     case this.keyCode.pageUp:
-      this.moveSliderTo(this.valueNow + 10);
+      this.moveSliderTo(this.valueNow + 10, true)
       flag = true;
       break;
 
     case this.keyCode.home:
-      this.moveSliderTo(this.railMin);
+      this.moveSliderTo(this.railMin, true)
       flag = true;
       break;
 
     case this.keyCode.end:
-      this.moveSliderTo(this.railMax);
+      this.moveSliderTo(this.railMax, true)
       flag = true;
       break;
 
@@ -243,6 +266,7 @@ Slider.prototype.handleMouseDown = function (event) {
     self.valueNow =
       self.railMin +
       parseInt(((self.railMax - self.railMin) * diffX) / self.railWidth);
+
     self.moveSliderTo(self.valueNow);
 
     event.preventDefault();
@@ -252,6 +276,8 @@ Slider.prototype.handleMouseDown = function (event) {
   var handleMouseUp = function () {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);
+
+    self.moveSliderTo(self.valueNow, true);
   };
 
   // bind a mousemove event handler to move pointer
