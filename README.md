@@ -233,10 +233,16 @@ The R Journal, 3(2), 29–33. doi: 10.32614/RJ-2011-015.
 
 4. [Ckmeans.1d.dp](https://cran.r-project.org/web/packages/Ckmeans.1d.dp/index.html)
 
+5. [W3C multi-thumb slider](https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html)
+
+6. [AB Loop Player](https://agrahn.gitlab.io/ABLoopPlayer)
+
 #### License
 
 [MIT](https://github.com/twystd/taps2beats/blob/master/LICENSE)
 
-Web page icons by FontAwesome:
+#### Attributions
 
-- [FontAwesome](https://fontawesome.com/license)
+1. Icons by [FontAwesome](https://fontawesome.com):
+   - _[FontAwesome](https://fontawesome.com/license)_
+

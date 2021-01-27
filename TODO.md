@@ -1,12 +1,15 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Loop controls
+      - [ ] Fix slider thumbs so that they actually point to the timeline
+      - [ ] 'TAP' pad
+      - [ ] Explanatory text
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
-      - [ ] 'TAP' pad
       - [ ] Show taps
       - [ ] Load audio from file
+      - [x] Panels a la transcriptase
+      - [x] Loop controls
       - [x] FontAwesome credit in README
       - [x] Start/end controls
       - [x] Parse YouTube URL

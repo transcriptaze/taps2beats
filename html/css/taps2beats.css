@@ -15,6 +15,12 @@ body {
   padding: 0px;
 }
 
+.panel {
+  padding: 4px;
+  background: #eee8d5;  
+  box-shadow: -1px -1px 2px 0 #fdf6e3, 1px 1px 4px 0 #93a1a1;
+}
+
 #content {
   width: 100%;
   height: 100%;
@@ -88,8 +94,8 @@ main {
   width: 640px; 
   height: 390px; 
   position: absolute; 
-  left: 0px; 
-  top: 0px; 
+  left: 4px; 
+  top: 4px; 
   z-index: 1;
   visibility: visible;
 }
@@ -121,7 +127,7 @@ div.url input#url {
 }
 
 div.url input#url::placeholder {
-  color: lightgray;
+  color: gray;
   font-style: italic;
   font-size: 0.9em;
 }
@@ -180,6 +186,64 @@ input#to {
 div#other {
   grid-area: middle;  
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+label#loop {
+  cursor: pointer;  
+  margin-right: 4px;
+}
+
+label#loop input[type="checkbox"] {
+  display: none;
+}
+
+label#loop img {
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  margin: auto;
+}
+
+label#loop img.yes {
+  display: none;
+}
+
+label#loop img.no {
+  display: block;
+  filter: invert(100%) sepia(30%) saturate(7%) hue-rotate(292deg) brightness(81%) contrast(103%);
+}
+
+label#loop input[type="checkbox"]:checked ~ img.yes {
+  display: block;
+}
+
+label#loop input[type="checkbox"]:checked ~ img.no {
+  display: none;
+}
+
+input#delay {
+  width: 4em;
+  padding: 2px 4px 2px 4px;
+  border: 1px solid red;
+  border-radius: 2px;
+  text-align: center;
+  margin-left: 4px;
+  outline: none;
+}
+
+input#delay::placeholder {
+  color: gray;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+input#delay::-webkit-inner-spin-button, 
+input#delay::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
 }
 
 footer {

@@ -20,6 +20,9 @@
       <!-- NAV -->
 
       <nav>
+        <ul>
+          <li class="selected">T2B</li>
+        </ul>
       </nav>
 
       <!-- MAIN -->
@@ -27,12 +30,12 @@
         <div>
           
           <div id="container">
-            <div class="url">
+            <div class="url panel">
               <input id="url"  type="text" placeholder="YouTube URL" value="https://www.youtube.com/watch?v=CKI7MnfBYJA" readonly />
               <input id="load" type="button" value="Load" onclick="load(event)" disabled />
             </div>
 
-            <div style="position:relative;">
+            <div class="panel" style="position:relative;">
               <div id="player" class="player"></div>
               <div id="loading" class="overlay">
                 <img src="images/youtube-brands.svg" draggable="false" />
@@ -40,7 +43,7 @@
             </div>
           </div>
 
-          <div id="controls" class="controls">
+          <div id="controls" class="controls panel">
             <!-- https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html -->
             <div class="slider">
               <div class="rail" style="width:640px;">
@@ -65,10 +68,12 @@
             <input id="from" type="text" class="time" readonly />
             <input id="to"   type="text" class="time" readonly />
             <div id="other">
-              <label for="loop">Loop</label>
-              <input id="loop" type="checkbox">
-              <label for="delay">Loop delay</label>
-              <input id="delay" type="input" value="0" />
+              <label id="loop">
+                <input type="checkbox" onclick="onLoop(event)" />
+                <img class="no"  src="images/redo-alt-solid.svg" draggable="false" />
+                <img class="yes" src="images/redo-alt-solid.svg" draggable="false" />
+              </label>
+              <input id="delay" type="number" min="0" max="10" placeholder="loop delay" value="2.5" />
             </div>
           </div>
 

@@ -2,7 +2,9 @@
 
 var player
 var loopTimer
-var cued = false
+var delayTimer
+var loaded = false
+var looping = false
 var start
 var end
 
@@ -19,18 +21,18 @@ function onPlayerStateChange(event) {
 
   switch (event.data) {
     case YT.PlayerState.ENDED:
-      if (!cued) {
-        cued = true
+      if (!loaded) {
+        loaded = true
         const duration = player.getDuration()
 
         start.init(0,duration,0)
         end.init(0,duration,duration)
-        cue()
+        cue(false)
       }
       break
 
     case YT.PlayerState.PLAYING:
-      if (cued) {
+      if (loaded) {
         loopTimer = setInterval(tick, 100)        
       }
       break
@@ -48,15 +50,6 @@ function onPlayerStateChange(event) {
   }
 }
 
-function tick() {
-  const end = document.getElementById('end').getAttribute('aria-valuenow')
-  const t = player.getCurrentTime()
-
-  if (t > end) {
-    cue()
-  }
-}
-
 function onSetStart(t, released) {
   document.getElementById('from').value = format(t)
 
@@ -64,7 +57,7 @@ function onSetStart(t, released) {
     case YT.PlayerState.CUED:
     case YT.PlayerState.ENDED:
       if (released) {
-        cue()
+        cue(false)
       }
       break
 
@@ -86,27 +79,55 @@ function onSetEnd(t, released) {
     switch (player.getPlayerState()) {
       case YT.PlayerState.ENDED:
       case YT.PlayerState.CUED:
-        cue()
+        cue(false)
         break
     }    
   }
+}
+
+function onLoop(event) {
+  looping = event.target.checked
 }
 
 function load(event) {
   const url = document.getElementById('url')    
   const vid = getVideoID(url.value)
 
-  cued = false
+  loaded = false
   document.getElementById('loading').style.visibility = 'visible'
   player.loadVideoById({ videoId: vid, startSeconds: 0, endSeconds: 0.1 })
 }
 
-function cue() {
+function cue(play) {
   const url = document.getElementById('url')    
   const vid = getVideoID(url.value)
   const start = document.getElementById('start').getAttribute('aria-valuenow')
 
-  player.cueVideoById({ videoId: vid, startSeconds: start })
+  if (play) {
+    player.loadVideoById({ videoId: vid, startSeconds: start })
+  } else {
+    player.cueVideoById({ videoId: vid, startSeconds: start })
+  }
+}
+
+function tick() {
+  const delay = parseFloat(document.getElementById('delay').value)
+  const end = document.getElementById('end').getAttribute('aria-valuenow')
+  const t = player.getCurrentTime()
+
+  if (t > end) {
+    if (!isNaN(delay) && delay > 0) {
+      cue(false)      
+      delayTimer = setInterval(delayed, delay * 1000)
+    } else {
+      cue(looping)            
+    }
+  }
+}
+
+function delayed() {
+  clearInterval(delayTimer)
+  cue(looping)
 }
 
 var Slider = function (node, handler) {
