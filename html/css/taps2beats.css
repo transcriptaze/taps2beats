@@ -156,7 +156,7 @@ div.url input#load[disabled] {
 }
 
 #controls {
-  visibility: hidden;
+  visibility: visible;
 }
 
 div.controls {
@@ -270,20 +270,6 @@ div.slider {
   padding-bottom: 1em;
 }
 
-div.rail-label {
-  padding-right: 0.5em;
-  text-align: right;
-  float: left;
-  width: 4em;
-  position: relative;
-  top: -0.5em;
-}
-
-div.rail-label.max {
-  padding-left: 0.5em;
-  text-align: left;
-}
-
 div.slider .rail {
   background-color: #eee;
   border: 1px solid #888;
@@ -306,6 +292,15 @@ div.slider img[role="slider"]:hover {
   outline-style: solid;
   outline-width: 2px;
   outline-offset: 2px;
+}
+
+div.slider img#start {
+  width: 10px;
+  left: -10px;
+}
+
+div.slider img#end {
+  width: 10px;
 }
 
 div.slider .rail.focus {

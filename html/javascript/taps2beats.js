@@ -14,6 +14,7 @@ function onPlayerReady(event) {
 
   start = new Slider('start', onSetStart)
   end = new Slider('end', onSetEnd)
+        end.init(0,100,100)
 }
 
 function onPlayerStateChange(event) {
@@ -143,7 +144,6 @@ var Slider = function (node, handler) {
   this.railMin = 0
   this.railMax = 100
   this.railWidth = 0
-  this.railBorderWidth = 1
 
   this.thumbWidth = 20
   this.thumbHeight = 24
@@ -200,11 +200,11 @@ Slider.prototype.moveSliderTo = function (value, released) {
   }
 
   if (value < valueMin) {
-    value = valueMin;
+    value = valueMin
   }
 
-  this.valueNow = value;
-  this.dolValueNow = value;
+  this.valueNow = value
+  this.dolValueNow = value
 
   if (released) {
     this.domNode.setAttribute('aria-valuenow', this.valueNow);    
@@ -218,16 +218,14 @@ Slider.prototype.moveSliderTo = function (value, released) {
     this.maxDomNode.setAttribute('aria-valuemin', this.valueNow);
   }
 
-  var pos = Math.round(
-    ((this.valueNow - this.railMin) *
-      (this.railWidth - 2 * (this.thumbWidth - this.railBorderWidth))) /
-      (this.railMax - this.railMin)
-  );
+  const range = this.railMax - this.railMin
+  const scale = this.railWidth/range
+  const pos = Math.round((this.valueNow - this.railMin) * scale)
 
   if (this.minDomNode) {
-    this.domNode.style.left = pos + this.thumbWidth - this.railBorderWidth + 'px';
+    this.domNode.style.left = pos + 'px'
   } else {
-    this.domNode.style.left = pos - this.railBorderWidth + 'px';
+    this.domNode.style.left = pos - 10 + 'px'
   }
 
   if (this.handler) {

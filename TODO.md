@@ -1,13 +1,14 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Fix slider thumbs so that they actually point to the timeline
+      - [ ] Zoot up slider thumbs
       - [ ] 'TAP' pad
       - [ ] Explanatory text
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
       - [ ] Show taps
       - [ ] Load audio from file
+      - [x] Adjust slider thumbs to point at edges
       - [x] Panels a la transcriptase
       - [x] Loop controls
       - [x] FontAwesome credit in README
