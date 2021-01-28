@@ -145,8 +145,7 @@ var Slider = function (node, handler) {
   this.railMax = 100
   this.railWidth = 0
 
-  this.thumbWidth = 20
-  this.thumbHeight = 24
+  this.thumbWidth = 10
 
   this.keyCode = Object.freeze({
     left: 37,
@@ -220,12 +219,12 @@ Slider.prototype.moveSliderTo = function (value, released) {
 
   const range = this.railMax - this.railMin
   const scale = this.railWidth/range
-  const pos = Math.round((this.valueNow - this.railMin) * scale)
+  const pos = (this.valueNow - this.railMin) * scale
 
   if (this.minDomNode) {
-    this.domNode.style.left = pos + 'px'
+    this.domNode.style.left = Math.ceil(pos) + 'px'
   } else {
-    this.domNode.style.left = pos - 10 + 'px'
+    this.domNode.style.left = Math.floor(pos) - this.thumbWidth + 'px'
   }
 
   if (this.handler) {

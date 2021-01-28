@@ -156,7 +156,7 @@ div.url input#load[disabled] {
 }
 
 #controls {
-  visibility: visible;
+  visibility: hidden;
 }
 
 div.controls {

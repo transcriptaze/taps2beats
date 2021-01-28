@@ -1,14 +1,14 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Zoot up slider thumbs
       - [ ] 'TAP' pad
+      - [ ] Zoot up slider
       - [ ] Explanatory text
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
       - [ ] Show taps
       - [ ] Load audio from file
-      - [x] Adjust slider thumbs to point at edges
+      - [x] Rework slider thumbs to align with video
       - [x] Panels a la transcriptase
       - [x] Loop controls
       - [x] FontAwesome credit in README
