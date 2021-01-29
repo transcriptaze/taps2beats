@@ -35,10 +35,12 @@ function onPlayerStateChange(event) {
     case YT.PlayerState.PLAYING:
       if (loaded) {
         loopTimer = setInterval(tick, 100)        
+        document.getElementById('pad').dataset.state = 'playing'
       }
       break
 
     case YT.PlayerState.PAUSED:
+      document.getElementById('pad').dataset.state = 'cued'
       break
 
     case YT.PlayerState.BUFFERING:
@@ -47,6 +49,10 @@ function onPlayerStateChange(event) {
     case YT.PlayerState.CUED:
       document.getElementById('loading').style.visibility = 'hidden'
       document.getElementById('controls').style.visibility = 'visible'      
+      document.getElementById('tap').style.visibility = 'visible'      
+      document.getElementById('pad').dataset.state = 'cued'
+      document.getElementById('pad').focus()
+      player.unMute()
       break
   }
 }
@@ -90,6 +96,35 @@ function onLoop(event) {
   looping = event.target.checked
 }
 
+function onTap(event) {
+  if (event.code === 'Space') {
+    event.preventDefault()
+
+    if (!event.repeat) {
+      switch (player.getPlayerState()) {
+        case YT.PlayerState.CUED:
+        case YT.PlayerState.PAUSED:
+          player.playVideo()
+          break
+
+        case YT.PlayerState.PLAYING:
+          console.log(player.getCurrentTime())
+          break
+      }
+    }
+  } else if (event.code === 'KeyS') {
+    event.preventDefault()
+    if (!event.repeat && player.getPlayerState() == YT.PlayerState.PLAYING) {
+        cue(false)
+    }
+  } else if (event.code === 'KeyP') {
+    event.preventDefault()
+    if (!event.repeat && player.getPlayerState() == YT.PlayerState.PLAYING) {
+        player.pauseVideo()
+    }
+  } 
+}
+
 function load(event) {
   const url = document.getElementById('url')    
   const vid = getVideoID(url.value)
@@ -107,6 +142,7 @@ function cue(play) {
   if (play) {
     player.loadVideoById({ videoId: vid, startSeconds: start })
   } else {
+    player.mute()
     player.cueVideoById({ videoId: vid, startSeconds: start })
   }
 }

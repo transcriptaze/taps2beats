@@ -1,13 +1,14 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] 'TAP' pad
+      - [ ] Record taps
       - [ ] Zoot up slider
       - [ ] Explanatory text
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
       - [ ] Show taps
       - [ ] Load audio from file
+      - [x] 'TAP' pad
       - [x] Rework slider thumbs to align with video
       - [x] Panels a la transcriptase
       - [x] Loop controls
