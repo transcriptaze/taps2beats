@@ -1,14 +1,15 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Record taps
+      - [ ] Draw taps
+      - [ ] Animate TAP pad
       - [ ] Zoot up slider
       - [ ] Explanatory text
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
-      - [ ] Show taps
       - [ ] Load audio from file
       - [x] 'TAP' pad
+      - [x] Record taps
       - [x] Rework slider thumbs to align with video
       - [x] Panels a la transcriptase
       - [x] Loop controls
@@ -68,6 +69,7 @@
 6. https://gitlab.com/agrahn/ABLoopPlayer
 7. https://agrahn.gitlab.io/ABLoopPlayer
 8. https://towardsdatascience.com/deep-learning-in-geomtry-arclentgh-learning-119d347231ce
+9. https://dsp.stackexchange.com/questions/60528/how-to-compute-key-of-a-song
 
 ## NOTES
 

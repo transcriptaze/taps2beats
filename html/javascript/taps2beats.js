@@ -7,6 +7,10 @@ var loaded = false
 var looping = false
 var start
 var end
+var taps = {
+  taps: [],
+  current: []
+}
 
 function onPlayerReady(event) {
   document.getElementById('url').readOnly = false
@@ -35,12 +39,12 @@ function onPlayerStateChange(event) {
     case YT.PlayerState.PLAYING:
       if (loaded) {
         loopTimer = setInterval(tick, 100)        
-        document.getElementById('pad').dataset.state = 'playing'
+        document.getElementById('tap').dataset.state = 'playing'
       }
       break
 
     case YT.PlayerState.PAUSED:
-      document.getElementById('pad').dataset.state = 'cued'
+      document.getElementById('tap').dataset.state = 'cued'
       break
 
     case YT.PlayerState.BUFFERING:
@@ -50,9 +54,17 @@ function onPlayerStateChange(event) {
       document.getElementById('loading').style.visibility = 'hidden'
       document.getElementById('controls').style.visibility = 'visible'      
       document.getElementById('tap').style.visibility = 'visible'      
-      document.getElementById('pad').dataset.state = 'cued'
+      document.getElementById('tap').dataset.state = 'cued'
       document.getElementById('pad').focus()
       player.unMute()
+
+      if (taps.current.length > 0)  {
+          taps.taps.push(taps.current)
+          taps.current = []
+          if (taps.taps.length > 0) {
+            document.getElementById('taps').value = JSON.stringify(taps.taps)            
+          }
+      }
       break
   }
 }
@@ -108,7 +120,7 @@ function onTap(event) {
           break
 
         case YT.PlayerState.PLAYING:
-          console.log(player.getCurrentTime())
+          taps.current.push(player.getCurrentTime())
           break
       }
     }
@@ -123,6 +135,22 @@ function onTap(event) {
         player.pauseVideo()
     }
   } 
+}
+
+function onFocus(event) {
+  switch (player.getPlayerState()) {
+    case YT.PlayerState.CUED:
+    case YT.PlayerState.PAUSED:
+      document.getElementById('tap').dataset.state = 'cued'
+      break
+
+    case YT.PlayerState.PLAYING:
+      document.getElementById('tap').dataset.state = 'playing'
+  }
+}
+
+function onBlur(event) {
+  document.getElementById('tap').dataset.state = 'idle'
 }
 
 function load(event) {

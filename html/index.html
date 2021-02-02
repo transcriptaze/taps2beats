@@ -42,8 +42,11 @@
               </div>
             </div>
 
-            <div id="tap" class="panel" tabindex="-1">
-              <div id="pad" class="pad" tabindex="0" onkeydown="onTap(event)" data-state="idle">
+            <div id="tap" class="panel" tabindex="-1" data-state="idle">
+              <div id="pad" class="pad" tabindex="0" onkeydown="onTap(event)" onfocus="onFocus(event)" onblur="onBlur(event)">
+                <canvas width="48" height="48"></canvas>
+              </div>
+              <div class="help" tabindex="0">
                 <p class="cued" >
                   Press 'SPACE' to start video. <br/><br/>While the video is playing, press 'SPACE' on each beat of the song
                 </p>
@@ -90,6 +93,11 @@
             </div>
 
           </div>
+
+          <div>
+            <textarea id="taps" style="width:640px; height=80px;"></textarea>
+          </div>
+
         </div>
       </main>
 

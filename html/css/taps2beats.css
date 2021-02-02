@@ -182,8 +182,9 @@ div.url input#load[disabled] {
 }
 
 .pad {
+  background: blue;
   width: 128px;
-  height: 100%;
+  height: 128px;
   border: 1px inset;
   border-radius: 2px;
 
@@ -196,7 +197,15 @@ div.url input#load[disabled] {
   background: #d0d0d0;
 }
 
-.pad p {  
+.pad canvas {
+  background: green;
+}
+
+#tap .help {
+  width: 128px;  
+}
+
+.help p {  
   color: gray;
   font-size: 0.8em;
   font-style: italic;  
@@ -204,26 +213,21 @@ div.url input#load[disabled] {
   margin-left: 12px;
   margin-right: 12px;
   margin-top: 24px;
-  visibility: hidden;
 }
 
-.pad:focus p {
-  visibility: visible;  
-}
-
-.pad p.cued {
+.help p.cued {
   display: none;
 }
 
-.pad p.playing {
+.help p.playing {
   display: none;
 }
 
-.pad[data-state="cued"] p.cued {
+#tap[data-state="cued"] .help p.cued {
   display: block;
 }
 
-.pad[data-state="playing"] p.playing {
+#tap[data-state="playing"] .help p.playing {
   display: block;
 }
 
