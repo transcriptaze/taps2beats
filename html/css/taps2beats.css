@@ -79,8 +79,8 @@ main {
 #container {
   display: grid;
   grid-template-columns: auto auto;
-  grid-template-rows: auto auto auto;
-  grid-template-areas: "top unused1" "middle right" "bottom unused2";
+  grid-template-rows: auto auto auto auto;
+  grid-template-areas: "url unused1" "video pad" "controls unused2" "taps unused3";
 
   text-align: center;
   margin: auto;
@@ -89,22 +89,27 @@ main {
 
 div#file {
   display: flex;
-  grid-area: top;
+  grid-area: url;
 }
 
 div#video {
   display: block;
-  grid-area: middle;
+  grid-area: video;
 }
 
 div#tap {
-  grid-area: right;
+  grid-area: pad;
   margin-left: 8px;
   visibility: hidden;
 }
 
 div#controls {
-  grid-area: bottom;
+  grid-area: controls;
+  visibility: hidden;
+}
+
+div#taps {
+  grid-area: taps;
   visibility: hidden;
 }
 
@@ -316,6 +321,39 @@ input#delay::-webkit-inner-spin-button,
 input#delay::-webkit-outer-spin-button { 
   -webkit-appearance: none; 
   margin: 0; 
+}
+
+div#taps {
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+div#current {
+  position: relative;
+  height: 17px;
+}
+
+div#history {
+  position: relative;
+  height: 17px;
+  margin-top: 2px;
+}
+
+canvas.taps {
+  position: absolute;
+  left: 4px;
+  width: 640;
+  height: 8;
+}
+
+canvas.all {
+  top: 0px;
+  background: lightblue;
+}
+
+canvas.zoomed {
+  top: 9px;
+  background: lightgreen;
 }
 
 footer {

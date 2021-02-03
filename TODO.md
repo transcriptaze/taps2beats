@@ -1,13 +1,20 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Draw taps
+      - [ ] Cluster taps
+      - [ ] Show BPM
+      - [ ] Clear on load
+      - [ ] Export as JSON
+      - [ ] Export as MIDI
       - [ ] Animate TAP pad
       - [ ] Zoot up slider
       - [ ] Explanatory text
       - [ ] 'Loading' windmill
       - [ ] Fade out loading overlay
       - [ ] Load audio from file
+      - [ ] Parse 'other' YouTube URL formats
+
+      - [x] Draw taps
       - [x] 'TAP' pad
       - [x] Record taps
       - [x] Rework slider thumbs to align with video

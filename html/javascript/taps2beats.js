@@ -8,6 +8,7 @@ var looping = false
 var start
 var end
 var taps = {
+  duration: 0,
   taps: [],
   current: []
 }
@@ -32,6 +33,7 @@ function onPlayerStateChange(event) {
 
         start.init(0,duration,0)
         end.init(0,duration,duration)
+        taps.duration = duration
         cue(false)
       }
       break
@@ -54,6 +56,7 @@ function onPlayerStateChange(event) {
       document.getElementById('loading').style.visibility = 'hidden'
       document.getElementById('controls').style.visibility = 'visible'      
       document.getElementById('tap').style.visibility = 'visible'      
+      document.getElementById('taps').style.visibility = 'visible'      
       document.getElementById('tap').dataset.state = 'cued'
       document.getElementById('pad').focus()
       player.unMute()
@@ -61,9 +64,7 @@ function onPlayerStateChange(event) {
       if (taps.current.length > 0)  {
           taps.taps.push(taps.current)
           taps.current = []
-          if (taps.taps.length > 0) {
-            document.getElementById('taps').value = JSON.stringify(taps.taps)            
-          }
+          draw()
       }
       break
   }
@@ -121,6 +122,7 @@ function onTap(event) {
 
         case YT.PlayerState.PLAYING:
           taps.current.push(player.getCurrentTime())
+          draw()
           break
       }
     }
@@ -182,10 +184,10 @@ function tick() {
 
   if (t > end) {
     if (!isNaN(delay) && delay > 0) {
-      cue(false)      
-      delayTimer = setInterval(delayed, delay * 1000)
+        cue(false)      
+        delayTimer = setInterval(delayed, delay * 1000)
     } else {
-      cue(looping)            
+        cue(looping)            
     }
   }
 }
@@ -193,6 +195,34 @@ function tick() {
 function delayed() {
   clearInterval(delayTimer)
   cue(looping)
+}
+
+function draw() {
+  if (player.getPlayerState() ===  YT.PlayerState.PLAYING) {
+      drawTaps(document.querySelector('#current canvas.all'), taps.current, 0, taps.duration)
+      drawTaps(document.querySelector('#current canvas.zoomed'), taps.current, start.valueNow, end.valueNow - start.valueNow)
+  } else {
+      drawTaps(document.querySelector('#history canvas.all'), taps.taps, 0, taps.duration)    
+      drawTaps(document.querySelector('#history canvas.zoomed'), taps.taps, start.valueNow, end.valueNow - start.valueNow)
+  }
+}
+
+function drawTaps(canvas, taps, offset, duration) {
+  let ctx = canvas.getContext('2d')
+  let width = canvas.width
+  let height = canvas.height
+
+  ctx.lineWidth = 1
+  ctx.strokeStyle = 'red'
+
+  ctx.clearRect(0, 0, width, height)
+  ctx.beginPath()
+  taps.flat().forEach(function(t) {
+      let x = Math.floor((t - offset) * width/duration) + 0.5
+      ctx.moveTo(x, 0)
+      ctx.lineTo(x, height)
+  })
+  ctx.stroke()
 }
 
 var Slider = function (node, handler) {
