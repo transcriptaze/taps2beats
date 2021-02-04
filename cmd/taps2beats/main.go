@@ -1,3 +1,5 @@
+// +build !js !wasm
+
 // Command line utility for the taps2beats module.
 //
 //   Usage:

@@ -15,6 +15,16 @@ build: format
 	mkdir -p bin
 	go build -o bin ./...
 
+wasm: format
+	mkdir -p html/wasm
+	GOOS=js GOARCH=wasm go build -o ./html/wasm ./...
+
+build-all: format
+	mkdir -p bin
+	mkdir -p html/wasm
+	go build -o bin ./...
+	GOOS=js GOARCH=wasm go build -o ./html/wasm ./...
+
 test: build
 	go test ./...
 
@@ -49,4 +59,7 @@ stdin: build
 
 help: build
 	./bin/taps2beats --help
+
+httpd: build
+	go run cmd/httpd/httpd.go	
 

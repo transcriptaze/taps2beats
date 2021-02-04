@@ -164,6 +164,21 @@ function load(event) {
   player.loadVideoById({ videoId: vid, startSeconds: 0, endSeconds: 0.1 })
 }
 
+function analyse (event) {
+  const p = new Promise((resolve, reject) => {
+    goTaps((obj, err) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(obj)
+      }
+    })
+  })
+
+  p.then(o => { console.log("gotcha!!", o) })
+   .catch(function (err) { console.error(err) })
+}
+
 function cue(play) {
   const url = document.getElementById('url')    
   const vid = getVideoID(url.value)

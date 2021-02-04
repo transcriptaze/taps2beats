@@ -6,6 +6,21 @@
     <title>taps2beats</title>
     <link rel="icon"       href="images/favicon.png">
     <link rel="stylesheet" href="css/taps2beats.css" type="text/css">
+    <script src="./javascript/wasm_exec.js"></script>
+    <script>
+      document.addEventListener('readystatechange', event => {
+        switch (event.target.readyState) {
+          case 'complete':           
+              const go = new Go();
+              WebAssembly
+                .instantiateStreaming(fetch("./wasm/wasm"), go.importObject)
+                .then((result) => {
+                  go.run(result.instance);
+                });
+              break;
+        }
+      })
+    </script
   </head>
 
   <body> 
@@ -33,6 +48,7 @@
             <div id="file" class="url panel">
               <input id="url"  type="text" placeholder="YouTube URL" value="https://www.youtube.com/watch?v=CKI7MnfBYJA" readonly />
               <input id="load" type="button" value="Load" onclick="load(event)" disabled />
+              <input id="wasm" type="button" value="WASM" onclick="analyse(event)" />
             </div>
 
             <div id="video" class="panel" style="position:relative;">
