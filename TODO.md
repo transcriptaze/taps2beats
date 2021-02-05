@@ -1,16 +1,16 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Clear on load
-      - [ ] Show BPM/offset
-      - [ ] SPACE, P,S,L from everywhere
       - [ ] Cluster taps
-            - insufficient data warning
             - only show 'zoomed' bar if sliders are set
             - tooltips for bars
-      - [ ] Fix logo
-      - [ ] Quantize
+      - [ ] Clear on load
+      - [ ] Show BPM/offset
       - [ ] Extrapolate
+      - [ ] Quantize
+      - [ ] SPACE, P,S,L from everywhere
+      - [ ] eslint
+      - [ ] Fix logo
       - [ ] Export as JSON
       - [ ] Export as MIDI
       - [ ] Animate TAP pad

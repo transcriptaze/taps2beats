@@ -227,13 +227,20 @@ function draw() {
 
 function drawBeats (beats) {
   if (beats != null) {
+      document.getElementById('nodata').style.display = 'none'
+      document.getElementById('beats').style.display = 'block'
+
       let t = []
       
       beats.beats.forEach(b => { t.push(b.at) })
 
       drawTaps(document.querySelector('#beats canvas.all'), t, 0, taps.duration)
       drawTaps(document.querySelector('#beats canvas.zoomed'), t, start.valueNow, end.valueNow - start.valueNow)
+      return
   }
+
+  document.getElementById('nodata').style.display = 'block'
+  document.getElementById('beats').style.display = 'none'
 }
 
 function drawTaps(canvas, taps, offset, duration) {

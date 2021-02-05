@@ -340,9 +340,20 @@ div#history {
 }
 
 div#beats {
+  display: none;
   position: relative;
   height: 17px;
   margin-top: 2px;
+}
+
+div#nodata {
+  display: none;
+  margin-top: 4px;
+}
+
+div#nodata p {
+  font-size: 0.6em;
+  color: gray;
 }
 
 canvas.taps {
