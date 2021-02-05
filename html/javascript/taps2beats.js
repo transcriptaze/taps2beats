@@ -65,6 +65,7 @@ function onPlayerStateChange(event) {
           taps.taps.push(taps.current)
           taps.current = []
           draw()
+          analyse()
       }
       break
   }
@@ -164,19 +165,21 @@ function load(event) {
   player.loadVideoById({ videoId: vid, startSeconds: 0, endSeconds: 0.1 })
 }
 
-function analyse (event) {
-  const p = new Promise((resolve, reject) => {
-    goTaps((obj, err) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(obj)
-      }
-    })
-  })
+function analyse () {
+  if (taps.taps.flat().length > 0) {
+      const p = new Promise((resolve, reject) => {
+        goTaps((obj, err) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(obj)
+          }
+        }, taps.taps)
+      })
 
-  p.then(o => { console.log("gotcha!!", o) })
-   .catch(function (err) { console.error(err) })
+      p.then(beats => { drawBeats(beats) })
+       .catch(function (err) { console.error(err) })
+  }
 }
 
 function cue(play) {
@@ -219,6 +222,17 @@ function draw() {
   } else {
       drawTaps(document.querySelector('#history canvas.all'), taps.taps, 0, taps.duration)    
       drawTaps(document.querySelector('#history canvas.zoomed'), taps.taps, start.valueNow, end.valueNow - start.valueNow)
+  }
+}
+
+function drawBeats (beats) {
+  if (beats != null) {
+      let t = []
+      
+      beats.beats.forEach(b => { t.push(b.at) })
+
+      drawTaps(document.querySelector('#beats canvas.all'), t, 0, taps.duration)
+      drawTaps(document.querySelector('#beats canvas.zoomed'), t, start.valueNow, end.valueNow - start.valueNow)
   }
 }
 

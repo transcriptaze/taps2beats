@@ -4,9 +4,11 @@
 package main
 
 import (
-"syscall/js"
+	"encoding/json"
+	"fmt"
+	"syscall/js"
 
-//	"github.com/twystd/taps2beats/taps2beats"
+	"github.com/twystd/taps2beats/taps2beats"
 )
 
 const VERSION = "v0.1.0"
@@ -21,16 +23,44 @@ func main() {
 
 func taps(this js.Value, inputs []js.Value) interface{} {
 	callback := inputs[0]
+	object := inputs[1]
 
 	go func() {
-		// if err := dispatcher.Redraw(); err != nil {
-		// 	callback.Invoke(err.Error())
-		// 	return
-		// }
+		taps := [][]float64{}
 
-		// callback.Invoke(js.Null())
-		callback.Invoke("qwerty-uiop")
+		if err := unmarshal(object, &taps); err != nil {
+			callback.Invoke(err.Error())
+			return
+		}
+
+		beats := taps2beats.Taps2Beats(taps2beats.Floats2Seconds(taps), 0.0)
+
+		if len(beats.Beats) > 1 && beats.Variance != nil && *beats.Variance < 0.1 {
+			callback.Invoke(marshal(beats))
+			return
+		}
+
+		callback.Invoke(js.Null())
 	}()
 
 	return nil
+}
+
+func marshal(p interface{}) js.Value {
+	if p == nil {
+		return js.Null()
+	}
+
+	bytes, err := json.Marshal(p)
+	if err != nil {
+		return js.Null()
+	}
+
+	return js.Global().Get("JSON").Call("parse", string(bytes))
+}
+
+func unmarshal(v js.Value, p interface{}) error {
+	s := js.Global().Get("JSON").Call("stringify", v).String()
+
+	return json.Unmarshal([]byte(s), p)
 }

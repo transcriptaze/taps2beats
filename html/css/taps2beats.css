@@ -339,6 +339,12 @@ div#history {
   margin-top: 2px;
 }
 
+div#beats {
+  position: relative;
+  height: 17px;
+  margin-top: 2px;
+}
+
 canvas.taps {
   position: absolute;
   left: 4px;

@@ -48,7 +48,6 @@
             <div id="file" class="url panel">
               <input id="url"  type="text" placeholder="YouTube URL" value="https://www.youtube.com/watch?v=CKI7MnfBYJA" readonly />
               <input id="load" type="button" value="Load" onclick="load(event)" disabled />
-              <input id="wasm" type="button" value="WASM" onclick="analyse(event)" />
             </div>
 
             <div id="video" class="panel" style="position:relative;">
@@ -108,12 +107,16 @@
               </div>
             </div>
 
-            <div id="taps">
+            <div id="taps" class="panel">
               <div id="current">
                 <canvas class="taps all" width="640" height="8"></canvas>
                 <canvas class="taps zoomed" width="640" height="8"></canvas>
               </div>
               <div id="history">
+                <canvas class="taps all" width="640" height="8"></canvas>
+                <canvas class="taps zoomed" width="640" height="8"></canvas>
+              </div>
+              <div id="beats">
                 <canvas class="taps all" width="640" height="8"></canvas>
                 <canvas class="taps zoomed" width="640" height="8"></canvas>
               </div>

@@ -24,9 +24,10 @@ import (
 
 // Contains the estimated BPM, offset of the first beat and the beats estimated from a set of 'taps'.
 type Beats struct {
-	BPM    uint          `json:"BPM"`
-	Offset time.Duration `json:"offset"`
-	Beats  []Beat        `json:"beats"`
+	BPM      uint          `json:"BPM"`
+	Offset   time.Duration `json:"offset"`
+	Beats    []Beat        `json:"beats"`
+	Variance *float64      `json:"-"`
 }
 
 // Contains the estimated time of a single beat, the mean and variance of the 'taps' that were
@@ -99,11 +100,24 @@ func Taps2Beats(taps [][]time.Duration, forgetting float64) Beats {
 
 	sort.SliceStable(beats, func(i, j int) bool { return beats[i].At < beats[j].At })
 
-	return Beats{
+	result := Beats{
 		BPM:    BPM,
 		Offset: offset,
 		Beats:  beats,
 	}
+
+	if len(beats) > 0 {
+		variance := 0.0
+		for _, b := range beats {
+			variance += b.Variance.Seconds()
+		}
+
+		variance = variance / float64(len(beats))
+
+		result.Variance = &variance
+	}
+
+	return result
 }
 
 // Adjusts the times of the beats by performing a least squares reqression to fit the estimated beats to

@@ -7,6 +7,7 @@ clean:
 
 format: 
 	go fmt ./...
+	go fmt ./cmd/wasm/*.go
 
 debug: build
 	go test ./... -run ExampleBeats_Interpolate
@@ -26,7 +27,7 @@ build-all: format
 	GOOS=js GOARCH=wasm go build -o ./html/wasm ./...
 
 test: build
-	go test ./...
+	go test ./... -run TestTaps2BeatsJS
 
 vet: build
 	go vet ./...

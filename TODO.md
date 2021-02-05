@@ -1,9 +1,16 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Cluster taps
-      - [ ] Show BPM
       - [ ] Clear on load
+      - [ ] Show BPM/offset
+      - [ ] SPACE, P,S,L from everywhere
+      - [ ] Cluster taps
+            - insufficient data warning
+            - only show 'zoomed' bar if sliders are set
+            - tooltips for bars
+      - [ ] Fix logo
+      - [ ] Quantize
+      - [ ] Extrapolate
       - [ ] Export as JSON
       - [ ] Export as MIDI
       - [ ] Animate TAP pad
@@ -25,6 +32,7 @@
       - [x] Parse YouTube URL
       - [x] Splashscreen
 
+- [ ] Error if beats == 1 or variance is too high
 - [ ] Initial version release
 
 - [x] godoc examples
