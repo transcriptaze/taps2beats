@@ -5,7 +5,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"syscall/js"
 
 	"github.com/twystd/taps2beats/taps2beats"

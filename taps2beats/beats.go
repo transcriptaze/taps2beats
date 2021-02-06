@@ -516,6 +516,7 @@ func reindex(beats []Beat) error {
 
 	dt := Seconds(xn - x0).Minutes()
 	bmax := int(math.Ceil(dt * float64(MaxBPM*MinSubdivision/4)))
+	variance := math.MaxFloat64
 
 loop:
 	for i := N; i <= bmax; i++ {
@@ -542,18 +543,26 @@ loop:
 			sumsq += y*y - 2*y*bn + bn*bn
 		}
 
-		variance := sumsq / float64(N-1)
+		sigmasq := sumsq / float64(N-1)
 
-		if variance < 0.001 {
+		if sigmasq < variance {
 			for i := range beats {
 				beats[i].beat = index[i]
 			}
 
-			return nil
+			variance = sigmasq
+		}
+
+		if variance < 0.001 {
+			break
 		}
 	}
 
-	return fmt.Errorf("Error mapping taps to beats: %v", beats)
+	if variance > 0.1 {
+		return fmt.Errorf("Error mapping taps to beats: %v", beats)
+	}
+
+	return nil
 }
 
 // Converts a result from the ckmeans.1d.dp algorithm to a Beat.

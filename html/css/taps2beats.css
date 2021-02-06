@@ -240,16 +240,23 @@ div.controls {
   display: grid;
   clear: both; 
   margin-top:12px;
-  grid-template-columns: 4em 1fr 4em;
-  grid-template-areas: "slider slider slider" "from middle to";
+  grid-template-columns: min-content 1fr min-content min-content min-content;
+  grid-template-areas: "slider slider slider slider slider" "from middle offset bpm to";
+  grid-column-gap: 2px;
 }
 
-input.time {
+input.info {
   width: 4em;
   padding: 2px 4px 2px 4px;
   border: 1px solid red;
   border-radius: 2px;
+  font-size: 0.7em;
   text-align: center;
+}
+
+input.info::placeholder {
+  color: gray;
+  font-style: italic;
 }
 
 input#from {
@@ -258,6 +265,14 @@ input#from {
 
 input#to {
   grid-area: to;
+}
+
+input#offset {
+  grid-area: offset;
+}
+
+input#bpm {
+  grid-area: bpm;
 }
 
 div#other {

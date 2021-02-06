@@ -13,7 +13,7 @@
           case 'complete':           
               const go = new Go();
               WebAssembly
-                .instantiateStreaming(fetch("./wasm/wasm"), go.importObject)
+                .instantiateStreaming(fetch("./wasm/T2B.wasm"), go.importObject)
                 .then((result) => {
                   go.run(result.instance);
                 });
@@ -46,7 +46,7 @@
           <div id="container">
 
             <div id="file" class="url panel">
-              <input id="url"  type="text" placeholder="YouTube URL" value="https://www.youtube.com/watch?v=CKI7MnfBYJA" readonly />
+              <input id="url"  type="text" title="YouTube URL" placeholder="https://www.youtube.com/watch?v=CKI7MnfBYJA" value="https://www.youtube.com/watch?v=CKI7MnfBYJA" readonly />
               <input id="load" type="button" value="Load" onclick="load(event)" disabled />
             </div>
 
@@ -95,15 +95,17 @@
                        draggable="false">
                </div>
               </div>
-              <input id="from" type="text" class="time" readonly />
-              <input id="to"   type="text" class="time" readonly />
+              <input id="from"   type="text" class="info" readonly />
+              <input id="to"     type="text" class="info" readonly />
+              <input id="offset" type="text" class="info" placeholder="offset" readonly />
+              <input id="bpm"    type="text" class="info" placeholder="BPM"    readonly />
               <div id="other">
                 <label id="loop">
                   <input type="checkbox" onclick="onLoop(event)" />
                   <img class="no"  src="images/redo-alt-solid.svg" draggable="false" />
                   <img class="yes" src="images/redo-alt-solid.svg" draggable="false" />
                 </label>
-                <input id="delay" type="number" min="0" max="10" placeholder="loop delay" value="1.0" />
+                <input id="delay" type="number" min="0" max="10" title="loop delay" placeholder="loop delay" value="1.0" />
               </div>
             </div>
 

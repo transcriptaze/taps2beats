@@ -18,13 +18,13 @@ build: format
 
 wasm: format
 	mkdir -p html/wasm
-	GOOS=js GOARCH=wasm go build -o ./html/wasm ./...
+	GOOS=js GOARCH=wasm go build -o ./html/wasm/T2B.wasm -i cmd/wasm/*.go
 
 build-all: format
 	mkdir -p bin
 	mkdir -p html/wasm
 	go build -o bin ./...
-	GOOS=js GOARCH=wasm go build -o ./html/wasm ./...
+	GOOS=js GOARCH=wasm go build -o ./html/wasm/T2B.wasm -i cmd/wasm/*.go
 
 test: build
 	go test ./... -run TestTaps2BeatsJS

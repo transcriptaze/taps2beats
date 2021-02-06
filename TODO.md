@@ -5,9 +5,10 @@
             - only show 'zoomed' bar if sliders are set
             - tooltips for bars
       - [ ] Clear on load
-      - [ ] Show BPM/offset
-      - [ ] Extrapolate
+      - [x] Show BPM
+      - [ ] Show offset
       - [ ] Quantize
+      - [ ] Extrapolate
       - [ ] SPACE, P,S,L from everywhere
       - [ ] eslint
       - [ ] Fix logo

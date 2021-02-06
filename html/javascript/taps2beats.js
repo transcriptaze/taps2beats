@@ -167,7 +167,7 @@ function load(event) {
 
 function analyse () {
   if (taps.taps.flat().length > 0) {
-      const p = new Promise((resolve, reject) => {
+      new Promise((resolve, reject) => {
         goTaps((obj, err) => {
           if (err) {
             reject(err)
@@ -176,9 +176,30 @@ function analyse () {
           }
         }, taps.taps)
       })
+      .then(beats => { 
+        if (beats == null) {
+          document.getElementById('nodata').style.display = 'block'
+          document.getElementById('beats').style.display = 'none'
+          // document.getElementById('bpm').style.visibility = 'hidden'            
+          // document.getElementById('offset').style.visibility = 'hidden'            
+        } else {
+          document.getElementById('nodata').style.display = 'none'
+          document.getElementById('beats').style.display = 'block'
+          // document.getElementById('bpm').style.visibility = 'visible'            
+          // document.getElementById('offset').style.visibility = 'visible'            
 
-      p.then(beats => { drawBeats(beats) })
-       .catch(function (err) { console.error(err) })
+          if (beats.BPM > 0) {
+            document.getElementById('bpm').value = beats.BPM + ' BPM'
+            document.getElementById('offset').value = Number.parseFloat(beats.offset).toFixed(2) + 's'
+          } else {
+            document.getElementById('bpm').value = ''
+            document.getElementById('offset').value = ''
+          }
+
+          drawBeats(beats.beats)
+        }
+      })
+      .catch(function (err) { console.error(err) })
   }
 }
 
@@ -232,7 +253,7 @@ function drawBeats (beats) {
 
       let t = []
       
-      beats.beats.forEach(b => { t.push(b.at) })
+      beats.forEach(b => { t.push(b.at) })
 
       drawTaps(document.querySelector('#beats canvas.all'), t, 0, taps.duration)
       drawTaps(document.querySelector('#beats canvas.zoomed'), t, start.valueNow, end.valueNow - start.valueNow)
