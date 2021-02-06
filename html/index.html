@@ -96,6 +96,14 @@
                </div>
               </div>
               <input id="from"   type="text" class="info" readonly />
+              <label id="quantize" class="checktext">
+                <input type="checkbox" onchange="quantize(event)" disabled/>
+                <span>QUANTIZE</span>
+              </label>
+              <label id="interpolate" class="checktext">
+                <input type="checkbox" onchange="interpolate(event)" disabled/>
+                <span>INTERPOLATE</span>
+              </label>
               <input id="to"     type="text" class="info" readonly />
               <input id="offset" type="text" class="info" placeholder="offset" readonly />
               <input id="bpm"    type="text" class="info" placeholder="BPM"    readonly />

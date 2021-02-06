@@ -165,44 +165,6 @@ function load(event) {
   player.loadVideoById({ videoId: vid, startSeconds: 0, endSeconds: 0.1 })
 }
 
-function analyse () {
-  if (taps.taps.flat().length > 0) {
-      new Promise((resolve, reject) => {
-        goTaps((obj, err) => {
-          if (err) {
-            reject(err)
-          } else {
-            resolve(obj)
-          }
-        }, taps.taps)
-      })
-      .then(beats => { 
-        if (beats == null) {
-          document.getElementById('nodata').style.display = 'block'
-          document.getElementById('beats').style.display = 'none'
-          // document.getElementById('bpm').style.visibility = 'hidden'            
-          // document.getElementById('offset').style.visibility = 'hidden'            
-        } else {
-          document.getElementById('nodata').style.display = 'none'
-          document.getElementById('beats').style.display = 'block'
-          // document.getElementById('bpm').style.visibility = 'visible'            
-          // document.getElementById('offset').style.visibility = 'visible'            
-
-          if (beats.BPM > 0) {
-            document.getElementById('bpm').value = beats.BPM + ' BPM'
-            document.getElementById('offset').value = Number.parseFloat(beats.offset).toFixed(2) + 's'
-          } else {
-            document.getElementById('bpm').value = ''
-            document.getElementById('offset').value = ''
-          }
-
-          drawBeats(beats.beats)
-        }
-      })
-      .catch(function (err) { console.error(err) })
-  }
-}
-
 function cue(play) {
   const url = document.getElementById('url')    
   const vid = getVideoID(url.value)
@@ -234,6 +196,63 @@ function tick() {
 function delayed() {
   clearInterval(delayTimer)
   cue(looping)
+}
+
+function analyse () {
+  if (taps.taps.flat().length > 0) {
+      new Promise((resolve, reject) => {
+        goTaps((obj, err) => {
+          if (err) {
+            reject(err)
+          } else {
+            resolve(obj)
+          }
+        }, taps.taps)
+      })
+      .then(beats => { 
+        if (beats == null) {
+          document.getElementById('nodata').style.display = 'block'
+          document.getElementById('beats').style.display = 'none'
+
+          document.getElementById('bpm').value = ''
+          document.getElementById('offset').value = ''
+          document.getElementById('quantize').style.visibility = 'hidden'
+          document.getElementById('quantize').querySelector("input").disabled = true
+          document.getElementById('interpolate').style.visibility = 'hidden'
+          document.getElementById('interpolate').querySelector("input").disabled = true
+        } else {
+          document.getElementById('nodata').style.display = 'none'
+          document.getElementById('beats').style.display = 'block'
+
+          if (beats.BPM > 0) {
+            document.getElementById('bpm').value = beats.BPM + ' BPM'
+            document.getElementById('offset').value = Number.parseFloat(beats.offset).toFixed(2) + 's'
+            document.getElementById('quantize').style.visibility = 'visible'
+            document.getElementById('quantize').querySelector("input").disabled = false
+            document.getElementById('interpolate').style.visibility = 'visible'
+            document.getElementById('interpolate').querySelector("input").disabled = false
+          } else {
+            document.getElementById('bpm').value = ''
+            document.getElementById('offset').value = ''
+            document.getElementById('quantize').style.visibility = 'hidden'
+            document.getElementById('quantize').querySelector("input").disabled = true
+            document.getElementById('interpolate').style.visibility = 'hidden'
+            document.getElementById('interpolate').querySelector("input").disabled = true
+          }
+
+          drawBeats(beats.beats)
+        }
+      })
+      .catch(function (err) { console.error(err) })
+  }
+}
+
+function quantize () {
+  alert('quantize')
+}
+
+function interpolate () {
+  alert('interpolate')
 }
 
 function draw() {

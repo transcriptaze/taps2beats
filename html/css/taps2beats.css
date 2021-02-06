@@ -240,8 +240,8 @@ div.controls {
   display: grid;
   clear: both; 
   margin-top:12px;
-  grid-template-columns: min-content 1fr min-content min-content min-content;
-  grid-template-areas: "slider slider slider slider slider" "from middle offset bpm to";
+  grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
+  grid-template-areas: "slider slider slider slider slider slider slider" "from middle quantize interpolate offset bpm to";
   grid-column-gap: 2px;
 }
 
@@ -263,6 +263,14 @@ input#from {
   grid-area: from;
 }
 
+label#quantize {
+  grid-area: quantize;
+}
+
+label#interpolate {
+  grid-area: interpolate;
+}
+
 input#to {
   grid-area: to;
 }
@@ -281,6 +289,30 @@ div#other {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+label.checktext {
+  border: 1px solid red;
+  border-radius: 2px;
+  visibility: hidden;
+}
+
+label.checktext input[type="checkbox"] {
+  display: none;
+}
+
+label.checktext input[type="checkbox"] ~ span {
+  color: gray;
+  font-size: 0.65em;
+  font-family: sans-serif;
+  font-style: italic;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+label.checktext input[type="checkbox"]:checked ~ span {
+  color: #444444;
+  font-style: normal;
 }
 
 label#loop {

@@ -1,14 +1,12 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] Cluster taps
+      - [ ] Beats
             - only show 'zoomed' bar if sliders are set
             - tooltips for bars
       - [ ] Clear on load
-      - [x] Show BPM
-      - [ ] Show offset
       - [ ] Quantize
-      - [ ] Extrapolate
+      - [ ] Interpolate
       - [ ] SPACE, P,S,L from everywhere
       - [ ] eslint
       - [ ] Fix logo
@@ -22,6 +20,8 @@
       - [ ] Load audio from file
       - [ ] Parse 'other' YouTube URL formats
 
+      - [x] Show BPM
+      - [x] Show offset
       - [x] Draw taps
       - [x] 'TAP' pad
       - [x] Record taps
