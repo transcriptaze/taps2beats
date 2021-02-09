@@ -161,7 +161,16 @@ function load(event) {
   const url = document.getElementById('url')    
   const vid = getVideoID(url.value)
 
+  document.getElementById('message').style.display = 'none'
+  document.getElementById('beats').style.display = 'none'
+  
+  taps.duration = 0
+  taps.taps = []
+  taps.current = []
+  draw()
+
   loaded = false
+
   document.getElementById('loading').style.visibility = 'visible'
   player.loadVideoById({ videoId: vid, startSeconds: 0, endSeconds: 0.1 })
 }

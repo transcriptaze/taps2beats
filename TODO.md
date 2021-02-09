@@ -1,14 +1,15 @@
 ## IN PROGRESS
 
 - [ ] Web page
+      - [ ] SPACE, P,S,L from everywhere
+      - [ ] Remove TAP pad
       - [ ] Beats
             - only show 'zoomed' bar if sliders are set
             - tooltips for bars
-      - [ ] Clear on load
-      - [ ] SPACE, P,S,L from everywhere
-      - [ ] Remove TAP pad
       - [ ] eslint
       - [ ] Fix logo
+      - [ ] Remove navbar
+      - [ ] Remove footer
       - [ ] Export as JSON
       - [ ] Export as MIDI
       - [ ] Zoot up slider
@@ -18,6 +19,7 @@
       - [ ] Load audio from file
       - [ ] Parse 'other' YouTube URL formats
 
+      - [x] Clear on load
       - [x] Quantize
       - [x] Interpolate
       - [x] Show BPM
