@@ -1,6 +1,10 @@
 ## IN PROGRESS
 
 - [ ] Web page
+      - [ ] Clear button
+            - disabled style
+            - focus style
+            - remove focused outline
       - [ ] SPACE, P,S,L from everywhere
       - [ ] Remove TAP pad
       - [ ] Beats

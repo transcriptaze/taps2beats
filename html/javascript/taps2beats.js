@@ -161,18 +161,28 @@ function load(event) {
   const url = document.getElementById('url')    
   const vid = getVideoID(url.value)
 
-  document.getElementById('message').style.display = 'none'
-  document.getElementById('beats').style.display = 'none'
-  
-  taps.duration = 0
-  taps.taps = []
-  taps.current = []
-  draw()
-
+  clearTaps(event)
   loaded = false
 
   document.getElementById('loading').style.visibility = 'visible'
   player.loadVideoById({ videoId: vid, startSeconds: 0, endSeconds: 0.1 })
+}
+
+function clearTaps(event) {
+  document.getElementById('message').style.display = 'none'
+  document.getElementById('beats').style.display = 'none'
+
+  taps.duration = 0
+  taps.taps = []
+  taps.current = []
+
+  drawTaps(document.querySelector('#current canvas.all'), taps.current, 0, taps.duration)
+  drawTaps(document.querySelector('#current canvas.zoomed'), taps.current, start.valueNow, end.valueNow - start.valueNow)
+  drawTaps(document.querySelector('#history canvas.all'), taps.taps, 0, taps.duration)    
+  drawTaps(document.querySelector('#history canvas.zoomed'), taps.taps, start.valueNow, end.valueNow - start.valueNow)
+
+  document.getElementById('bpm').value = ''
+  document.getElementById('offset').value = ''
 }
 
 function cue(play) {
