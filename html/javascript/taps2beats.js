@@ -57,6 +57,7 @@ function onPlayerStateChange(event) {
       document.getElementById('controls').style.visibility = 'visible'      
       document.getElementById('tap').style.visibility = 'visible'      
       document.getElementById('taps').style.visibility = 'visible'      
+      document.getElementById('export').style.visibility = 'visible'      
       document.getElementById('tap').dataset.state = 'cued'
       document.getElementById('pad').focus()
       player.unMute()
@@ -200,6 +201,9 @@ function delayed() {
 
 function analyse () {
   if (taps.taps.flat().length > 0) {
+      const quantize = document.getElementById('quantize').querySelector('input').checked
+      const interpolate = document.getElementById('interpolate').querySelector('input').checked
+
       new Promise((resolve, reject) => {
         goTaps((obj, err) => {
           if (err) {
@@ -207,11 +211,11 @@ function analyse () {
           } else {
             resolve(obj)
           }
-        }, taps.taps)
+        }, taps.taps, taps.duration, quantize, interpolate)
       })
       .then(beats => { 
         if (beats == null) {
-          document.getElementById('nodata').style.display = 'block'
+          document.getElementById('message').style.display = 'none'
           document.getElementById('beats').style.display = 'none'
 
           document.getElementById('bpm').value = ''
@@ -221,9 +225,10 @@ function analyse () {
           document.getElementById('interpolate').style.visibility = 'hidden'
           document.getElementById('interpolate').querySelector("input").disabled = true
         } else {
-          document.getElementById('nodata').style.display = 'none'
+          document.getElementById('message').style.display = 'none'
           document.getElementById('beats').style.display = 'block'
 
+          console.log(beats)
           if (beats.BPM > 0) {
             document.getElementById('bpm').value = beats.BPM + ' BPM'
             document.getElementById('offset').value = Number.parseFloat(beats.offset).toFixed(2) + 's'
@@ -243,16 +248,21 @@ function analyse () {
           drawBeats(beats.beats)
         }
       })
-      .catch(function (err) { console.error(err) })
+      .catch(function (err) { 
+        console.log(err)
+          document.getElementById('beats').style.display = 'none'
+          document.getElementById('message').style.display = 'block'
+          document.getElementById('message').querySelector('p').innerText = err.toString().toUpperCase()
+      })
   }
 }
 
 function quantize () {
-  alert('quantize')
+  analyse()
 }
 
 function interpolate () {
-  alert('interpolate')
+  analyse()
 }
 
 function draw() {
@@ -267,7 +277,7 @@ function draw() {
 
 function drawBeats (beats) {
   if (beats != null) {
-      document.getElementById('nodata').style.display = 'none'
+      document.getElementById('message').style.display = 'none'
       document.getElementById('beats').style.display = 'block'
 
       let t = []
@@ -279,7 +289,7 @@ function drawBeats (beats) {
       return
   }
 
-  document.getElementById('nodata').style.display = 'block'
+  document.getElementById('message').style.display = 'block'
   document.getElementById('beats').style.display = 'none'
 }
 
@@ -462,36 +472,30 @@ Slider.prototype.handleMouseDown = function (event) {
   var self = this;
 
   var handleMouseMove = function (event) {
-    var diffX = event.pageX - self.railDomNode.offsetLeft;
-    self.valueNow =
-      self.railMin +
-      parseInt(((self.railMax - self.railMin) * diffX) / self.railWidth);
+    var diffX = event.pageX - self.railDomNode.offsetLeft
+    self.valueNow = self.railMin + parseInt(((self.railMax - self.railMin) * diffX) / self.railWidth)
 
-    self.moveSliderTo(self.valueNow);
+    self.moveSliderTo(self.valueNow)
 
-    event.preventDefault();
-    event.stopPropagation();
-  };
+    event.preventDefault()
+    event.stopPropagation()
+  }
 
   var handleMouseUp = function () {
-    document.removeEventListener('mousemove', handleMouseMove);
-    document.removeEventListener('mouseup', handleMouseUp);
+    document.removeEventListener('mousemove', handleMouseMove)
+    document.removeEventListener('mouseup', handleMouseUp)
 
-    self.moveSliderTo(self.valueNow, true);
-  };
+    self.moveSliderTo(self.valueNow, true)
+  }
 
-  // bind a mousemove event handler to move pointer
-  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mousemove', handleMouseMove)
+  document.addEventListener('mouseup', handleMouseUp)
 
-  // bind a mouseup event handler to stop tracking mouse movements
-  document.addEventListener('mouseup', handleMouseUp);
+  event.preventDefault()
+  event.stopPropagation()
 
-  event.preventDefault();
-  event.stopPropagation();
-
-  // Set focus to the clicked handle
-  this.domNode.focus();
-};
+  this.domNode.focus()
+}
 
 function format(t) {
   let minutes = 0

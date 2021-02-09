@@ -5,14 +5,12 @@
             - only show 'zoomed' bar if sliders are set
             - tooltips for bars
       - [ ] Clear on load
-      - [ ] Quantize
-      - [ ] Interpolate
       - [ ] SPACE, P,S,L from everywhere
+      - [ ] Remove TAP pad
       - [ ] eslint
       - [ ] Fix logo
       - [ ] Export as JSON
       - [ ] Export as MIDI
-      - [ ] Animate TAP pad
       - [ ] Zoot up slider
       - [ ] Explanatory text
       - [ ] 'Loading' windmill
@@ -20,6 +18,8 @@
       - [ ] Load audio from file
       - [ ] Parse 'other' YouTube URL formats
 
+      - [x] Quantize
+      - [x] Interpolate
       - [x] Show BPM
       - [x] Show offset
       - [x] Draw taps

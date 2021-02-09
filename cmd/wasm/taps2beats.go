@@ -5,6 +5,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"syscall/js"
 
 	"github.com/twystd/taps2beats/taps2beats"
@@ -23,6 +24,9 @@ func main() {
 func taps(this js.Value, inputs []js.Value) interface{} {
 	callback := inputs[0]
 	object := inputs[1]
+	duration := inputs[2].Float()
+	quantize := inputs[3].Bool()
+	interpolate := inputs[4].Bool()
 
 	go func() {
 		taps := [][]float64{}
@@ -35,11 +39,27 @@ func taps(this js.Value, inputs []js.Value) interface{} {
 		beats := taps2beats.Taps2Beats(taps2beats.Floats2Seconds(taps), 0.0)
 
 		if len(beats.Beats) > 1 && beats.Variance != nil && *beats.Variance < 0.1 {
-			callback.Invoke(marshal(beats))
+			if quantize {
+				if err := beats.Quantize(); err != nil {
+					callback.Invoke(js.Null(), err.Error())
+					return
+				}
+			}
+
+			if interpolate {
+				start := taps2beats.Seconds(0.0)
+				end := taps2beats.Seconds(duration)
+				if err := beats.Interpolate(start, end); err != nil {
+					callback.Invoke(js.Null(), err.Error())
+					return
+				}
+			}
+
+			callback.Invoke(marshal(beats), js.Null())
 			return
 		}
 
-		callback.Invoke(js.Null())
+		callback.Invoke(js.Null(), fmt.Errorf("insufficient data").Error())
 	}()
 
 	return nil

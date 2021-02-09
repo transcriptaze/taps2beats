@@ -71,6 +71,7 @@
               </div>
             </div>
 
+            <!-- CONTROLS -->
             <div id="controls" class="controls panel">
               <!-- https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html -->
               <div class="slider">
@@ -117,6 +118,7 @@
               </div>
             </div>
 
+            <!-- TAPS -->
             <div id="taps" class="panel">
               <div id="current">
                 <canvas class="taps all" width="640" height="8"></canvas>
@@ -130,9 +132,19 @@
                 <canvas class="taps all" width="640" height="8"></canvas>
                 <canvas class="taps zoomed" width="640" height="8"></canvas>
               </div>
-              <div id="nodata">
-                <p>-- NOT ENOUGH DATA --</p>
+              <div id="message">
+                <p></p>
               </div>
+            </div>
+
+            <!-- EXPORT -->
+            <div id="export" class="panel">
+              <button type="button" disabled>
+                <img src="images/file-export-solid.svg" />
+              </button>
+              <button type="button" disabled>
+                <img src="images/trash-solid.svg" />
+              </button>
             </div>
 
           </div>

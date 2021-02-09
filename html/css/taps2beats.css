@@ -21,6 +21,12 @@ body {
   box-shadow: -1px -1px 2px 0 #fdf6e3, 1px 1px 4px 0 #93a1a1;
 }
 
+#logo {
+  width: 96px;
+  height: 96px;
+  padding: 12px;
+}
+
 #content {
   width: 100%;
   height: 100%;
@@ -80,7 +86,9 @@ main {
   display: grid;
   grid-template-columns: auto auto;
   grid-template-rows: auto auto auto auto;
-  grid-template-areas: "url unused1" "video pad" "controls unused2" "taps unused3";
+  grid-template-areas: "url unused1" "video pad" "controls export" "taps export";
+  column-gap: 6px;
+  row-gap: 4px;
 
   text-align: center;
   margin: auto;
@@ -99,12 +107,16 @@ div#video {
 
 div#tap {
   grid-area: pad;
-  margin-left: 8px;
   visibility: hidden;
 }
 
 div#controls {
   grid-area: controls;
+  visibility: hidden;
+}
+
+div#export {
+  grid-area: export;
   visibility: hidden;
 }
 
@@ -116,7 +128,6 @@ div#taps {
 div.url {
   display: flex;
   flex-flow: row nowrap;
-  margin-bottom: 8px;
 }
 
 div.url input#url {
@@ -239,7 +250,6 @@ div.url input#load[disabled] {
 div.controls {
   display: grid;
   clear: both; 
-  margin-top:12px;
   grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
   grid-template-areas: "slider slider slider slider slider slider slider" "from middle quantize interpolate offset bpm to";
   grid-column-gap: 2px;
@@ -372,7 +382,6 @@ input#delay::-webkit-outer-spin-button {
 
 div#taps {
   margin-top: 4px;
-  margin-bottom: 4px;
 }
 
 div#current {
@@ -393,12 +402,13 @@ div#beats {
   margin-top: 2px;
 }
 
-div#nodata {
+div#message {
   display: none;
   margin-top: 4px;
 }
 
-div#nodata p {
+div#message p {
+  font-family: sans-serif;
   font-size: 0.6em;
   color: gray;
 }
@@ -420,6 +430,16 @@ canvas.zoomed {
   background: lightgreen;
 }
 
+div#export button {
+  border: none;
+}
+
+div#export button img {
+  width: 28px;
+  height: 28px;
+  padding: 12px;
+}
+
 footer {
   grid-area: footer;
   height: auto;
@@ -429,12 +449,6 @@ footer {
   font-size: 0.8em;
   background: #eee8d5;
   color: #002b36;
-}
-
-#logo {
-  width: 96px;
-  height: 96px;
-  padding: 12px;
 }
 
 div.slider {
