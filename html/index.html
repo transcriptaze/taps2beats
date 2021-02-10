@@ -94,21 +94,12 @@
                        aria-valuenow="100"
                        aria-valuemax="100"
                        draggable="false">
-               </div>
+                  <input id="from" type="text" readonly />
+                  <input id="to"   type="text" readonly />
+                </div>
               </div>
-              <input id="from"   type="text" class="info" readonly />
-              <label id="quantize" class="checktext">
-                <input type="checkbox" onchange="quantize(event)" disabled/>
-                <span>QUANTIZE</span>
-              </label>
-              <label id="interpolate" class="checktext">
-                <input type="checkbox" onchange="interpolate(event)" disabled/>
-                <span>INTERPOLATE</span>
-              </label>
-              <input id="to"     type="text" class="info" readonly />
-              <input id="offset" type="text" class="info" placeholder="offset" readonly />
-              <input id="bpm"    type="text" class="info" placeholder="BPM"    readonly />
-              <div id="other">
+
+              <div id="looping">
                 <label id="loop">
                   <input type="checkbox" onclick="onLoop(event)" />
                   <img class="no"  src="images/redo-alt-solid.svg" draggable="false" />
@@ -116,6 +107,19 @@
                 </label>
                 <input id="delay" type="number" min="0" max="10" title="loop delay" placeholder="loop delay" value="1.0" />
               </div>
+
+              <label id="quantize" class="checktext">
+                <input type="checkbox" onchange="quantize(event)" disabled/>
+                <span>QUANTIZE</span>
+              </label>
+
+              <label id="interpolate" class="checktext">
+                <input type="checkbox" onchange="interpolate(event)" disabled/>
+                <span>INTERPOLATE</span>
+              </label>
+              
+              <input id="offset" type="text" class="info" placeholder="offset" readonly />
+              <input id="bpm"    type="text" class="info" placeholder="BPM"    readonly />              
             </div>
 
             <!-- TAPS -->
@@ -161,6 +165,7 @@
  
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="javascript/taps2beats.js"></script>
+  <script src="javascript/slider.js"></script>
   <script type="text/javascript">
     function onYouTubeIframeAPIReady() {
       player = new YT.Player('player', {

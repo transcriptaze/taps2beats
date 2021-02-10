@@ -250,8 +250,8 @@ div.url input#load[disabled] {
 div.controls {
   display: grid;
   clear: both; 
-  grid-template-columns: min-content 1fr min-content min-content min-content min-content min-content;
-  grid-template-areas: "slider slider slider slider slider slider slider" "from middle quantize interpolate offset bpm to";
+  grid-template-columns: min-content 1fr min-content min-content min-content min-content;
+  grid-template-areas: "slider slider slider slider slider slider" "looping middle quantize interpolate offset bpm";
   grid-column-gap: 2px;
 }
 
@@ -267,10 +267,6 @@ input.info {
 input.info::placeholder {
   color: gray;
   font-style: italic;
-}
-
-input#from {
-  grid-area: from;
 }
 
 label#quantize {
@@ -293,8 +289,8 @@ input#bpm {
   grid-area: bpm;
 }
 
-div#other {
-  grid-area: middle;  
+div#looping {
+  grid-area: looping;  
   text-align: center;
   display: flex;
   align-items: center;
@@ -317,7 +313,7 @@ label.checktext input[type="checkbox"] ~ span {
   font-family: sans-serif;
   font-style: italic;
   padding-left: 4px;
-  padding-right: 4px;
+  padding-right: 4px;  
 }
 
 label.checktext input[type="checkbox"]:checked ~ span {
@@ -337,7 +333,7 @@ label#loop input[type="checkbox"] {
 label#loop img {
   width: 20px;
   height: 20px;
-  padding: 2px;
+  padding: 2px 2px 2px 4px;
   margin: auto;
 }
 
@@ -468,6 +464,24 @@ div.slider .rail {
   float: left;
 }
 
+div.slider .rail input {
+  position: absolute;
+  width: 40px;
+  top: -14px;
+  font-size: 0.65em;
+  border: none;
+}
+
+div.slider input#from {
+  left: -60px;
+  text-align: right;
+}
+
+div.slider input#to {
+  left: 10px;
+  text-align: left;
+}
+
 div.slider img[role="slider"] {
   position: absolute;
   padding: 0;
@@ -477,10 +491,11 @@ div.slider img[role="slider"] {
 
 div.slider img[role="slider"].focus,
 div.slider img[role="slider"]:hover {
-  outline-color: rgb(140, 203, 242);
-  outline-style: solid;
-  outline-width: 2px;
-  outline-offset: 2px;
+  outline: none;
+//  outline-color: rgb(140, 203, 242);
+//  outline-style: solid;
+//  outline-width: 2px;
+//  outline-offset: 2px;
 }
 
 div.slider img#start {

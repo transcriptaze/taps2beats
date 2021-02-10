@@ -1,12 +1,13 @@
 ## IN PROGRESS
 
 - [ ] Web page
+      - [ ] SPACE, P,S,L from everywhere
+      - [ ] Don't play if slider gap is 0 (< 1s?)
+      - [ ] Remove TAP pad
       - [ ] Clear button
             - disabled style
             - focus style
             - remove focused outline
-      - [ ] SPACE, P,S,L from everywhere
-      - [ ] Remove TAP pad
       - [ ] Beats
             - only show 'zoomed' bar if sliders are set
             - tooltips for bars
