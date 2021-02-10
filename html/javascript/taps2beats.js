@@ -13,6 +13,12 @@ var taps = {
   current: []
 }
 
+document.addEventListener('keydown', event => {
+  if (loaded) {
+    onTap(event)
+  }
+})
+
 function onPlayerReady(event) {
   document.getElementById('url').readOnly = false
   document.getElementById('load').disabled = false
@@ -41,12 +47,12 @@ function onPlayerStateChange(event) {
     case YT.PlayerState.PLAYING:
       if (loaded) {
         loopTimer = setInterval(tick, 100)        
-        document.getElementById('tap').dataset.state = 'playing'
+        document.getElementById('help').dataset.state = 'playing'
       }
       break
 
     case YT.PlayerState.PAUSED:
-      document.getElementById('tap').dataset.state = 'cued'
+      document.getElementById('help').dataset.state = 'cued'
       break
 
     case YT.PlayerState.BUFFERING:
@@ -55,11 +61,11 @@ function onPlayerStateChange(event) {
     case YT.PlayerState.CUED:
       document.getElementById('loading').style.visibility = 'hidden'
       document.getElementById('controls').style.visibility = 'visible'      
-      document.getElementById('tap').style.visibility = 'visible'      
+      document.getElementById('help').style.visibility = 'visible'      
       document.getElementById('taps').style.visibility = 'visible'      
       document.getElementById('export').style.visibility = 'visible'      
-      document.getElementById('tap').dataset.state = 'cued'
-      document.getElementById('pad').focus()
+      document.getElementById('help').dataset.state = 'cued'
+      document.getElementById('help').focus()
       player.unMute()
 
       if (taps.current.length > 0)  {
@@ -139,22 +145,6 @@ function onTap(event) {
         player.pauseVideo()
     }
   } 
-}
-
-function onFocus(event) {
-  switch (player.getPlayerState()) {
-    case YT.PlayerState.CUED:
-    case YT.PlayerState.PAUSED:
-      document.getElementById('tap').dataset.state = 'cued'
-      break
-
-    case YT.PlayerState.PLAYING:
-      document.getElementById('tap').dataset.state = 'playing'
-  }
-}
-
-function onBlur(event) {
-  document.getElementById('tap').dataset.state = 'idle'
 }
 
 function load(event) {

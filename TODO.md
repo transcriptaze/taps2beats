@@ -1,9 +1,10 @@
 ## IN PROGRESS
 
 - [ ] Web page
-      - [ ] SPACE, P,S,L from everywhere
+      - [ ] Export as JSON
+      - [ ] Zoom on slider adjust
       - [ ] Don't play if slider gap is 0 (< 1s?)
-      - [ ] Remove TAP pad
+      - [ ] Replace YouTube controls with custom stuff
       - [ ] Clear button
             - disabled style
             - focus style
@@ -15,7 +16,6 @@
       - [ ] Fix logo
       - [ ] Remove navbar
       - [ ] Remove footer
-      - [ ] Export as JSON
       - [ ] Export as MIDI
       - [ ] Zoot up slider
       - [ ] Explanatory text
@@ -24,6 +24,8 @@
       - [ ] Load audio from file
       - [ ] Parse 'other' YouTube URL formats
 
+      - [x] Remove TAP pad
+      - [x] SPACE, P,S,L from everywhere
       - [x] Clear on load
       - [x] Quantize
       - [x] Interpolate

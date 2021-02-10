@@ -51,16 +51,13 @@
             </div>
 
             <div id="video" class="panel" style="position:relative;">
-              <div id="player" class="player"></div>
+              <div id="player" class="player" tabindex="-1"></div>
               <div id="loading" class="overlay">
                 <img src="images/youtube-brands.svg" draggable="false" />
               </div>
             </div>
 
-            <div id="tap" class="panel" tabindex="-1" data-state="idle">
-              <div id="pad" class="pad" tabindex="0" onkeydown="onTap(event)" onfocus="onFocus(event)" onblur="onBlur(event)">
-                <canvas width="48" height="48"></canvas>
-              </div>
+            <div id="help" class="panel" tabindex="-1" data-state="idle">
               <div class="help" tabindex="0">
                 <p class="cued" >
                   Press 'SPACE' to start video. <br/><br/>While the video is playing, press 'SPACE' on each beat of the song

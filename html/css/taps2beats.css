@@ -86,7 +86,7 @@ main {
   display: grid;
   grid-template-columns: auto auto;
   grid-template-rows: auto auto auto auto;
-  grid-template-areas: "url unused1" "video pad" "controls export" "taps export";
+  grid-template-areas: "url unused1" "video help" "controls export" "taps export";
   column-gap: 6px;
   row-gap: 4px;
 
@@ -105,14 +105,16 @@ div#video {
   grid-area: video;
 }
 
-div#tap {
-  grid-area: pad;
+div#help {
+  grid-area: help;
   visibility: hidden;
+  outline: none;
 }
 
 div#controls {
   grid-area: controls;
   visibility: hidden;
+  outline: none;
 }
 
 div#export {
@@ -197,27 +199,7 @@ div.url input#load[disabled] {
   width: 80px;
 }
 
-.pad {
-  background: blue;
-  width: 128px;
-  height: 128px;
-  border: 1px inset;
-  border-radius: 2px;
-
-  display: flex;
-  align-items: top;
-  outline: none;
-}
-
-.pad:focus {
-  background: #d0d0d0;
-}
-
-.pad canvas {
-  background: green;
-}
-
-#tap .help {
+#help .help {
   width: 128px;  
 }
 
@@ -239,11 +221,11 @@ div.url input#load[disabled] {
   display: none;
 }
 
-#tap[data-state="cued"] .help p.cued {
+#help[data-state="cued"] .help p.cued {
   display: block;
 }
 
-#tap[data-state="playing"] .help p.playing {
+#help[data-state="playing"] .help p.playing {
   display: block;
 }
 
