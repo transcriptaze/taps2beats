@@ -4,7 +4,7 @@
       - [ ] Export as JSON
       - [ ] Zoom on slider adjust
       - [ ] Don't play if slider gap is 0 (< 1s?)
-      - [ ] Replace YouTube controls with custom stuff
+      - [ ] Insufficient data warning when tapping double time
       - [ ] Clear button
             - disabled style
             - focus style

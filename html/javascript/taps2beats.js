@@ -47,6 +47,7 @@ function onPlayerStateChange(event) {
     case YT.PlayerState.PLAYING:
       if (loaded) {
         loopTimer = setInterval(tick, 100)        
+        document.getElementById('help').focus()
         document.getElementById('help').dataset.state = 'playing'
       }
       break
