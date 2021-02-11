@@ -1,47 +1,5 @@
 ## IN PROGRESS
 
-- [ ] Web page
-      - [ ] Export as JSON
-      - [ ] Zoom on slider adjust
-      - [ ] Don't play if slider gap is 0 (< 1s?)
-      - [ ] Insufficient data warning when tapping double time
-      - [ ] Clear button
-            - disabled style
-            - focus style
-            - remove focused outline
-      - [ ] Beats
-            - only show 'zoomed' bar if sliders are set
-            - tooltips for bars
-      - [ ] eslint
-      - [ ] Fix logo
-      - [ ] Remove navbar
-      - [ ] Remove footer
-      - [ ] Export as MIDI
-      - [ ] Zoot up slider
-      - [ ] Explanatory text
-      - [ ] 'Loading' windmill
-      - [ ] Fade out loading overlay
-      - [ ] Load audio from file
-      - [ ] Parse 'other' YouTube URL formats
-
-      - [x] Remove TAP pad
-      - [x] SPACE, P,S,L from everywhere
-      - [x] Clear on load
-      - [x] Quantize
-      - [x] Interpolate
-      - [x] Show BPM
-      - [x] Show offset
-      - [x] Draw taps
-      - [x] 'TAP' pad
-      - [x] Record taps
-      - [x] Rework slider thumbs to align with video
-      - [x] Panels a la transcriptase
-      - [x] Loop controls
-      - [x] FontAwesome credit in README
-      - [x] Start/end controls
-      - [x] Parse YouTube URL
-      - [x] Splashscreen
-
 - [ ] Error if beats == 1 or variance is too high
 - [ ] Initial version release
 
@@ -82,22 +40,15 @@
 
 ## TODO
 
-- [ ] Better range slider
-      https://css-tricks.com/multi-thumb-sliders-general-case
-
 1. Look into beat detection algorithms
 2. Look into gradient descent for interpolation
 3. Look into constrained Deming regression for interpolation
 3. https://moultano.wordpress.com/2018/11/08/minhashing-3kbzhsxyg4467-6
 4. --format option to set the output value format (?)
 5. --interactive, to record the 'taps' directly (?)
-6. https://gitlab.com/agrahn/ABLoopPlayer
-7. https://agrahn.gitlab.io/ABLoopPlayer
-8. https://towardsdatascience.com/deep-learning-in-geomtry-arclentgh-learning-119d347231ce
-9. https://dsp.stackexchange.com/questions/60528/how-to-compute-key-of-a-song
+6. https://towardsdatascience.com/deep-learning-in-geomtry-arclentgh-learning-119d347231ce
+7. https://dsp.stackexchange.com/questions/60528/how-to-compute-key-of-a-song
 
 ## NOTES
-
-1. https://w3c.github.io/aria-practices/examples/slider/multithumb-slider.html
 
 
