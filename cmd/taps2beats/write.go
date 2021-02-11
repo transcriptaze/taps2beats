@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/twystd/taps2beats/taps2beats"
+	"github.com/transcriptaze/taps2beats/taps2beats"
 )
 
 func formatJSON(beats taps2beats.Beats, f io.Writer) error {

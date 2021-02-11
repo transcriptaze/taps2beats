@@ -13,12 +13,12 @@ and (optionally) interpolate the beats over the interval.
 
 #### Installation
 
-To install the stable version, download the `tar.gz` or `zip` release for your platform from the [Releases](https://github.com/twystd/taps2beats/releases) 
+To install the stable version, download the `tar.gz` or `zip` release for your platform from the [Releases](https://github.com/transcriptaze/taps2beats/releases) 
 page, and unpack into the directory of your choice.  
 
-The build the development version, clone the [taps2beats](https://github.com/twystd/taps2beats) _github_ repository:
+The build the development version, clone the [taps2beats](https://github.com/transcriptaze/taps2beats) _github_ repository:
 
-    git clone https://github.com/twystd/taps2beats.git
+    git clone https://github.com/transcriptaze/taps2beats.git
     cd taps2beats
     make build
 
@@ -220,7 +220,7 @@ Offset: 316ms
 
 #### Issues and Feature Requests
 
-Please create an issue in the [taps2beats](https://github.com/twystd/taps2beats) _github_ repository.
+Please create an issue in the [taps2beats](https://github.com/transcriptaze/taps2beats) _github_ repository.
 
 #### References
 
@@ -239,7 +239,7 @@ The R Journal, 3(2), 29–33. doi: 10.32614/RJ-2011-015.
 
 #### License
 
-[MIT](https://github.com/twystd/taps2beats/blob/master/LICENSE)
+[MIT](https://github.com/transcriptaze/taps2beats/blob/master/LICENSE)
 
 #### Attributions
 

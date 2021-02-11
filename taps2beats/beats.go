@@ -18,8 +18,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/twystd/taps2beats/taps2beats/ckmeans"
-	"github.com/twystd/taps2beats/taps2beats/regression"
+	"github.com/transcriptaze/taps2beats/taps2beats/ckmeans"
+	"github.com/transcriptaze/taps2beats/taps2beats/regression"
 )
 
 // Contains the estimated BPM, offset of the first beat and the beats estimated from a set of 'taps'.

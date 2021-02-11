@@ -7,7 +7,6 @@ clean:
 
 format: 
 	go fmt ./...
-	go fmt ./cmd/wasm/*.go
 
 debug: build
 	go test ./... -run ExampleBeats_Interpolate
@@ -16,15 +15,9 @@ build: format
 	mkdir -p bin
 	go build -o bin ./...
 
-wasm: format
-	mkdir -p html/wasm
-	GOOS=js GOARCH=wasm go build -o ./html/wasm/T2B.wasm -i cmd/wasm/*.go
-
 build-all: format
 	mkdir -p bin
-	mkdir -p html/wasm
 	go build -o bin ./...
-	GOOS=js GOARCH=wasm go build -o ./html/wasm/T2B.wasm -i cmd/wasm/*.go
 
 test: build
 	go test ./... -run TestTaps2BeatsJS
@@ -60,7 +53,3 @@ stdin: build
 
 help: build
 	./bin/taps2beats --help
-
-httpd: build
-	go run cmd/httpd/httpd.go	
-
