@@ -111,35 +111,6 @@ func TestTaps2Beats(t *testing.T) {
 	compare(beats.Beats, expected.Beats, t)
 }
 
-// func TestTaps2BeatsJS(t *testing.T) {
-// 	expected := Beats{
-// 		BPM:    114,
-// 		Offset: 316 * time.Millisecond,
-// 		Beats:  []Beat{beats[8], beats[9], beats[10], beats[11], beats[12], beats[13], beats[14], beats[15]},
-// 	}
-//
-// 	taps := [][]float64{
-// 		{
-// 			1.6808709809265137, 2.680558198364258, 4.384705977111817, 5.07266901335144, 5.744292851226807,
-// 			7.21743113923645, 7.864426975204468, 8.521181040054321, 12.617829851226807, 13.296893062942505,
-// 			13.985408954223633, 15.345035160217286, 16.017740091552735, 16.705076910354613, 18.137180977111818,
-// 			18.775760009536743, 19.46510804577637},
-// 	}
-//
-// 	fmt.Printf("%v\n", Floats2Seconds(taps))
-// 	beats := Taps2Beats(Floats2Seconds(taps), 0.0)
-//
-// 	if beats.BPM != expected.BPM {
-// 		t.Errorf("Incorrect BPM - expected:%v, got:%v", expected.BPM, beats.BPM)
-// 	}
-//
-// 	if math.Abs(beats.Offset.Seconds()-expected.Offset.Seconds()) > 0.0011 {
-// 		t.Errorf("Incorrect offset - expected:%v, got:%v", expected.Offset, beats.Offset)
-// 	}
-//
-// 	compare(beats.Beats, expected.Beats, t)
-// }
-
 func TestTaps2BeatsWithMissingBeat(t *testing.T) {
 	expected := Beats{
 		BPM:    114,

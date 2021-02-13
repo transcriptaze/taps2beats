@@ -51,8 +51,15 @@ func (t instant) MarshalText() ([]byte, error) {
 	return []byte(s), nil
 }
 
+// Marshals an instant as the equivalent seconds value, rounded to the nearest millisecond.
+func (t instant) MarshalJSON() ([]byte, error) {
+	s := fmt.Sprintf("%.3f", time.Duration(t).Seconds())
+
+	return []byte(s), nil
+}
+
 // Unmarshals an instant as seconds from a float64 value.
-func (t *instant) UnmarshalText(s []byte) error {
+func (t *instant) UnmarshalJSON(s []byte) error {
 	if t != nil {
 		var v float64
 
@@ -558,7 +565,7 @@ loop:
 		}
 	}
 
-	if variance > 0.1 {
+	if variance > 0.05 {
 		return fmt.Errorf("Error mapping taps to beats: %v", beats)
 	}
 

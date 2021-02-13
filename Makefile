@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run ExampleBeats_Interpolate
+	go test ./... -run TestReindexWithPathologicalData
 
 build: format
 	mkdir -p bin
@@ -20,7 +20,7 @@ build-all: format
 	go build -o bin ./...
 
 test: build
-	go test ./... -run TestTaps2BeatsJS
+	go test ./...
 
 vet: build
 	go vet ./...
