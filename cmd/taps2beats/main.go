@@ -145,7 +145,7 @@ func main() {
 	}
 
 	if options.verbose {
-		fmt.Printf("  ... %v values read from %s\n", len(data), file)
+		fmt.Printf("  ... %v values read from %s\n", N, file)
 	}
 
 	if options.verbose {
