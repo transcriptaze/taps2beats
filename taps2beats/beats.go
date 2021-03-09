@@ -236,6 +236,76 @@ func (beats *Beats) Interpolate(start, end time.Duration) error {
 	}
 }
 
+// Applies some ad hoc heuristics in a desperate attempt to obtain a better estimate
+// of the beats and BPM. 
+// 
+// The clustering weights for the initial estimates are not
+// retained in the Beats struct so the heuristics should only be used when the
+// forgetting factor is zero i.e. all taps are equally weighted.
+func (beats *Beats) Clean() (Beats, error) {
+	// ... calculate the mean and standard deviation of the taps per beat
+	taps := 0
+	N := 0
+	sum := 0
+	for _, beat := range beats.Beats {
+		if n := len(beat.Taps); n > 0 {
+			taps += n
+			sum += n * n
+			N++
+		}
+	}
+
+	mean := float64(taps) / float64(N)
+	//variance := float64(sum)/float64(N) - mean*mean
+	// stddev := math.Sqrt(variance)
+	floor := int(math.Floor(mean / 3.0)) // TODO replace with outliers based on quartiles
+
+	// ... discard any beats with 'too few taps'
+	data := []float64{}
+	for _, beat := range beats.Beats {
+		if len(beat.Taps) > floor {
+			for _, t := range beat.Taps {
+				data = append(data, t.Seconds())
+			}
+		}
+	}
+
+	weights := make([]float64, len(data))
+	for i := 0; i < len(weights); i++ {
+		weights[i] = 1.0
+	}
+
+	clusters := ckmeans.CKMeans1dDp(data, weights)
+
+	cleaned := make([]Beat, len(clusters))
+	for i, cluster := range clusters {
+		cleaned[i] = makeBeat(cluster.Center, cluster)
+	}
+
+	BPM, offset := bpm(cleaned)
+
+	sort.SliceStable(cleaned, func(i, j int) bool { return cleaned[i].At < cleaned[j].At })
+
+	result := Beats{
+		BPM:    BPM,
+		Offset: offset,
+		Beats:  cleaned,
+	}
+
+	if len(cleaned) > 0 {
+		variance := 0.0
+		for _, b := range cleaned {
+			variance += b.Variance.Seconds()
+		}
+
+		variance = variance / float64(len(cleaned))
+
+		result.Variance = &variance
+	}
+
+	return result, nil
+}
+
 // Reduces the precision of the beats to the specified time value.
 func (beats *Beats) Round(precision time.Duration) {
 	if beats != nil {
