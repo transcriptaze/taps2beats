@@ -152,6 +152,4 @@ func TestCleanWithSingleTapBeat(t *testing.T) {
 	}
 
 	compare(cleaned.Beats, expected.Beats, t)
-
-	t.Errorf("OOOPS %v\n", cleaned)
 }

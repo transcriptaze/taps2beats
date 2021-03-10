@@ -236,34 +236,45 @@ func (beats *Beats) Interpolate(start, end time.Duration) error {
 	}
 }
 
-// Applies some ad hoc heuristics in a desperate attempt to obtain a better estimate
-// of the beats and BPM. 
-// 
-// The clustering weights for the initial estimates are not
-// retained in the Beats struct so the heuristics should only be used when the
-// forgetting factor is zero i.e. all taps are equally weighted.
+// Discards 'outlier' beats in a desperate attempt to obtain a better estimate of the beats and BPM.
+// Outlier beats are identified as those beats which have 'fewer than expected' taps, where 'fewer
+// than expected' is defined as less than a third of the median.
+//
+// It's an ad hoc estimation because interquartile range and other similar statistical outlier detection
+// techniques seem to work better with human supervision, at least in this particular application.
+//
+// The clustering weights for the initial estimates are not retained in the Beats struct so the
+// heuristics should only be used when the forgetting factor is zero i.e. all taps are equally
+// weighted.
 func (beats *Beats) Clean() (Beats, error) {
-	// ... calculate the mean and standard deviation of the taps per beat
-	taps := 0
-	N := 0
-	sum := 0
+	// ... calculate the median taps per beat
+	taps := []int{}
 	for _, beat := range beats.Beats {
-		if n := len(beat.Taps); n > 0 {
-			taps += n
-			sum += n * n
-			N++
+		if N := len(beat.Taps); N > 0 {
+			taps = append(taps, N)
 		}
 	}
 
-	mean := float64(taps) / float64(N)
-	//variance := float64(sum)/float64(N) - mean*mean
-	// stddev := math.Sqrt(variance)
-	floor := int(math.Floor(mean / 3.0)) // TODO replace with outliers based on quartiles
+	sort.Ints(taps)
+
+	N := len(taps)
+	median := 1.0
+	switch {
+	case N == 0:
+		median = 1.0
+
+	case N%2 == 0:
+		median = float64(taps[N/2-1]+taps[N/2+1]) / 2.0
+
+	default:
+		median = float64(taps[N/2])
+	}
 
 	// ... discard any beats with 'too few taps'
+	fence := median / 3.0
 	data := []float64{}
 	for _, beat := range beats.Beats {
-		if len(beat.Taps) > floor {
+		if float64(len(beat.Taps)) >= fence {
 			for _, t := range beat.Taps {
 				data = append(data, t.Seconds())
 			}
