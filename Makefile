@@ -1,3 +1,5 @@
+DIST ?= development
+
 all: test      \
 	 benchmark \
      coverage
@@ -36,6 +38,14 @@ coverage: build
 
 godoc: build
 	godoc -http=:80     
+
+release: build
+	mkdir -p dist/$(DIST)/windows
+	mkdir -p dist/$(DIST)/darwin
+	mkdir -p dist/$(DIST)/linux
+	env GOOS=linux   GOARCH=amd64 go build -o dist/$(DIST)/linux   ./...
+	env GOOS=darwin  GOARCH=amd64 go build -o dist/$(DIST)/darwin  ./...
+	env GOOS=windows GOARCH=amd64 go build -o dist/$(DIST)/windows ./...
 
 run: build
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift ./examples/taps.txt

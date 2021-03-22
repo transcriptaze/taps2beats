@@ -320,6 +320,7 @@ func help() {
 	fmt.Println()
 	fmt.Println("    --precision <time>    time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
 	fmt.Println("    --out                 output file path")
+	fmt.Println("    --clean               discards outlier taps i.e. taps assigned to beats with too few taps")
 	fmt.Println("    --shift               shifts all times so that the first beat is on 0 and the offset is 0")
 	fmt.Println("    --json                formats the output as prettified JSON")
 	fmt.Println("    --verbose             enables verbose progress messages")

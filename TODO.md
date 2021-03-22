@@ -1,7 +1,6 @@
 ## IN PROGRESS
 
-- [ ] Initial version release
-
+- [x] Initial version release
 - [x] Error if beats == 1 or variance is too high
 - [x] Discard outlier beats i.e. beats with too few taps
 - [x] godoc examples
