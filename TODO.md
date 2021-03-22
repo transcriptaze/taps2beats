@@ -1,9 +1,9 @@
 ## IN PROGRESS
 
-- [ ] Error if beats == 1 or variance is too high
 - [ ] Initial version release
-- [ ] Discard outlier beats i.e. beats with too few taps
 
+- [x] Error if beats == 1 or variance is too high
+- [x] Discard outlier beats i.e. beats with too few taps
 - [x] godoc examples
 - [x] godoc
 - [x] Implement Beats.UnmarshalJSON
@@ -49,6 +49,10 @@
 5. --interactive, to record the 'taps' directly (?)
 6. https://towardsdatascience.com/deep-learning-in-geomtry-arclentgh-learning-119d347231ce
 7. https://dsp.stackexchange.com/questions/60528/how-to-compute-key-of-a-song
+8. Improve BPM estimation (or at least make it a bit more robust)
+9. Improve clustering when tapping double time
+10. More sanity checks
+    - minimum gap between beats (e.g. when data only has one beat but the clustering produces 5)
 
 ## NOTES
 

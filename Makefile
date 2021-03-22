@@ -9,7 +9,7 @@ format:
 	go fmt ./...
 
 debug: build
-	go test ./... -run TestReindexWithPathologicalData
+	./bin/taps2beats --verbose ./examples/insufficient-data.txt
 
 build: format
 	mkdir -p bin
@@ -40,6 +40,7 @@ godoc: build
 run: build
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval '*' --shift ./examples/taps.txt
 	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  ./examples/taps.txt
+	./bin/taps2beats --verbose --clean ./examples/outlier.txt
 
 json: build
 #	./bin/taps2beats --verbose --precision 1ms --latency 7ms --quantize --interval 1s:12s  --json ./examples/taps.txt

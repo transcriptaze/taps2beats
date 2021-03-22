@@ -33,6 +33,8 @@
 //   --latency <time>       Adjusts all times to compensate for the latency between the
 //                          actual beat and the detected 'tap' e.g. --latency 73ms
 //
+//   --clean                Discards outlier taps i.e. taps that are assigned to beats with too few taps.
+//
 //   --shift                Adjusts all beats (and times) so that the first beat in the
 //                          interval falls on 0s.
 //
@@ -69,6 +71,7 @@ var options = struct {
 	forgetting float64
 	precision  time.Duration
 	latency    time.Duration
+	clean      bool
 	shift      bool
 	json       bool
 	verbose    bool
@@ -80,6 +83,7 @@ var options = struct {
 	forgetting: 0.0,
 	precision:  1 * time.Millisecond,
 	latency:    0 * time.Millisecond,
+	clean:      false,
 	shift:      false,
 	json:       false,
 	verbose:    false,
@@ -93,6 +97,7 @@ func main() {
 	flag.Float64Var(&options.forgetting, "forgetting", options.forgetting, "'forgetting factor' for discounting older taps")
 	flag.DurationVar(&options.precision, "precision", options.precision, "time precision for returned 'beats', in Go 'time' format (e.g. 1ms)")
 	flag.DurationVar(&options.latency, "latency", options.latency, "delay for which to compensate, in Go 'time' format (e.g. 70ms)")
+	flag.BoolVar(&options.clean, "clean", options.clean, "discards outlier taps i.e. taps assigned to beats with too few taps")
 	flag.BoolVar(&options.shift, "shift", options.shift, "shifts all times so that the first beat is on 0")
 	flag.BoolVar(&options.json, "json", options.json, "Sets the output format to prettified JSON")
 	flag.BoolVar(&options.verbose, "verbose", options.verbose, "enables verbose progress messages")
@@ -153,6 +158,26 @@ func main() {
 	}
 
 	beats := taps2beats.Taps2Beats(taps2beats.Floats2Seconds(data), options.forgetting)
+
+	// ... sanity check
+	if len(beats.Beats) <= 1 || (beats.Variance != nil && *beats.Variance > 0.1) {
+		fmt.Printf("\n  ** ERROR: insufficient data\n\n")
+		os.Exit(1)
+	}
+
+	// ... clean
+	if options.clean {
+		if options.verbose {
+			fmt.Printf("  ... discarding outlier taps\n")
+		}
+
+		if b, err := beats.Clean(); err != nil {
+			fmt.Printf("\n  ** ERROR: unable to clean beats (%v)\n\n", err)
+			os.Exit(1)
+		} else {
+			beats = b
+		}
+	}
 
 	// ... quantize
 	if options.quantize {
